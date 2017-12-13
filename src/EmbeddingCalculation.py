@@ -17,9 +17,9 @@ class EmbeddingCalculation(object):
         pass
         
     
-    def fetch_tweet_texts_from_file(self, absolute_path_to_file):
+    def fetch_tweet_texts_from_file(self, relative_path_to_file):
         tweet_texts = []
-        with open(absolute_path_to_file, 'rb') as file:
+        with open(relative_path_to_file, 'rb') as file:
             reader =  csv.reader(file, delimiter=';', encoding='utf-8')
     
 #            i = 0
@@ -28,7 +28,7 @@ class EmbeddingCalculation(object):
             next(reader)
             for row in reader:
     
-#                if(i > 100):
+#                if(i > 10):
 #                    break
     
     
@@ -107,12 +107,11 @@ class EmbeddingCalculation(object):
     
 def main():
     
-    cur_dir = os.path.dirname(os.path.abspath(__file__))
-    abs_path = cur_dir+"/data/uniformly_sampled_dl.csv"
-#    abs_path = cur_dir+"/data/test.csv"
+#    rel_path = "../data/uniformly_sampled_dl.csv"
+    rel_path = "../data/test.csv"
     ec = EmbeddingCalculation()
     
-    tweet_texts = ec.fetch_tweet_texts_from_file(abs_path)
+    tweet_texts = ec.fetch_tweet_texts_from_file(rel_path)
     chars_for_embed = ec.get_chars_ocurring_x_times(tweet_texts, 2)
 #    print(chars_for_embed)
     tweet_texts_only_embed_chars = ec.get_only_embed_chars(tweet_texts, chars_for_embed)
@@ -120,6 +119,7 @@ def main():
     context_target_onehot = ec.create_context_target_onehot_vectors(2, tweet_texts_only_embed_chars, chars_for_embed)
 #    print(len(context_target_onehot[0][0]))
 #    print(len(context_target_onehot))
+#    print(context_target_onehot)
     
 
 
