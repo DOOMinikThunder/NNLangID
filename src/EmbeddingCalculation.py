@@ -9,10 +9,13 @@ import torch.optim as optim
 import unicodecsv as csv
 import os
 import numpy as np
+import math
+
 
 
 class EmbeddingCalculation(object):
 
+    
     def __init__(self):
         pass
         
@@ -31,28 +34,33 @@ class EmbeddingCalculation(object):
 #                if(i > 10):
 #                    break
     
-    
 #                print(i)
                 tweet_texts.append(row[1])
 #                print(tweet_texts)
 #                i = i + 1
-        
             return tweet_texts
         
         
-    def get_chars_ocurring_x_times(self, tweet_texts, x):
-        alrdy_ocurred_chars = {}
-        chars_for_embed = {}
-        count = 0
+    def get_chars_occurring_min_x_times(self, tweet_texts, x):
+        occurred_chars = {}
+        # count occurrence of each char in the entire corpus
         for tweet in tweet_texts:
             for char in tweet:
-                if (char in alrdy_ocurred_chars):
-                    alrdy_ocurred_chars[char] = alrdy_ocurred_chars[char] + 1
+                # if already occurred, increment counter by 1
+                if (char in occurred_chars):
+                    occurred_chars[char] = occurred_chars[char] + 1
+                # if occurred for the first time, add to dict with count 1
                 else:
-                    alrdy_ocurred_chars[char] = 1
-                if (alrdy_ocurred_chars[char] == x):
-                    chars_for_embed[char] = count
-                    count = count + 1
+                    occurred_chars[char] = 1
+                    
+        chars_for_embed = {}
+        counter = 0
+        # fill new dict with the chars that occurred at least x times
+        # (filled values are tuples: (onehot-index, number of occurrences))
+        for char in occurred_chars:
+            if (occurred_chars[char] >= x):
+                chars_for_embed[char] = (counter, occurred_chars[char])
+                counter = counter + 1
         return chars_for_embed
     
 
@@ -79,16 +87,16 @@ class EmbeddingCalculation(object):
                 indexes = []
                 # context chars before the target
                 for j in range(context_window_size, 0, -1):
-                    indexes.append(chars_for_embed[tweet[i - j]])
+                    indexes.append(chars_for_embed[tweet[i - j]][0])
                 # context chars after the target
                 for j in range(1, context_window_size + 1):
-                    indexes.append(chars_for_embed[tweet[i + j]])
+                    indexes.append(chars_for_embed[tweet[i + j]][0])
                     
 #    indexes = [chars_for_embed[tweet[i - 2]], chars_for_embed[tweet[i - 1]],
 #               chars_for_embed[tweet[i + 1]], chars_for_embed[tweet[i + 2]],
                     
                 # the target char
-                indexes.append(chars_for_embed[tweet[i]])
+                indexes.append(chars_for_embed[tweet[i]][0])
 
                 tensor = torch.LongTensor(indexes)
                 # add 2nd dimension for scatter operation
@@ -105,6 +113,7 @@ class EmbeddingCalculation(object):
         return data
     
     
+    
 def main():
     
 #    rel_path = "../data/uniformly_sampled_dl.csv"
@@ -112,10 +121,11 @@ def main():
     ec = EmbeddingCalculation()
     
     tweet_texts = ec.fetch_tweet_texts_from_file(rel_path)
-    chars_for_embed = ec.get_chars_ocurring_x_times(tweet_texts, 2)
-#    print(chars_for_embed)
+    print(tweet_texts)
+    chars_for_embed = ec.get_chars_occurring_min_x_times(tweet_texts, 2)
+    print(chars_for_embed)
     tweet_texts_only_embed_chars = ec.get_only_embed_chars(tweet_texts, chars_for_embed)
-#    print(tweet_texts_only_embed_chars)
+    print(tweet_texts_only_embed_chars)
     context_target_onehot = ec.create_context_target_onehot_vectors(2, tweet_texts_only_embed_chars, chars_for_embed)
 #    print(len(context_target_onehot[0][0]))
 #    print(len(context_target_onehot))
@@ -123,8 +133,33 @@ def main():
     
 
 
- 
 
+
+#    embed = nn.Embedding(4, 2)
+#    input = autograd.Variable(torch.LongTensor([[0],[1]]))
+#    embed(input)
+#    print(embed.weight)
+#    print(embed(input))
+    
+    
+#    counter = 0
+#    weights
+#    sum_of_weights = 0
+#    for char in chars_for_embed:
+#        
+#        print(math.pow(chars_for_embed[char][1], (3 / 4)))
+#        sum_of_weights 
+#        counter = counter + chars_for_embed[char][1]
+#        
+
+
+
+        
+    
+    
+    
+    
+    
     
     
 # int to onehot conversion
