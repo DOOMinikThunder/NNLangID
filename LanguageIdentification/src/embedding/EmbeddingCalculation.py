@@ -10,7 +10,7 @@ import unicodecsv as csv
 import os
 import numpy as np
 import math
-
+import random
 
 
 class EmbeddingCalculation(object):
@@ -151,44 +151,41 @@ class EmbeddingCalculation(object):
         return indexed_tweet_texts
     
     
-    def get_batched_target_context_index_pairs(self, indexed_tweet_texts, batch_size, window_size):
+    def get_batched_target_context_index_pairs(self, indexed_tweet_texts, batch_size, max_window_size):
         pairs = [[]]
         pair_counter = 0
         batch_counter = 0
         for tweet_i in range(len(indexed_tweet_texts)):
             for index_j in range(len(indexed_tweet_texts[tweet_i])):
-                # if batch is full: create new batch list
-                if (pair_counter == batch_size):
-                    pairs.append([])
-                    batch_counter = batch_counter + 1
-                    pair_counter = 0
-
+                
+                # get random window size (so context chars further away from the target will have lesser weight)
+                rnd_window_size = random.randint(1, max_window_size)
                 # get pairs in the form (target_index, context_index) for the current window
-                for window_k in range(1, window_size + 1):
+                for window_k in range(1, rnd_window_size + 1):
                     left_context_index = index_j - window_k
                     right_context_index = index_j + window_k
                     
                     # if not out of bounds to the left
                     if (index_j - window_k >= 0):
+                        # if batch is full: create new batch list
+                        if (pair_counter == batch_size):
+                            pairs.append([])
+                            batch_counter = batch_counter + 1
+                            pair_counter = 0
                         pairs[batch_counter].append((indexed_tweet_texts[tweet_i][index_j],
                                                      indexed_tweet_texts[tweet_i][left_context_index]))
                         pair_counter = pair_counter + 1
+
+                    # if not out of bounds to the right
+                    if (index_j + window_k < len(indexed_tweet_texts[tweet_i])):
                         # if batch is full: create new batch list
                         if (pair_counter == batch_size):
                             pairs.append([])
                             batch_counter = batch_counter + 1
                             pair_counter = 0
-                            
-                    # if not out of bounds to the right
-                    if (index_j + window_k < len(indexed_tweet_texts[tweet_i])):
                         pairs[batch_counter].append((indexed_tweet_texts[tweet_i][index_j],
                                                      indexed_tweet_texts[tweet_i][right_context_index]))
                         pair_counter = pair_counter + 1
-                        # if batch is full: create new batch list
-                        if (pair_counter == batch_size):
-                            pairs.append([])
-                            batch_counter = batch_counter + 1
-                            pair_counter = 0
         return pairs
         
     
@@ -221,8 +218,6 @@ def main():
     pairs = ec.get_batched_target_context_index_pairs(indexed_tweet_texts, 5, 2)
     print(pairs)
     
-
-
 
 
 
