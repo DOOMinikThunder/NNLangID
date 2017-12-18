@@ -195,8 +195,8 @@ class EmbeddingCalculation(object):
     
 def main():
     
-#    rel_path = "../data/uniformly_sampled_dl.csv"
-    rel_path = "../data/test.csv"
+#    rel_path = "../../data/uniformly_sampled_dl.csv"
+    rel_path = "../../data/test.csv"
     ec = EmbeddingCalculation()
     
     tweet_texts = ec.fetch_tweet_texts_from_file(rel_path)
