@@ -17,7 +17,8 @@ class EmbeddingCalculation(object):
 
     
     def __init__(self):
-        pass
+        self.char2index = {}
+        self.index2char = {}
         
     
     def fetch_tweet_texts_from_file(self, relative_path_to_file):
@@ -74,6 +75,12 @@ class EmbeddingCalculation(object):
         return tweet_texts_only_embed_chars
     
     
+    def set_char2index_and_index2char(self, chars_for_embed):
+        for char in chars_for_embed:
+            self.char2index[char] = chars_for_embed[char][0]
+            self.index2char[chars_for_embed[char][0]] = char
+            
+    
     # create onehot-vectors for every char and its surrounding context chars (of all tweets)
     # (the last onehot-vector is always the target)
     # (context_window_size = 2 means 2 chars before and after the target char are considered)
@@ -113,6 +120,78 @@ class EmbeddingCalculation(object):
         return data
     
     
+    def get_batched_indexed_text(self, tweet_texts_only_embed_chars, batch_size):
+        batch_tweet_texts = [[]]
+        tweet_counter = -1
+        char_counter = 0
+        batch_counter = 0
+        for tweet in tweet_texts_only_embed_chars:
+            batch_tweet_texts[batch_counter].append([])
+            tweet_counter = tweet_counter + 1
+            for char in tweet:
+                # if batch is full: create new batch list
+                if (char_counter == batch_size):
+                    batch_counter = batch_counter + 1
+                    tweet_counter = 0
+                    char_counter = 0
+                    batch_tweet_texts.append([])
+                    batch_tweet_texts[batch_counter].append([])
+                    
+                batch_tweet_texts[batch_counter][tweet_counter].append(self.char2index[char])
+                char_counter = char_counter + 1
+        return batch_tweet_texts
+    
+    
+    def get_indexed_tweet_texts(self, tweet_texts_only_embed_chars):
+        indexed_tweet_texts = []
+        for i in range(len(tweet_texts_only_embed_chars)):
+            indexed_tweet_texts.append([])
+            for j in range(len(tweet_texts_only_embed_chars[i])):
+                indexed_tweet_texts[i].append(self.char2index[tweet_texts_only_embed_chars[i][j]])
+        return indexed_tweet_texts
+    
+    
+    def get_batched_target_context_index_pairs(self, indexed_tweet_texts, batch_size, window_size):
+        pairs = [[]]
+        pair_counter = 0
+        batch_counter = 0
+        for tweet_i in range(len(indexed_tweet_texts)):
+            for index_j in range(len(indexed_tweet_texts[tweet_i])):
+                # if batch is full: create new batch list
+                if (pair_counter == batch_size):
+                    pairs.append([])
+                    batch_counter = batch_counter + 1
+                    pair_counter = 0
+
+                # get pairs in the form (target_index, context_index) for the current window
+                for window_k in range(1, window_size + 1):
+                    left_context_index = index_j - window_k
+                    right_context_index = index_j + window_k
+                    
+                    # if not out of bounds to the left
+                    if (index_j - window_k >= 0):
+                        pairs[batch_counter].append((indexed_tweet_texts[tweet_i][index_j],
+                                                     indexed_tweet_texts[tweet_i][left_context_index]))
+                        pair_counter = pair_counter + 1
+                        # if batch is full: create new batch list
+                        if (pair_counter == batch_size):
+                            pairs.append([])
+                            batch_counter = batch_counter + 1
+                            pair_counter = 0
+                            
+                    # if not out of bounds to the right
+                    if (index_j + window_k < len(indexed_tweet_texts[tweet_i])):
+                        pairs[batch_counter].append((indexed_tweet_texts[tweet_i][index_j],
+                                                     indexed_tweet_texts[tweet_i][right_context_index]))
+                        pair_counter = pair_counter + 1
+                        # if batch is full: create new batch list
+                        if (pair_counter == batch_size):
+                            pairs.append([])
+                            batch_counter = batch_counter + 1
+                            pair_counter = 0
+        return pairs
+        
+    
     
 def main():
     
@@ -124,13 +203,30 @@ def main():
     print(tweet_texts)
     chars_for_embed = ec.get_chars_occurring_min_x_times(tweet_texts, 2)
     print(chars_for_embed)
+    ec.set_char2index_and_index2char(chars_for_embed)
+#    print(ec.char2index)
+#    print(ec.index2char)
     tweet_texts_only_embed_chars = ec.get_only_embed_chars(tweet_texts, chars_for_embed)
     print(tweet_texts_only_embed_chars)
-    context_target_onehot = ec.create_context_target_onehot_vectors(2, tweet_texts_only_embed_chars, chars_for_embed)
+    
+    
+#    context_target_onehot = ec.create_context_target_onehot_vectors(2, tweet_texts_only_embed_chars, chars_for_embed)
 #    print(len(context_target_onehot[0][0]))
 #    print(len(context_target_onehot))
 #    print(context_target_onehot)
     
+
+    indexed_tweet_texts = ec.get_indexed_tweet_texts(tweet_texts_only_embed_chars)
+    print(indexed_tweet_texts)
+    pairs = ec.get_batched_target_context_index_pairs(indexed_tweet_texts, 5, 2)
+    print(pairs)
+    
+
+
+
+
+
+
 
 
 
