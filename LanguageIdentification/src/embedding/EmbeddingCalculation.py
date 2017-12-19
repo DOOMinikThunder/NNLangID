@@ -205,16 +205,17 @@ class EmbeddingCalculation(object):
     def get_neg_samples(self, num_pairs, num_samples):
         return np.random.choice(self.sampling_table, size=(num_pairs, num_samples)).tolist()
             
-            
     
+        
 def main():
     
     ##############
     # PARAMETERS #
     ##############
     
-#    rel_path = "../../data/uniformly_sampled_dl.csv"
-    rel_path = "../../data/test.csv"
+#    input_data_rel_path = "../../data/input_data/uniformly_sampled_dl.csv"
+    input_data_rel_path = "../../data/input_data/test.csv"
+    embed_weights_rel_path = "../../data/embed_weights/embed_weights.txt"
     
     # Hyperparameters
     min_char_frequency = 2
@@ -224,7 +225,7 @@ def main():
     num_neg_samples = 5
     embed_dim = 2
     initial_lr = 0.025
-    num_epochs = 1
+    num_epochs = 3
     
     
     ###################################
@@ -232,7 +233,7 @@ def main():
     ###################################
     
     embedding_calculation = EmbeddingCalculation()
-    tweet_texts = embedding_calculation.fetch_tweet_texts_from_file(rel_path, fetch_only_first_x_tweets=math.inf)
+    tweet_texts = embedding_calculation.fetch_tweet_texts_from_file(input_data_rel_path, fetch_only_first_x_tweets=math.inf)
 #    print(tweet_texts)
     chars_for_embed = embedding_calculation.get_chars_occurring_min_x_times(tweet_texts, min_char_frequency)
 #    print(chars_for_embed)
@@ -268,10 +269,15 @@ def main():
             loss = skip_gram_model.forward(targets, contexts, neg_samples)
             loss.backward()
             optimizer.step()
+            
+            # TODO: maybe adapt learning rate
     
     
-    
-    
+    ##################################
+    # SAVE EMBEDDING WEIGHTS TO FILE #
+    ##################################
+    skip_gram_model.save_embed_to_file(embed_weights_rel_path)
+#    print(skip_gram_model.embed_hidden.weight)
     
     
     ###########

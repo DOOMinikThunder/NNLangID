@@ -38,4 +38,15 @@ class SkipGramModel(nn.Module):
         neg_score = torch.sum(neg_score, dim=1)
         neg_score = F.logsigmoid(-1 * neg_score)
         losses.append(sum(neg_score))
-        return -1 * sum(losses)
+        return (-1 * sum(losses)) / len(targets)
+    
+    
+    def save_embed_to_file(self, relative_path_to_file):
+        weights_array = self.embed_hidden.weight.data.numpy()
+        writer = open(relative_path_to_file, 'w')
+        # write vocabulary size and embedding dimension to file
+        writer.write('%d %d' % (self.vocab_size, self.embed_dim))
+        # write weights to file (one row for each char of the vocabulary)
+        for i in range(self.vocab_size):
+            line = ' '.join(map(lambda x: str(x), weights_array[i]))
+            writer.write('\n%s' % line)
