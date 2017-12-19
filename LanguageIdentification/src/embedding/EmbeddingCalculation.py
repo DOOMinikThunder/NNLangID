@@ -6,11 +6,15 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
+
 import unicodecsv as csv
 import os
 import numpy as np
 import math
 import random
+import SkipGramModel
+#from tqdm import tqdm
+
 
 
 class EmbeddingCalculation(object):
@@ -19,6 +23,7 @@ class EmbeddingCalculation(object):
     def __init__(self):
         self.char2index = {}
         self.index2char = {}
+        self.sampling_table = []
         
     
     def fetch_tweet_texts_from_file(self, relative_path_to_file):
@@ -189,22 +194,59 @@ class EmbeddingCalculation(object):
         return pairs
         
     
+    def get_neg_samples(self, num_pairs, num_samples):
+        return np.random.choice(self.sampling_table, size=(num_pairs, num_samples)).tolist()
     
+    
+    def set_sampling_table(self, chars_for_embed, table_size=100000000):
+        char_pow_frequencies = {}
+        char_pow_frequencies_acc = 0
+        for char in chars_for_embed:
+            char_pow_frequency = math.pow(chars_for_embed[char][1], 0.75)
+            char_pow_frequencies_acc = char_pow_frequencies_acc + char_pow_frequency
+            char_pow_frequencies[chars_for_embed[char][0]] = char_pow_frequency
+        
+        # get the number of occurrences of each char in the table (depending on the probability function)
+        # and fill the table accordingly
+        for char_index in char_pow_frequencies:
+            num_of_char = np.round((char_pow_frequencies[char_index] / char_pow_frequencies_acc) * table_size)
+
+            for i in range(int(num_of_char)):
+                self.sampling_table.append(char_index)
+                
+            
+            
 def main():
+    
+    #############
+    # PARAMETER #
+    #############
     
 #    rel_path = "../../data/uniformly_sampled_dl.csv"
     rel_path = "../../data/test.csv"
-    ec = EmbeddingCalculation()
+    min_char_frequency = 2
+    sampling_table_size = 1000
+    batch_size = 10
+    max_context_window_size = 2
+    num_neg_samples = 5
+    embed_dim = 2
+    initial_lr = 0.025
+    num_epochs = 1
     
+    
+    
+    ec = EmbeddingCalculation()
     tweet_texts = ec.fetch_tweet_texts_from_file(rel_path)
     print(tweet_texts)
-    chars_for_embed = ec.get_chars_occurring_min_x_times(tweet_texts, 2)
+    chars_for_embed = ec.get_chars_occurring_min_x_times(tweet_texts, min_char_frequency)
     print(chars_for_embed)
     ec.set_char2index_and_index2char(chars_for_embed)
 #    print(ec.char2index)
 #    print(ec.index2char)
     tweet_texts_only_embed_chars = ec.get_only_embed_chars(tweet_texts, chars_for_embed)
     print(tweet_texts_only_embed_chars)
+    indexed_tweet_texts = ec.get_indexed_tweet_texts(tweet_texts_only_embed_chars)
+    print(indexed_tweet_texts)
     
     
 #    context_target_onehot = ec.create_context_target_onehot_vectors(2, tweet_texts_only_embed_chars, chars_for_embed)
@@ -212,20 +254,68 @@ def main():
 #    print(len(context_target_onehot))
 #    print(context_target_onehot)
     
-
-    indexed_tweet_texts = ec.get_indexed_tweet_texts(tweet_texts_only_embed_chars)
-    print(indexed_tweet_texts)
-    pairs = ec.get_batched_target_context_index_pairs(indexed_tweet_texts, 5, 2)
-    print(pairs)
     
+    ec.set_sampling_table(chars_for_embed, sampling_table_size)
+#    print(ec.sampling_table)
+#    print(len(ec.sampling_table))
+    batched_pairs = ec.get_batched_target_context_index_pairs(indexed_tweet_texts, batch_size, max_context_window_size)
+    print(batched_pairs)
+    
+    
+    skip_gram_model = SkipGramModel.SkipGramModel(len(chars_for_embed), embed_dim)
+    optimizer = optim.SGD(skip_gram_model.parameters(), lr=initial_lr)
+    
+#    progress_bar = tqdm(range(len(batched_pairs)))
+#    for i in progress_bar:
+#        batch = batched_pairs[i]
+    for epoch_i in range(num_epochs):
+        print("Epoch:", epoch_i)
+        for batch in batched_pairs:
+            targets = [pair[0] for pair in batch]
+            contexts = [pair[1] for pair in batch]
+            neg_samples = ec.get_neg_samples(len(batch), num_neg_samples)
+    #        print(neg_samples)
+            
+            optimizer.zero_grad()
+            loss = skip_gram_model.forward(targets, contexts, neg_samples)
+            loss.backward()
+            optimizer.step()
+    
+    
+    
+    
+    
+    
+    
+    
+    print(len(chars_for_embed), "len(chars_for_embed)")
+    print(chars_for_embed)
+    
+    a = skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[0]])))
+    b = skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[1]])))
+    c = skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[2]])))
+    d = skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[3]])))
+#    print(skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[0]]))))
+#    print(skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[1]]))))
+#    print(skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[2]]))))
+#    print(skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[3]]))))
+    
+    print("DIFF")
 
-
-
-
-
-
-
-
+    print("a-b", torch.FloatTensor.sum((torch.abs(a - b)).data[0]))
+    print("c-d", torch.FloatTensor.sum((torch.abs(c - d)).data[0]))
+    print("a-c", torch.FloatTensor.sum((torch.abs(a - c)).data[0]))
+    print("a-d", torch.FloatTensor.sum((torch.abs(a - d)).data[0]))
+    print("b-c", torch.FloatTensor.sum((torch.abs(b - c)).data[0]))
+    print("b-d", torch.FloatTensor.sum((torch.abs(b - d)).data[0]))
+    
+    
+    
+    
+    
+    
+    
+    
 #    embed = nn.Embedding(4, 2)
 #    input = autograd.Variable(torch.LongTensor([[0],[1]]))
 #    embed(input)
