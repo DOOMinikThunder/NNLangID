@@ -270,8 +270,9 @@ def main():
             loss.backward()
             optimizer.step()
             
-            # TODO: maybe adapt learning rate
-    
+# TODO: maybe adapt learning rate
+# TODO: check why error occurs when batch of size 1 in forward method
+            
     
     ##################################
     # SAVE EMBEDDING WEIGHTS TO FILE #
