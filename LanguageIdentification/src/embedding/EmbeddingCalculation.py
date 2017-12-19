@@ -223,7 +223,7 @@ def main():
     batch_size = 10
     max_context_window_size = 2
     num_neg_samples = 5
-    embed_dim = 2
+#    embed_dim = 2   # will be set automatically later
     initial_lr = 0.025
     num_epochs = 3
     
@@ -241,6 +241,10 @@ def main():
 #    print(tweet_texts_only_embed_chars)
     indexed_tweet_texts = embedding_calculation.get_indexed_tweet_texts(tweet_texts_only_embed_chars, chars_for_embed)
 #    print(indexed_tweet_texts)
+    
+    
+    embed_dim = math.ceil(math.log2(len(chars_for_embed)))
+#    print(embed_dim)
     
     
     ##########################################
