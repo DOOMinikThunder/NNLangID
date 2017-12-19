@@ -4,11 +4,7 @@ import torch
 import torch.autograd as autograd
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim
 
-import unicodecsv as csv
-import os
-import numpy as np
 
 
 class SkipGramModel(nn.Module):
