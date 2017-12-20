@@ -220,12 +220,12 @@ def main():
     # Hyperparameters
     min_char_frequency = 2
     sampling_table_size = 1000
-    batch_size = 10
+    batch_size = 2
     max_context_window_size = 2
     num_neg_samples = 5
 #    embed_dim = 2   # will be set automatically later
     initial_lr = 0.025
-    num_epochs = 3
+    num_epochs = 1
     
     
     ###################################
@@ -243,6 +243,7 @@ def main():
 #    print(indexed_tweet_texts)
     
     
+    # set embedding dimension to: roundup(log2(vocabulary-size))
     embed_dim = math.ceil(math.log2(len(chars_for_embed)))
 #    print(embed_dim)
     
@@ -256,6 +257,12 @@ def main():
 #    print(len(embedding_calculation.sampling_table))
     batched_pairs = embedding_calculation.get_batched_target_context_index_pairs(indexed_tweet_texts, batch_size, max_context_window_size)
 #    print(batched_pairs)
+    
+    # hacky workaround for the crashing error in SkipGramModel forward-method (sum-function):
+    # if the last batch consists of only 1 tuple, then just delete it
+    if (len(batched_pairs[-1]) == 1):
+        del batched_pairs[-1]
+    
     skip_gram_model = SkipGramModel.SkipGramModel(len(chars_for_embed), embed_dim)
     optimizer = optim.SGD(skip_gram_model.parameters(), lr=initial_lr)
     
@@ -274,15 +281,13 @@ def main():
             loss.backward()
             optimizer.step()
             
-# TODO: maybe adapt learning rate
-# TODO: check why error occurs when batch of size 1 in forward method
-            
-    
-    ##################################
-    # SAVE EMBEDDING WEIGHTS TO FILE #
-    ##################################
+    # write embedding weights to file
     skip_gram_model.save_embed_to_file(embed_weights_rel_path)
 #    print(skip_gram_model.embed_hidden.weight)
+    
+    
+# TODO: maybe adapt learning rate
+# TODO: check why error occurs when batch of size 1 in forward method
     
     
     ###########
