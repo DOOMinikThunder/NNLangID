@@ -13,10 +13,10 @@ def main():
     # PARAMETERS #
     ##############
     
-#    input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
-    input_data_rel_path = "../data/input_data/test.csv"
+    input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
+#    input_data_rel_path = "../data/input_data/test.csv"
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
-    fetch_only_lang_x = None#'de'
+    fetch_only_lang_pair = ['el', 'fa']#None
     fetch_only_first_x_tweets = math.inf#5
     calc_embed = True
     
@@ -33,10 +33,10 @@ def main():
     # HYPERPARAMETERS RNN
 #    input_size = list(embed_char_text_inp_tensors[0].size())[2]
 #    num_classes = len(vocab_lang)
-    hidden_size = 100
+    hidden_size = 10
     num_layers = 1
     batch_size_rnn = 1
-    num_epochs_rnn = 3
+    num_epochs_rnn = 10
     num_batches_rnn = 1
     is_bidirectional = True
     
@@ -48,7 +48,7 @@ def main():
     input_data = InputData.InputData()
     indexed_texts_and_lang, vocab_chars, vocab_lang = input_data.get_indexed_data(input_data_rel_path=input_data_rel_path,
                                                                                   min_char_frequency=min_char_frequency,
-                                                                                  fetch_only_lang_x=fetch_only_lang_x,
+                                                                                  fetch_only_lang_pair=fetch_only_lang_pair,
                                                                                   fetch_only_first_x_tweets=fetch_only_first_x_tweets)
 #    print(indexed_texts_and_lang)
 #    print(vocab_chars)
