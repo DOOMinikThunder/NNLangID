@@ -11,7 +11,7 @@ class SkipGramModel(nn.Module):
 
     
     def __init__(self, vocab_size, embed_dim):
-        super(SkipGramModel, self).__init__()
+        super().__init__()
         self.vocab_size = vocab_size
         self.embed_dim = embed_dim
         self.embed_hidden = nn.Embedding(vocab_size, embed_dim, sparse=True)
