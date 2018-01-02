@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import math
+import InputData
+from embedding import EmbeddingCalculation
+from net import GRUModel
+
 
 
 def main():
@@ -13,75 +18,87 @@ def main():
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
     fetch_only_lang_x = None#'de'
     fetch_only_first_x_tweets = math.inf#5
+    calc_embed = True
     
-    # Hyperparameters
+    # HYPERPARAMETERS EMBEDDING
     min_char_frequency = 2
     sampling_table_size = 1000
-    batch_size = 2
+    batch_size_embed = 2
     max_context_window_size = 2
     num_neg_samples = 5
 #    embed_dim = 2   # will be set automatically later
-    initial_lr = 0.025
-    num_epochs = 1
+    initial_lr_embed = 0.025
+    num_epochs_embed = 1
+    
+    # HYPERPARAMETERS RNN
+#    input_size = list(embed_char_text_inp_tensors[0].size())[2]
+#    num_classes = len(vocab_lang)
+    hidden_size = 100
+    num_layers = 1
+    batch_size_rnn = 1
+    num_epochs_rnn = 3
+    num_batches_rnn = 1
+    is_bidirectional = True
     
     
     ###################################
     # DATA RETRIEVAL & TRANSFORMATION #
     ###################################
     
-    input_data = InputData()
-    indexed_texts_and_lang, vocab_chars, vocab_lang = input_data.get_indexed_data(input_data_rel_path,
-                                                                                  min_char_frequency,
-                                                                                  fetch_only_lang_x,
-                                                                                  fetch_only_first_x_tweets)
+    input_data = InputData.InputData()
+    indexed_texts_and_lang, vocab_chars, vocab_lang = input_data.get_indexed_data(input_data_rel_path=input_data_rel_path,
+                                                                                  min_char_frequency=min_char_frequency,
+                                                                                  fetch_only_lang_x=fetch_only_lang_x,
+                                                                                  fetch_only_first_x_tweets=fetch_only_first_x_tweets)
 #    print(indexed_texts_and_lang)
 #    print(vocab_chars)
 #    print(vocab_lang)
     
-    # get only tweet texts for embedding
-    indexed_tweet_texts = []
-    for i in range(len(indexed_texts_and_lang)):
-        indexed_tweet_texts.append(indexed_texts_and_lang[i][0])
-#    print(indexed_tweet_texts)
-    
-    
+
     #########################
     # EMBEDDING CALCULATION #
     #########################
     
-    embedding_calculation = EmbeddingCalculation()
-    embedding_calculation.calc_embed(indexed_tweet_texts,
-                                     batch_size,
-                                     vocab_chars,
-                                     max_context_window_size,
-                                     num_neg_samples,
-                                     sampling_table_size,
-                                     num_epochs,
-                                     initial_lr,
-                                     embed_weights_rel_path)
+    if (calc_embed):
+        indexed_texts = input_data.get_only_indexed_texts(indexed_texts_and_lang)
+        embedding_calculation = EmbeddingCalculation.EmbeddingCalculation()
+        embedding_calculation.calc_embed(indexed_tweet_texts=indexed_texts,
+                                         batch_size=batch_size_embed,
+                                         vocab_chars=vocab_chars,
+                                         max_context_window_size=max_context_window_size,
+                                         num_neg_samples=num_neg_samples,
+                                         sampling_table_size=sampling_table_size,
+                                         num_epochs=num_epochs_embed,
+                                         initial_lr=initial_lr_embed,
+                                         embed_weights_rel_path=embed_weights_rel_path)
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-        
-#    context_target_onehot = embedding_calculation.create_context_target_onehot_vectors(2, tweet_texts_only_embed_chars, chars_for_embed)
-#    print(len(context_target_onehot[0][0]))
-#    print(len(context_target_onehot))
-#    print(context_target_onehot)
-    
-# int to onehot conversion
-#    b = np.zeros((a.size, a.max()+1))
-#    b[np.arange(a.size),a] = 1
+    ################
+    # RNN TRAINING #
+    ################
+ 
+    # initialization
+    embed_char_text_inp_tensors, target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=indexed_texts_and_lang,
+                                                                                                   embed_weights_rel_path=embed_weights_rel_path)
+    gru_model = GRUModel.GRUModel(input_size=list(embed_char_text_inp_tensors[0].size())[2],
+                                  hidden_size=hidden_size,
+                                  num_layers=num_layers,
+                                  num_classes=len(vocab_lang),
+                                  is_bidirectional=is_bidirectional)
+    print('MODEL:\n', gru_model)
+
+    # training
+    gru_model.train(inputs=embed_char_text_inp_tensors,
+                    targets=target_tensors,
+                    batch_size=batch_size_rnn,
+                    num_batches=num_batches_rnn,
+                    num_epochs=num_epochs_rnn)
     
 
+    
+    
+    
+    
 
 if __name__ == '__main__':
     main()

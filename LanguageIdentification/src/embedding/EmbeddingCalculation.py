@@ -6,7 +6,7 @@ import torch.optim as optim
 import numpy as np
 import math
 import random
-import SkipGramModel
+from . import SkipGramModel
 #from tqdm import tqdm
 
 
@@ -165,7 +165,7 @@ class EmbeddingCalculation(object):
         # train skip-gram
         num_epochs_minus_one = num_epochs - 1
         for epoch_i in range(num_epochs):
-            print("Epoch:", epoch_i, "/", num_epochs_minus_one)
+            print("Embedding epoch:", epoch_i, "/", num_epochs_minus_one)
             for batch in batched_pairs:
                 targets = [pair[0] for pair in batch]
                 contexts = [pair[1] for pair in batch]

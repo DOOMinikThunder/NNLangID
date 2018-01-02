@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import torch
+from torch.autograd import Variable
 import unicodecsv as csv
 import math
 
@@ -111,3 +113,54 @@ class InputData(object):
             char2index[char] = vocab_chars[char][0]
             index2char[vocab_chars[char][0]] = char
         return char2index, index2char
+    
+    
+    def get_only_indexed_texts(self, indexed_texts_and_lang):
+        indexed_texts = []
+        for i in range(len(indexed_texts_and_lang)):
+            indexed_texts.append(indexed_texts_and_lang[i][0])
+        return indexed_texts
+    
+    
+    def create_embed_from_weights_file(self, relative_path_to_file):
+        weights = []
+        embed_dims = []
+        with open(relative_path_to_file, 'rb') as file:
+            reader = csv.reader(file, delimiter=' ', encoding='utf-8')
+
+            first_row = True
+            for row in reader:
+                if (first_row):
+                    embed_dims = [int(x) for x in row]
+                    first_row = False
+                else:
+                    float_row = [float(x) for x in row]
+                    weights.append(float_row)
+
+            weights_tensor = torch.FloatTensor(weights)
+            weights_tensor_param = torch.nn.Parameter(weights_tensor, requires_grad=False)
+            embed = torch.nn.Embedding(embed_dims[0], embed_dims[1])
+            embed.weight = weights_tensor_param
+        return embed
+    
+    
+    def create_embed_input_and_target_tensors(self, indexed_texts_and_lang, embed_weights_rel_path):
+        embed = self.create_embed_from_weights_file(embed_weights_rel_path)
+
+        embed_char_text_inp_tensors = []
+        target_tensors = []
+        for tweet in indexed_texts_and_lang:
+            # tweet text:
+            # get tensor with the embedding for each char of the tweet
+            embed_tensor = embed(Variable(torch.LongTensor(tweet[0])))
+            # create correctly dimensionated input tensor and append to input tensor list
+            dims = list(embed_tensor.size())
+            embed_tensor_inp = embed_tensor.view(dims[0], -1, dims[1])
+            embed_char_text_inp_tensors.append(embed_tensor_inp)
+            # tweet language:
+            # create list in size of the number of chars of the tweet and fill with language index
+            target_list = [tweet[1] for x in range(dims[0])]
+            # create target tensor and append to target tensor list
+            target_list_tensor = Variable(torch.LongTensor(target_list))
+            target_tensors.append(target_list_tensor)
+        return embed_char_text_inp_tensors, target_tensors
