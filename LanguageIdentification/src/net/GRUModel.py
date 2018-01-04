@@ -13,28 +13,23 @@ class GRUModel(nn.Module):
         super().__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers
+        self.num_classes = num_classes
         self.log_softmax = nn.LogSoftmax()
+        self.gru_layer = nn.GRU(input_size=input_size,
+                                hidden_size=hidden_size,
+                                num_layers=num_layers,
+                                bidirectional=is_bidirectional)
         if (is_bidirectional):
             self.num_directions = 2
-            self.gru_layer = nn.GRU(input_size=input_size,
-                                    hidden_size=hidden_size,
-                                    num_layers=num_layers,
-                                    bidirectional=True)
-            # hidden_size * 2 because of bidirectional
-            self.output_layer = nn.Linear(hidden_size * self.num_directions, num_classes)
         else:
             self.num_directions = 1
-            self.gru_layer = nn.GRU(input_size=input_size,
-                                    hidden_size=hidden_size,
-                                    num_layers=num_layers,
-                                    bidirectional=False)
-            self.output_layer = nn.Linear(hidden_size, num_classes)
-            
+        self.output_layer = nn.Linear(hidden_size * self.num_directions, num_classes)
+        
 
     def forward(self, inp, hidden=None):
         output, next_hidden = self.gru_layer(inp, hidden)
         output = self.output_layer(output)
-        output = self.log_softmax(output)
+        output = self.log_softmax(output.view(-1, self.num_classes))
         return output, next_hidden
 
 
@@ -42,9 +37,12 @@ class GRUModel(nn.Module):
         return Variable(torch.zeros(self.num_layers * self.num_directions, batch_size, self.hidden_size))
     
     
-    def train(self, inputs, targets, batch_size, num_batches, num_epochs):
+    def train(self, inputs, targets, batch_size, num_batches, num_epochs, eval=False):
         criterion = torch.nn.NLLLoss()
         optimizer = optim.Adam(params=self.parameters())
+        
+        all_pred = 0
+        correct_pred = 0
         
         num_epochs_minus_one = num_epochs - 1
         num_batches_minus_one = num_batches - 1
@@ -64,7 +62,33 @@ class GRUModel(nn.Module):
 #                    print('OUTPUT:\n', output)
                     
                     self.zero_grad()
-                    loss = criterion(output, target)
-                    print('RNN LOSS:\n', loss)
-                    loss.backward()
-                    optimizer.step()
+                    #print('output', output)  # softmax for every language, e.g. -5 -3
+                    #print('target', target)  # the target language index, e.g. 0
+                    
+                    if(eval):
+                        mean_list = [0]*output.size()[1]
+                        for pred in output:
+                            for i,_ in enumerate(mean_list):
+                                mean_list[i] += pred[i].data[0]
+                        mean_list = [mean/output.size()[0] for mean in mean_list]
+                        prediction = mean_list.index(max(mean_list))
+                        if(prediction == int(target.data[0])):
+                            correct_pred += 1
+                        all_pred += 1
+                    else:
+                        loss = criterion(output, target)
+                        print('RNN LOSS:\n', float(loss.data[0]))
+                        loss.backward()
+                        optimizer.step()
+                        
+                        
+        if(eval):
+            print(correct_pred, all_pred)
+            accuracy = correct_pred/all_pred
+            print('accuracy', accuracy)
+
+
+#                    loss = criterion(output, target)
+#                    print('RNN LOSS:\n', loss)
+#                    loss.backward()
+#                    optimizer.step()
