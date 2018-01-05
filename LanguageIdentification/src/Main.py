@@ -5,7 +5,7 @@ from random import shuffle
 import InputData
 from embedding import EmbeddingCalculation
 from net import GRUModel
-
+import Evaluator
 
 
 def main():
@@ -17,6 +17,7 @@ def main():
 #    input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
     input_data_rel_path = "../data/input_data/test.csv"
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
+
     fetch_only_lang_pair = None#['el', 'fa']
     fetch_only_first_x_tweets = math.inf#5
     calc_embed = True
@@ -91,6 +92,7 @@ def main():
     embed_char_text_inp_tensors, target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=indexed_texts_and_lang,
                                                                                                    embed_weights_rel_path=embed_weights_rel_path)
     #print('input size', list(embed_char_text_inp_tensors[0].size())[2])
+    print('input size', embed_char_text_inp_tensors[0])
     gru_model = GRUModel.GRUModel(input_size=list(embed_char_text_inp_tensors[0].size())[2],
                                   hidden_size=hidden_size,
                                   num_layers=num_layers,
@@ -115,13 +117,6 @@ def main():
                     num_epochs=num_epochs_rnn)
 
     #evaluate validation set
-    gru_model.train(inputs=embed_char_text_inp_tensors,
-                    targets=target_tensors,
-                    batch_size=batch_size_rnn,
-                    num_batches=num_batches_rnn,
-                    num_epochs=1,
-                    eval=True)
-
 
 
 #    # training
@@ -130,11 +125,10 @@ def main():
 #                    batch_size=batch_size_rnn,
 #                    num_batches=num_batches_rnn,
 #                    num_epochs=num_epochs_rnn)
-    
 
-    
-    
-    
+    evaluator = Evaluator.Evaluator(gru_model)
+    evaluator.evalute_data_set(shuffled_input, target_tensors)
+
     
 
 if __name__ == '__main__':

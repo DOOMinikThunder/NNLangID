@@ -37,12 +37,10 @@ class GRUModel(nn.Module):
         return Variable(torch.zeros(self.num_layers * self.num_directions, batch_size, self.hidden_size))
     
     
-    def train(self, inputs, targets, batch_size, num_batches, num_epochs, eval=False):
+    def train(self, inputs, targets, batch_size, num_batches, num_epochs):
         criterion = torch.nn.NLLLoss()
         optimizer = optim.Adam(params=self.parameters())
-        
-        all_pred = 0
-        correct_pred = 0
+
         
         num_epochs_minus_one = num_epochs - 1
         num_batches_minus_one = num_batches - 1
@@ -64,31 +62,8 @@ class GRUModel(nn.Module):
                     self.zero_grad()
                     #print('output', output)  # softmax for every language, e.g. -5 -3
                     #print('target', target)  # the target language index, e.g. 0
-                    
-                    if(eval):
-                        mean_list = [0]*output.size()[1]
-                        for pred in output:
-                            for i,_ in enumerate(mean_list):
-                                mean_list[i] += pred[i].data[0]
-                        mean_list = [mean/output.size()[0] for mean in mean_list]
-                        prediction = mean_list.index(max(mean_list))
-                        if(prediction == int(target.data[0])):
-                            correct_pred += 1
-                        all_pred += 1
-                    else:
-                        loss = criterion(output, target)
-                        print('RNN LOSS:\n', float(loss.data[0]))
-                        loss.backward()
-                        optimizer.step()
-                        
-                        
-        if(eval):
-            print(correct_pred, all_pred)
-            accuracy = correct_pred/all_pred
-            print('accuracy', accuracy)
 
-
-#                    loss = criterion(output, target)
-#                    print('RNN LOSS:\n', loss)
-#                    loss.backward()
-#                    optimizer.step()
+                    loss = criterion(output, target)
+                    print('RNN LOSS:\n', float(loss.data[0]))
+                    loss.backward()
+                    optimizer.step()
