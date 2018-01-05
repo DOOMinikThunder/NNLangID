@@ -8,11 +8,13 @@ class Evaluator(object):
 	def __init__(self, model):
 		self.model = model
 
-	def evalute_data_set(self, input_data, target_data):
+	def evalute_data_set(self, input_data, target_data, vocab_lang):
 		if(len(input_data) != len(target_data)):
-			print("input and target size different for 'evaluate_data_set'")
+			print("input and target size different for 'evaluate_data_set()'")
 			return -1
 		pred_true = 0
+		predictions = []
+		target_list = []
 		for input, target in zip(input_data, target_data):
 			output,_ = self.model(input)
 			lang_prediction = self.evaluate_prediction(output)
@@ -20,8 +22,11 @@ class Evaluator(object):
 			# todo later: multiple language predictions
 			#print('lang_pred',lang_prediction)
 			#print('target', stats.mode(target.data.numpy()).mode[0])
-			pred_true += int(lang_prediction == stats.mode(target.data.numpy()).mode[0])
+			target_list.append(stats.mode(target.data.numpy()).mode[0])
+			pred_true += int(lang_prediction == target_list[-1])
+			predictions.append(lang_prediction)
 		accuracy = pred_true/len(input_data)
+		self.confusion_matrix(predictions, target_list, vocab_lang)
 		print('accuracy', accuracy)
 
 	#prediction: tensor of languages-dimensional entries containing log softmax probabilities
@@ -35,4 +40,12 @@ class Evaluator(object):
 		lang_idx = lang_predictions.index(max(lang_predictions))
 		return lang_idx
 
-
+	def confusion_matrix(self, predictions, targets, vocab_lang):
+		#todo: more elaborate
+		if(len(predictions) != len(targets)):
+			print("predictions and target size different for 'confusion_matrix()'")
+			return []
+		conf_matrix = np.zeros((len(vocab_lang), len(vocab_lang)))
+		for pred, targ in zip(predictions, targets):
+			conf_matrix[targ][pred] += 1
+		print('conf_matrix\n', conf_matrix)

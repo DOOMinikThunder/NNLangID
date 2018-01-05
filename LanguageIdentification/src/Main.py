@@ -127,7 +127,7 @@ def main():
 #                    num_epochs=num_epochs_rnn)
 
     evaluator = Evaluator.Evaluator(gru_model)
-    evaluator.evalute_data_set(shuffled_input, target_tensors)
+    evaluator.evalute_data_set(shuffled_input, target_tensors, vocab_lang)
 
     
 
