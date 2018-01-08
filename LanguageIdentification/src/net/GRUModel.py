@@ -83,9 +83,9 @@ class GRUModel(nn.Module):
                         
                         
         if(eval):
-            print(correct_pred, all_pred)
+            print('Correct:', correct_pred, '/', all_pred)
             accuracy = correct_pred/all_pred
-            print('accuracy', accuracy)
+            print('Accuracy:', accuracy)
 
 
 #                    loss = criterion(output, target)
