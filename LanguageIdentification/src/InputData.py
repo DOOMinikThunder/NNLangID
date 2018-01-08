@@ -10,7 +10,7 @@ import math
 class InputData(object):
         
         
-    def fetch_tweet_texts_and_lang_from_file(self, relative_path_to_file, fetch_only_lang_pair=None, fetch_only_first_x_tweets=math.inf):
+    def fetch_tweet_texts_and_lang_from_file(self, relative_path_to_file, fetch_only_langs=None, fetch_only_first_x_tweets=math.inf):
         texts_and_lang = []
         with open(relative_path_to_file, 'rb') as file:
             reader = csv.reader(file, delimiter=';', encoding='utf-8')
@@ -22,10 +22,11 @@ class InputData(object):
                     break
                 tweet_counter += 1
                 
-                # if only tweets of a specific language pair shall be fetched
-                if (fetch_only_lang_pair != None):
-                    if (row[2] == fetch_only_lang_pair[0] or row[2] == fetch_only_lang_pair[1]):
-                        texts_and_lang.append((row[1], row[2]))
+                # if only tweets of specific languages shall be fetched
+                if (fetch_only_langs != None):
+                    for lang in fetch_only_langs:
+                        if (row[2] == lang):
+                            texts_and_lang.append((row[1], row[2]))
                 else:
                     texts_and_lang.append((row[1], row[2]))
         return texts_and_lang
@@ -93,8 +94,8 @@ class InputData(object):
         return indexed_texts_and_lang
       
     
-    def get_indexed_data(self, input_data_rel_path, min_char_frequency, fetch_only_lang_pair=None, fetch_only_first_x_tweets=math.inf):
-        texts_and_lang = self.fetch_tweet_texts_and_lang_from_file(input_data_rel_path, fetch_only_lang_pair, fetch_only_first_x_tweets)
+    def get_indexed_data(self, input_data_rel_path, min_char_frequency, fetch_only_langs=None, fetch_only_first_x_tweets=math.inf):
+        texts_and_lang = self.fetch_tweet_texts_and_lang_from_file(input_data_rel_path, fetch_only_langs, fetch_only_first_x_tweets)
 #        print(texts_and_lang)
         vocab_chars, vocab_lang = self.get_vocab_chars_and_lang(texts_and_lang, min_char_frequency)
 #        print(vocab_chars)
