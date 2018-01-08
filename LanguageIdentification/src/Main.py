@@ -13,15 +13,16 @@ def main():
     # PARAMETERS #
     ##############
     
-#    input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
-    input_data_rel_path = "../data/input_data/test.csv"
+    input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
+#    input_data_rel_path = "../data/input_data/test.csv"
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
-    fetch_only_langs = None#['el', 'fa', 'hi', 'ca']
+    fetch_only_langs = ['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
     fetch_only_first_x_tweets = math.inf#5
-    calc_embed = True
+    calc_embed = False
     
     # HYPERPARAMETERS EMBEDDING
-    set_ratios = [0.8, 0.0, 0.2]    # [train_ratio, val_ratio, test_ratio]
+    set_ratios = [1.0, 0.0, 0.0]    # [train_ratio, val_ratio, test_ratio]
+                                    # warning: changes may require new embedding calculation due to differently shuffled train_set
     min_char_frequency = 2
     sampling_table_size = 1000
     batch_size_embed = 2
@@ -93,6 +94,8 @@ def main():
     # initialization
     train_embed_char_text_inp_tensors, train_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=train_set_indexed,
                                                                                                                embed_weights_rel_path=embed_weights_rel_path)
+    val_embed_char_text_inp_tensors, val_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=val_set_indexed,
+                                                                                                           embed_weights_rel_path=embed_weights_rel_path)
     test_embed_char_text_inp_tensors, test_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=test_set_indexed,
                                                                                                              embed_weights_rel_path=embed_weights_rel_path)
     gru_model = GRUModel.GRUModel(input_size=list(train_embed_char_text_inp_tensors[0].size())[2],
@@ -103,22 +106,62 @@ def main():
     print('MODEL:\n', gru_model)
 
     # training
-    # input: whole data set, every date contains the embedding of one char in one dimension
-    # target: whole target set, target is set for each character embedding
-    gru_model.train(inputs=train_embed_char_text_inp_tensors,
-                    targets=train_target_tensors,
-                    batch_size=batch_size_rnn,
-                    num_batches=num_batches_rnn,
-                    num_epochs=num_epochs_rnn)
-
-    # evaluate test set
-    gru_model.train(inputs=test_embed_char_text_inp_tensors,
-                    targets=test_target_tensors,
-                    batch_size=batch_size_rnn,
-                    num_batches=num_batches_rnn,
-                    num_epochs=1,
-                    eval=True)
-
+    cur_accuracy = 0
+    best_accuracy = math.inf
+    is_improving = True
+    # stop training when validation set error stops getting smaller
+    while is_improving:
+        # inputs: whole data set, every date contains the embedding of one char in one dimension
+        # targets: whole target set, target is set for each character embedding
+        gru_model.train(inputs=train_embed_char_text_inp_tensors,
+                        targets=train_target_tensors,
+                        batch_size=batch_size_rnn,
+                        num_batches=num_batches_rnn,
+                        num_epochs=num_epochs_rnn)
+    
+#        # evaluate validation set
+#        cur_accuracy = gru_model.train(inputs=val_embed_char_text_inp_tensors,
+#                                       targets=val_target_tensors,
+#                                       batch_size=batch_size_rnn,
+#                                       num_batches=num_batches_rnn,
+#                                       num_epochs=1,
+#                                       eval=True)
+        
+        # evaluate train set
+        cur_accuracy = gru_model.train(inputs=train_embed_char_text_inp_tensors,
+                                       targets=train_target_tensors,
+                                       batch_size=batch_size_rnn,
+                                       num_batches=num_batches_rnn,
+                                       num_epochs=1,
+                                       eval=True)
+        print('EVAL ACCURACY', cur_accuracy)
+        print('EVAL ACCURACY', cur_accuracy)
+        print('EVAL ACCURACY', cur_accuracy)
+        print('EVAL ACCURACY', cur_accuracy)
+        print('EVAL ACCURACY', cur_accuracy)
+        print('EVAL ACCURACY', cur_accuracy)
+        print('EVAL ACCURACY', cur_accuracy)
+        print('EVAL ACCURACY', cur_accuracy)
+        print('EVAL ACCURACY', cur_accuracy)
+        print('EVAL ACCURACY', cur_accuracy)
+        print('EVAL ACCURACY', cur_accuracy)
+        print('EVAL ACCURACY', cur_accuracy)
+        print('EVAL ACCURACY', cur_accuracy)
+        print('EVAL ACCURACY', cur_accuracy)
+        
+        if (best_accuracy > cur_accuracy):
+            best_accuracy = cur_accuracy
+        else:
+            is_improving = False
+        
+#    # evaluate test set
+#    accuracy = gru_model.train(inputs=test_embed_char_text_inp_tensors,
+#                               targets=test_target_tensors,
+#                               batch_size=batch_size_rnn,
+#                               num_batches=num_batches_rnn,
+#                               num_epochs=1,
+#                               eval=True)
+#    print('TEST ACCURACY\n', accuracy)
 
     
     

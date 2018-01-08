@@ -3,6 +3,7 @@
 import torch
 from torch import nn, optim
 from torch.autograd import Variable
+import torch.nn.functional as F
 
 
 
@@ -29,7 +30,12 @@ class GRUModel(nn.Module):
     def forward(self, inp, hidden=None):
         output, next_hidden = self.gru_layer(inp, hidden)
         output = self.output_layer(output)
-        output = self.log_softmax(output.view(-1, self.num_classes))
+        output = output.view(-1, self.num_classes)
+        
+#        for i in range(len(output)):
+#            output[i] = F.tanh(output.data[i])
+            
+        output = self.log_softmax(output)
         return output, next_hidden
 
 
@@ -46,11 +52,13 @@ class GRUModel(nn.Module):
         
         num_epochs_minus_one = num_epochs - 1
         num_batches_minus_one = num_batches - 1
+        inputs_size = len(inputs)
+        num_inputs_minus_one = inputs_size - 1
         for epoch in range(num_epochs):
             for batch in range(num_batches):
                 print('RNN epoch:', epoch, '/', num_epochs_minus_one, '\nRNN batch:', batch, '/', num_batches_minus_one)
                     
-                for i in range(len(inputs)):
+                for i in range(inputs_size):
                     inp = inputs[i]
                     target = targets[i]
                     hidden = self.initHidden(batch_size)
@@ -77,7 +85,7 @@ class GRUModel(nn.Module):
                         all_pred += 1
                     else:
                         loss = criterion(output, target)
-                        print('RNN LOSS:\n', float(loss.data[0]))
+                        print('RNN LOSS', i, '/', num_inputs_minus_one, ':\n', float(loss.data[0]))
                         loss.backward()
                         optimizer.step()
                         
@@ -85,8 +93,7 @@ class GRUModel(nn.Module):
         if(eval):
             print('Correct:', correct_pred, '/', all_pred)
             accuracy = correct_pred/all_pred
-            print('Accuracy:', accuracy)
-
+            return accuracy
 
 #                    loss = criterion(output, target)
 #                    print('RNN LOSS:\n', loss)
