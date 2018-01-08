@@ -32,6 +32,30 @@ class InputData(object):
                     texts_and_lang.append((row[1], row[2]))
         return texts_and_lang
         
+    
+    # set_ratios must be: [train_ratio, val_ratio, test_ratio]
+    def split_data_into_sets(self, texts_and_lang, set_ratios):
+        if (set_ratios[0] + set_ratios[1] + set_ratios[2] != 1):
+            print("Error: Set ratios do not sum to 1!")
+            return -1
+        data_size = len(texts_and_lang)
+        val_size = int(set_ratios[1] * data_size)
+        test_size = int(set_ratios[2] * data_size)
+        # train set size is adapted to fit total data size
+        # (as it is usually the largest set, the error will be neglectible)
+        train_size = data_size - (val_size + test_size)
+
+        train_set = []
+        val_set = []
+        test_set = []
+        for i in range(train_size):
+            train_set.append(texts_and_lang[i])
+        for i in range(val_size):
+            val_set.append(texts_and_lang[i+train_size])
+        for i in range(test_size):
+            test_set.append(texts_and_lang[i+train_size+val_size])
+        return train_set, val_set, test_set
+    
         
     def get_vocab_chars_and_lang(self, texts_and_lang, min_char_frequency):
         occurred_chars = {}
@@ -93,20 +117,27 @@ class InputData(object):
                 temp_indexed_text.append(vocab_chars[texts_and_lang_only_vocab_chars[i][0][j]][0])
             indexed_texts_and_lang.append((temp_indexed_text, vocab_lang[texts_and_lang_only_vocab_chars[i][1]][0]))
         return indexed_texts_and_lang
-      
     
-    def get_indexed_data(self, input_data_rel_path, min_char_frequency, fetch_only_langs=None, fetch_only_first_x_tweets=math.inf):
+    
+    def get_indexed_data(self, input_data_rel_path, min_char_frequency, set_ratios, fetch_only_langs=None, fetch_only_first_x_tweets=math.inf):
         texts_and_lang = self.fetch_tweet_texts_and_lang_from_file(input_data_rel_path, fetch_only_langs, fetch_only_first_x_tweets)
 #        print(texts_and_lang)
-        vocab_chars, vocab_lang = self.get_vocab_chars_and_lang(texts_and_lang, min_char_frequency)
+        shuffle(texts_and_lang)
+        train_set, val_set, test_set = self.split_data_into_sets(texts_and_lang, set_ratios)
+#        print(train_set, val_set, test_set)
+#        print(len(train_set), len(val_set), len(test_set))
+        vocab_chars, vocab_lang = self.get_vocab_chars_and_lang(train_set, min_char_frequency)
 #        print(vocab_chars)
 #        print(vocab_lang)
-        texts_and_lang_only_vocab_chars = self.get_texts_with_only_vocab_chars(texts_and_lang, vocab_chars)
-#        print(texts_and_lang_only_vocab_chars)
-        indexed_texts_and_lang = self.get_indexed_texts_and_lang(texts_and_lang_only_vocab_chars, vocab_chars, vocab_lang)
-#        print(indexed_texts_and_lang)
-        shuffle(indexed_texts_and_lang)
-        return indexed_texts_and_lang, vocab_chars, vocab_lang
+        train_set_only_vocab_chars = self.get_texts_with_only_vocab_chars(train_set, vocab_chars)
+        val_set_only_vocab_chars = self.get_texts_with_only_vocab_chars(val_set, vocab_chars)
+        test_set_only_vocab_chars = self.get_texts_with_only_vocab_chars(test_set, vocab_chars)
+#        print(train_set_only_vocab_chars, val_set_only_vocab_chars, test_set_only_vocab_chars)
+        train_set_indexed = self.get_indexed_texts_and_lang(train_set_only_vocab_chars, vocab_chars, vocab_lang)
+        val_set_indexed = self.get_indexed_texts_and_lang(val_set_only_vocab_chars, vocab_chars, vocab_lang)
+        test_set_indexed = self.get_indexed_texts_and_lang(test_set_only_vocab_chars, vocab_chars, vocab_lang)
+#        print(train_set_indexed, val_set_indexed, test_set_indexed)
+        return train_set_indexed, val_set_indexed, test_set_indexed, vocab_chars, vocab_lang
     
     
     def get_char2index_and_index2char(self, vocab_chars):

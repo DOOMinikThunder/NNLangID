@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import math
-from random import shuffle
 import InputData
 from embedding import EmbeddingCalculation
 from net import GRUModel
@@ -22,6 +21,7 @@ def main():
     calc_embed = True
     
     # HYPERPARAMETERS EMBEDDING
+    set_ratios = [0.8, 0.0, 0.2]    # [train_ratio, val_ratio, test_ratio]
     min_char_frequency = 2
     sampling_table_size = 1000
     batch_size_embed = 2
@@ -29,10 +29,10 @@ def main():
     num_neg_samples = 5
 #    embed_dim = 2   # will be set automatically later
     initial_lr_embed = 0.025
-    num_epochs_embed = 1
+    num_epochs_embed = 2
     
     # HYPERPARAMETERS RNN
-#    input_size = list(embed_char_text_inp_tensors[0].size())[2]
+#    input_size = list(train_embed_char_text_inp_tensors[0].size())[2]
 #    num_classes = len(vocab_lang)
     hidden_size = 100
     num_layers = 1
@@ -48,18 +48,21 @@ def main():
     
     input_data = InputData.InputData()
     """
-    indexed_texts_and_lang: list of every date where each character and target gets unique id, e.g. 
+    train_set_indexed: list of every date where each character and target gets unique id, e.g. 
         ([0,1,0,1],0),([2,3,2,3],1) for ([a,b,a,b], 'de'), ([c,d,c,d], 'en)
+    val_set_indexed: see train_set_indexed
+    test_set_indexed: see train_set_indexed
     vocab_chars: every character occurence as a dict of character: index, occurrences, e.g. 
         {'a': (0, 700), 'b': (1, 700)}
     vocab_lang: every language occurence as a dict of language: index, occurences, e.g. 
         {'de': (0, 32)}
     """
-    indexed_texts_and_lang, vocab_chars, vocab_lang = input_data.get_indexed_data(input_data_rel_path=input_data_rel_path,
-                                                                                  min_char_frequency=min_char_frequency,
-                                                                                  fetch_only_langs=fetch_only_langs,
-                                                                                  fetch_only_first_x_tweets=fetch_only_first_x_tweets)
-#    print(indexed_texts_and_lang)
+    train_set_indexed, val_set_indexed, test_set_indexed, vocab_chars, vocab_lang = input_data.get_indexed_data(input_data_rel_path=input_data_rel_path,
+                                                                                                                min_char_frequency=min_char_frequency,
+                                                                                                                set_ratios=set_ratios,
+                                                                                                                fetch_only_langs=fetch_only_langs,
+                                                                                                                fetch_only_first_x_tweets=fetch_only_first_x_tweets)
+#    print(train_set_indexed, val_set_indexed, test_set_indexed)
 #    print(vocab_chars)
 #    print(vocab_lang)
     
@@ -69,8 +72,8 @@ def main():
     #########################
     
     if (calc_embed):
-        indexed_texts = input_data.get_only_indexed_texts(indexed_texts_and_lang)
-        #print('indexed texts', indexed_texts)
+        indexed_texts = input_data.get_only_indexed_texts(train_set_indexed)
+#        print(indexed_texts)
         embedding_calculation = EmbeddingCalculation.EmbeddingCalculation()
         embedding_calculation.calc_embed(indexed_tweet_texts=indexed_texts,
                                          batch_size=batch_size_embed,
@@ -88,10 +91,11 @@ def main():
     ################
  
     # initialization
-    embed_char_text_inp_tensors, target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=indexed_texts_and_lang,
-                                                                                                   embed_weights_rel_path=embed_weights_rel_path)
-    #print('input size', list(embed_char_text_inp_tensors[0].size())[2])
-    gru_model = GRUModel.GRUModel(input_size=list(embed_char_text_inp_tensors[0].size())[2],
+    train_embed_char_text_inp_tensors, train_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=train_set_indexed,
+                                                                                                               embed_weights_rel_path=embed_weights_rel_path)
+    test_embed_char_text_inp_tensors, test_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=test_set_indexed,
+                                                                                                             embed_weights_rel_path=embed_weights_rel_path)
+    gru_model = GRUModel.GRUModel(input_size=list(train_embed_char_text_inp_tensors[0].size())[2],
                                   hidden_size=hidden_size,
                                   num_layers=num_layers,
                                   num_classes=len(vocab_lang),
@@ -101,15 +105,15 @@ def main():
     # training
     # input: whole data set, every date contains the embedding of one char in one dimension
     # target: whole target set, target is set for each character embedding
-    gru_model.train(inputs=embed_char_text_inp_tensors,
-                    targets=target_tensors,
+    gru_model.train(inputs=train_embed_char_text_inp_tensors,
+                    targets=train_target_tensors,
                     batch_size=batch_size_rnn,
                     num_batches=num_batches_rnn,
                     num_epochs=num_epochs_rnn)
 
-    #evaluate validation set
-    gru_model.train(inputs=embed_char_text_inp_tensors,
-                    targets=target_tensors,
+    # evaluate test set
+    gru_model.train(inputs=test_embed_char_text_inp_tensors,
+                    targets=test_target_tensors,
                     batch_size=batch_size_rnn,
                     num_batches=num_batches_rnn,
                     num_epochs=1,
