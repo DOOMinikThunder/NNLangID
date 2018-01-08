@@ -4,6 +4,7 @@ import torch
 from torch.autograd import Variable
 import unicodecsv as csv
 import math
+from random import shuffle
 
 
 
@@ -104,6 +105,7 @@ class InputData(object):
 #        print(texts_and_lang_only_vocab_chars)
         indexed_texts_and_lang = self.get_indexed_texts_and_lang(texts_and_lang_only_vocab_chars, vocab_chars, vocab_lang)
 #        print(indexed_texts_and_lang)
+        shuffle(indexed_texts_and_lang)
         return indexed_texts_and_lang, vocab_chars, vocab_lang
     
     

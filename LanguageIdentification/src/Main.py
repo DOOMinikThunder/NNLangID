@@ -101,15 +101,8 @@ def main():
     # training
     # input: whole data set, every date contains the embedding of one char in one dimension
     # target: whole target set, target is set for each character embedding
-    idx_list = [i for i in range(len(embed_char_text_inp_tensors))]
-    shuffle(idx_list)
-    shuffled_input = [embed_char_text_inp_tensors[i] for i in idx_list]
-    shuffled_target = [target_tensors[i] for i in idx_list]
-
-    print('input', len(embed_char_text_inp_tensors))
-    print('target', len(target_tensors))
-    gru_model.train(inputs=shuffled_input,
-                    targets=shuffled_target,
+    gru_model.train(inputs=embed_char_text_inp_tensors,
+                    targets=target_tensors,
                     batch_size=batch_size_rnn,
                     num_batches=num_batches_rnn,
                     num_epochs=num_epochs_rnn)
@@ -122,15 +115,6 @@ def main():
                     num_epochs=1,
                     eval=True)
 
-
-
-#    # training
-#    gru_model.train(inputs=embed_char_text_inp_tensors,
-#                    targets=target_tensors,
-#                    batch_size=batch_size_rnn,
-#                    num_batches=num_batches_rnn,
-#                    num_epochs=num_epochs_rnn)
-    
 
     
     
