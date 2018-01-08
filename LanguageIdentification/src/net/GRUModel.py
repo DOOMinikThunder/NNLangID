@@ -25,73 +25,62 @@ class GRUModel(nn.Module):
         else:
             self.num_directions = 1
         self.output_layer = nn.Linear(hidden_size * self.num_directions, num_classes)
+        self.batch_size = 1
         
+        self.criterion = torch.nn.NLLLoss()
+        self.optimizer = optim.Adam(params=self.parameters())
+
 
     def forward(self, inp, hidden=None):
         output, next_hidden = self.gru_layer(inp, hidden)
         output = self.output_layer(output)
         output = output.view(-1, self.num_classes)
-        
 #        for i in range(len(output)):
 #            output[i] = F.tanh(output.data[i])
-            
         output = self.log_softmax(output)
         return output, next_hidden
 
 
-    def initHidden(self, batch_size):
-        return Variable(torch.zeros(self.num_layers * self.num_directions, batch_size, self.hidden_size))
+    def initHidden(self):
+        return Variable(torch.zeros(self.num_layers * self.num_directions, self.batch_size, self.hidden_size))
     
     
-    def train(self, inputs, targets, batch_size, num_batches, num_epochs, eval=False):
-        criterion = torch.nn.NLLLoss()
-        optimizer = optim.Adam(params=self.parameters())
-        
+    def train(self, inputs, targets, eval=False):
         all_pred = 0
         correct_pred = 0
         
-        num_epochs_minus_one = num_epochs - 1
-        num_batches_minus_one = num_batches - 1
         inputs_size = len(inputs)
         num_inputs_minus_one = inputs_size - 1
-        for epoch in range(num_epochs):
-            for batch in range(num_batches):
-                print('RNN epoch:', epoch, '/', num_epochs_minus_one, '\nRNN batch:', batch, '/', num_batches_minus_one)
-                    
-                for i in range(inputs_size):
-                    inp = inputs[i]
-                    target = targets[i]
-                    hidden = self.initHidden(batch_size)
-                    dims = list(inp.size())
-                    
-                    output, hidden = self(inp, hidden)
-                    # transform 3D to 2D tensor for the criterion function
-                    output = output.view(dims[0], -1)
-#                    print('OUTPUT:\n', output)
-                    
-                    self.zero_grad()
-                    #print('output', output)  # softmax for every language, e.g. -5 -3
-                    #print('target', target)  # the target language index, e.g. 0
-                    
-                    if(eval):
-                        mean_list = [0]*output.size()[1]
-                        for pred in output:
-                            for i,_ in enumerate(mean_list):
-                                mean_list[i] += pred[i].data[0]
-                        mean_list = [mean/output.size()[0] for mean in mean_list]
-                        prediction = mean_list.index(max(mean_list))
-                        if(prediction == int(target.data[0])):
-                            correct_pred += 1
-                        all_pred += 1
-                    else:
-                        loss = criterion(output, target)
-                        print('RNN LOSS', i, '/', num_inputs_minus_one, ':\n', float(loss.data[0]))
-                        loss.backward()
-                        optimizer.step()
-                        
-                        
+        for i in range(inputs_size):
+            inp = inputs[i]
+            target = targets[i]
+            hidden = self.initHidden()
+            dims = list(inp.size())
+            
+            output, hidden = self(inp, hidden)
+            # transform 3D to 2D tensor for the criterion function
+            output = output.view(dims[0], -1)
+#           print('OUTPUT:\n', output)
+            
+            self.zero_grad()
+            
+            if(eval):
+                mean_list = [0]*output.size()[1]
+                for pred in output:
+                    for i,_ in enumerate(mean_list):
+                        mean_list[i] += pred[i].data[0]
+                mean_list = [mean/output.size()[0] for mean in mean_list]
+                prediction = mean_list.index(max(mean_list))
+                if(prediction == int(target.data[0])):
+                    correct_pred += 1
+                all_pred += 1
+            else:
+                loss = self.criterion(output, target)
+                print('RNN Loss', i, '/', num_inputs_minus_one, ':\n', float(loss.data[0]))
+                loss.backward()
+                self.optimizer.step()
         if(eval):
-            print('Correct:', correct_pred, '/', all_pred)
+#            print('Correct:', correct_pred, '/', all_pred)
             accuracy = correct_pred/all_pred
             return accuracy
 
@@ -99,3 +88,17 @@ class GRUModel(nn.Module):
 #                    print('RNN LOSS:\n', loss)
 #                    loss.backward()
 #                    optimizer.step()
+            
+        
+    def save_model_checkpoint_to_file(self, state, relative_path_to_file):
+        torch.save(state, relative_path_to_file)
+        
+        
+    def load_model_checkpoint_from_file(self, relative_path_to_file):
+        checkpoint = torch.load(relative_path_to_file)
+        start_epoch = checkpoint['start_epoch']
+        best_accuracy = checkpoint['best_accuracy']
+        self.load_state_dict(checkpoint['state_dict'])
+        self.optimizer.load_state_dict(checkpoint['optimizer'])
+#        self.eval()
+        return start_epoch, best_accuracy

@@ -16,6 +16,7 @@ def main():
     input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
 #    input_data_rel_path = "../data/input_data/test.csv"
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
+    model_checkpoint_rel_path = "../data/model_checkpoint/model_checkpoint.pth"
     fetch_only_langs = ['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
     fetch_only_first_x_tweets = math.inf#5
     calc_embed = False
@@ -37,9 +38,6 @@ def main():
 #    num_classes = len(vocab_lang)
     hidden_size = 100
     num_layers = 1
-    batch_size_rnn = 1
-    num_epochs_rnn = 1
-    num_batches_rnn = 1
     is_bidirectional = True
     
     
@@ -91,7 +89,7 @@ def main():
     # RNN TRAINING #
     ################
  
-    # initialization
+    # INITIALIZATION
     train_embed_char_text_inp_tensors, train_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=train_set_indexed,
                                                                                                                embed_weights_rel_path=embed_weights_rel_path)
     val_embed_char_text_inp_tensors, val_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=val_set_indexed,
@@ -103,68 +101,79 @@ def main():
                                   num_layers=num_layers,
                                   num_classes=len(vocab_lang),
                                   is_bidirectional=is_bidirectional)
-    print('MODEL:\n', gru_model)
+    print('Model:\n', gru_model)
 
-    # training
+
+    # TRAINING
     cur_accuracy = 0
-    best_accuracy = math.inf
+    best_accuracy = 0
+    epoch = 0
     is_improving = True
-    # stop training when validation set error stops getting smaller
+    # stop training when validation set error stops getting smaller ==> stop when overfitting occurs
     while is_improving:
+        print('RNN epoch:', epoch)
         # inputs: whole data set, every date contains the embedding of one char in one dimension
         # targets: whole target set, target is set for each character embedding
         gru_model.train(inputs=train_embed_char_text_inp_tensors,
-                        targets=train_target_tensors,
-                        batch_size=batch_size_rnn,
-                        num_batches=num_batches_rnn,
-                        num_epochs=num_epochs_rnn)
-    
+                        targets=train_target_tensors)
+        
 #        # evaluate validation set
 #        cur_accuracy = gru_model.train(inputs=val_embed_char_text_inp_tensors,
 #                                       targets=val_target_tensors,
-#                                       batch_size=batch_size_rnn,
-#                                       num_batches=num_batches_rnn,
-#                                       num_epochs=1,
 #                                       eval=True)
         
         # evaluate train set
         cur_accuracy = gru_model.train(inputs=train_embed_char_text_inp_tensors,
                                        targets=train_target_tensors,
-                                       batch_size=batch_size_rnn,
-                                       num_batches=num_batches_rnn,
-                                       num_epochs=1,
                                        eval=True)
-        print('EVAL ACCURACY', cur_accuracy)
-        print('EVAL ACCURACY', cur_accuracy)
-        print('EVAL ACCURACY', cur_accuracy)
-        print('EVAL ACCURACY', cur_accuracy)
-        print('EVAL ACCURACY', cur_accuracy)
-        print('EVAL ACCURACY', cur_accuracy)
-        print('EVAL ACCURACY', cur_accuracy)
-        print('EVAL ACCURACY', cur_accuracy)
-        print('EVAL ACCURACY', cur_accuracy)
-        print('EVAL ACCURACY', cur_accuracy)
-        print('EVAL ACCURACY', cur_accuracy)
-        print('EVAL ACCURACY', cur_accuracy)
-        print('EVAL ACCURACY', cur_accuracy)
-        print('EVAL ACCURACY', cur_accuracy)
+        print('EVAL ACCURACY:', cur_accuracy)
+        print('EVAL ACCURACY:', cur_accuracy)
+        print('EVAL ACCURACY:', cur_accuracy)
+        print('EVAL ACCURACY:', cur_accuracy)
+        print('EVAL ACCURACY:', cur_accuracy)
+        print('EVAL ACCURACY:', cur_accuracy)
+        print('EVAL ACCURACY:', cur_accuracy)
+        print('EVAL ACCURACY:', cur_accuracy)
+        print('EVAL ACCURACY:', cur_accuracy)
+        print('EVAL ACCURACY:', cur_accuracy)
+        print('EVAL ACCURACY:', cur_accuracy)
+        print('EVAL ACCURACY:', cur_accuracy)
+        print('EVAL ACCURACY:', cur_accuracy)
+        print('EVAL ACCURACY:', cur_accuracy)
+        print('EVAL ACCURACY:', cur_accuracy)
         
-        if (best_accuracy > cur_accuracy):
+        # check if accuracy improved and if so, save model checkpoint to file
+        if (best_accuracy < cur_accuracy):
             best_accuracy = cur_accuracy
+            gru_model.save_model_checkpoint_to_file({
+                                        'start_epoch': epoch + 1,
+                                        'state_dict': gru_model.state_dict(),
+                                        'best_accuracy': best_accuracy,
+                                        'optimizer': gru_model.optimizer.state_dict()
+                                        },
+                                        model_checkpoint_rel_path)
         else:
             is_improving = False
+        epoch += 1
         
+        
+    # EVALUATION
 #    # evaluate test set
+#    start_epoch, best_accuracy = gru_model.load_model_checkpoint_from_file(model_checkpoint_rel_path)
 #    accuracy = gru_model.train(inputs=test_embed_char_text_inp_tensors,
 #                               targets=test_target_tensors,
-#                               batch_size=batch_size_rnn,
-#                               num_batches=num_batches_rnn,
-#                               num_epochs=1,
 #                               eval=True)
-#    print('TEST ACCURACY\n', accuracy)
+#    print('TEST ACCURACY:\n', accuracy)
 
-    
-    
+    # evaluate train set
+    start_epoch, best_accuracy = gru_model.load_model_checkpoint_from_file(model_checkpoint_rel_path)
+#    print(start_epoch)
+#    print(best_accuracy)
+    cur_accuracy = gru_model.train(inputs=train_embed_char_text_inp_tensors,
+                                   targets=train_target_tensors,
+                                   eval=True)
+    print('FINAL EVAL ACCURACY:', cur_accuracy)
+
     
     
 
