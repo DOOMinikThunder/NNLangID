@@ -39,6 +39,9 @@ def main():
     hidden_size = 100
     num_layers = 1
     is_bidirectional = True
+    initial_lr_rnn = 0.025
+    lr_decay_factor_rnn = 0.1
+    weight_decay_rnn = 0.00001
     
     
     ###################################
@@ -100,7 +103,9 @@ def main():
                                   hidden_size=hidden_size,
                                   num_layers=num_layers,
                                   num_classes=len(vocab_lang),
-                                  is_bidirectional=is_bidirectional)
+                                  is_bidirectional=is_bidirectional,
+                                  initial_lr=initial_lr_rnn,
+                                  weight_decay=weight_decay_rnn)
     print('Model:\n', gru_model)
 
 
@@ -155,6 +160,8 @@ def main():
         else:
             is_improving = False
         epoch += 1
+        # decrease learning rate over time
+        gru_model.optimizer.lr = gru_model.lr * lr_decay_factor_rnn
         
         
     # EVALUATION

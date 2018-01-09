@@ -10,11 +10,13 @@ import torch.nn.functional as F
 class GRUModel(nn.Module):
     
     
-    def __init__(self, input_size, hidden_size, num_layers, num_classes, is_bidirectional):
+    def __init__(self, input_size, hidden_size, num_layers, num_classes, is_bidirectional, initial_lr, weight_decay):
         super().__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.num_classes = num_classes
+        self.lr = initial_lr
+        self.weight_decay = weight_decay
         self.log_softmax = nn.LogSoftmax()
         self.gru_layer = nn.GRU(input_size=input_size,
                                 hidden_size=hidden_size,
@@ -28,7 +30,7 @@ class GRUModel(nn.Module):
         self.batch_size = 1
         
         self.criterion = torch.nn.NLLLoss()
-        self.optimizer = optim.Adam(params=self.parameters())
+        self.optimizer = optim.Adam(params=self.parameters(), lr=initial_lr, weight_decay=weight_decay)
 
 
     def forward(self, inp, hidden=None):
