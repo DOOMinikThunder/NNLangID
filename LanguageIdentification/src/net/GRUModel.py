@@ -94,6 +94,7 @@ class GRUModel(nn.Module):
         
     def save_model_checkpoint_to_file(self, state, relative_path_to_file):
         torch.save(state, relative_path_to_file)
+        print('Model checkpoint saved to file:', relative_path_to_file)
         
         
     def load_model_checkpoint_from_file(self, relative_path_to_file):
@@ -103,4 +104,5 @@ class GRUModel(nn.Module):
         self.load_state_dict(checkpoint['state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer'])
 #        self.eval()
+        print('Model checkpoint loaded from file:', relative_path_to_file)
         return start_epoch, best_accuracy

@@ -138,7 +138,7 @@ class EmbeddingCalculation(object):
         return np.random.choice(self.sampling_table, size=(num_pairs, num_samples)).tolist()
             
     
-    def calc_embed(self, indexed_tweet_texts, batch_size, vocab_chars, max_context_window_size, num_neg_samples, sampling_table_size, num_epochs, initial_lr, embed_weights_rel_path):
+    def calc_embed(self, indexed_tweet_texts, batch_size, vocab_chars, max_context_window_size, num_neg_samples, num_epochs, initial_lr, embed_weights_rel_path, sampling_table_size=100000000):
         # set embedding dimension to: roundup(log2(vocabulary-size))
         embed_dim = math.ceil(math.log2(len(vocab_chars)))
     #    print(embed_dim)
@@ -190,18 +190,18 @@ class EmbeddingCalculation(object):
         # TESTING #
         ###########
         
-        print("VOCABULARY:", vocab_chars)
-        print("VOCABULARY SIZE:", len(vocab_chars))
-        
-        a = skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[0]])))
-        b = skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[1]])))
-        c = skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[2]])))
-        d = skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[3]])))
-        
-        print("EMBEDDING VECTOR DIFFERENCES:")
-        print("a-b", torch.FloatTensor.sum((torch.abs(a - b)).data[0]))
-        print("c-d", torch.FloatTensor.sum((torch.abs(c - d)).data[0]))
-        print("a-c", torch.FloatTensor.sum((torch.abs(a - c)).data[0]))
-        print("a-d", torch.FloatTensor.sum((torch.abs(a - d)).data[0]))
-        print("b-c", torch.FloatTensor.sum((torch.abs(b - c)).data[0]))
-        print("b-d", torch.FloatTensor.sum((torch.abs(b - d)).data[0]))
+#        print("VOCABULARY:", vocab_chars)
+#        print("VOCABULARY SIZE:", len(vocab_chars))
+#        
+#        a = skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[0]])))
+#        b = skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[1]])))
+#        c = skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[2]])))
+#        d = skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[3]])))
+#        
+#        print("EMBEDDING VECTOR DIFFERENCES:")
+#        print("a-b", torch.FloatTensor.sum((torch.abs(a - b)).data[0]))
+#        print("c-d", torch.FloatTensor.sum((torch.abs(c - d)).data[0]))
+#        print("a-c", torch.FloatTensor.sum((torch.abs(a - c)).data[0]))
+#        print("a-d", torch.FloatTensor.sum((torch.abs(a - d)).data[0]))
+#        print("b-c", torch.FloatTensor.sum((torch.abs(b - c)).data[0]))
+#        print("b-d", torch.FloatTensor.sum((torch.abs(b - d)).data[0]))

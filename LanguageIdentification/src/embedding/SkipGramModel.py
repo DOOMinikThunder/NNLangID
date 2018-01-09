@@ -50,3 +50,4 @@ class SkipGramModel(nn.Module):
         for i in range(self.vocab_size):
             line = ' '.join(map(lambda x: str(x), weights_array[i]))
             writer.write('\n%s' % line)
+        print('Embedding weights saved to file:', relative_path_to_file)

@@ -121,7 +121,7 @@ class InputData(object):
     
     def get_indexed_data(self, input_data_rel_path, min_char_frequency, set_ratios, fetch_only_langs=None, fetch_only_first_x_tweets=math.inf):
         texts_and_lang = self.fetch_tweet_texts_and_lang_from_file(input_data_rel_path, fetch_only_langs, fetch_only_first_x_tweets)
-        print(texts_and_lang)
+#        print(texts_and_lang)
         # initialize random number generator to facilitate testing
         random.seed(42)
         random.shuffle(texts_and_lang)
@@ -177,6 +177,7 @@ class InputData(object):
             weights_tensor_param = torch.nn.Parameter(weights_tensor, requires_grad=False)
             embed = torch.nn.Embedding(embed_dims[0], embed_dims[1])
             embed.weight = weights_tensor_param
+        print('Embedding weights loaded from file:', relative_path_to_file)
         return embed
     
     
