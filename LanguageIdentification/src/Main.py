@@ -17,7 +17,7 @@ def main():
 #    input_data_rel_path = "../data/input_data/test.csv"
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
     model_checkpoint_rel_path = "../data/model_checkpoint/model_checkpoint.pth"
-    fetch_only_langs = ['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
+    fetch_only_langs = None#['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
     fetch_only_first_x_tweets = math.inf#5
     calc_embed = True
     train_rnn = True
@@ -26,21 +26,21 @@ def main():
     set_ratios = [0.8, 0.1, 0.1]    # [train_ratio, val_ratio, test_ratio]
                                     # warning: changes may require new embedding calculation due to differently shuffled train_set
     min_char_frequency = 2
-    sampling_table_size = 1000      # should be 100000000
+    sampling_table_size = 100000000      # should be 100000000
     batch_size_embed = 2
-    max_context_window_size = 2
-    num_neg_samples = 5
+    max_context_window_size = 3
+    num_neg_samples = 10
 #    embed_dim = 2                  # will be set automatically later to: roundup(log2(vocabulary-size))
     initial_lr_embed = 0.025
-    num_epochs_embed = 1
+    num_epochs_embed = 3
     
     # HYPERPARAMETERS RNN
 #    input_size = list(train_embed_char_text_inp_tensors[0].size())[2]
 #    num_classes = len(vocab_lang)
-    hidden_size = 100
+    hidden_size = 1000
     num_layers = 1
     is_bidirectional = True
-    initial_lr_rnn = 0.001
+    initial_lr_rnn = 0.005
     lr_decay_factor_rnn = 0.1
     weight_decay_rnn = 0.00001
     
