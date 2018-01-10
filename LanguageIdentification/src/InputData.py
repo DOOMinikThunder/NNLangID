@@ -164,8 +164,10 @@ class InputData(object):
         for i in range(len(texts_and_lang_only_vocab_chars)):
             temp_indexed_text = []
             for j in range(len(texts_and_lang_only_vocab_chars[i][0])):
-                temp_indexed_text.append(vocab_chars[texts_and_lang_only_vocab_chars[i][0][j]][0])
-            indexed_texts_and_lang.append((temp_indexed_text, vocab_lang[texts_and_lang_only_vocab_chars[i][1]][0]))
+                if texts_and_lang_only_vocab_chars[i][0][j] in vocab_chars:
+                    temp_indexed_text.append(vocab_chars[texts_and_lang_only_vocab_chars[i][0][j]][0])
+            if texts_and_lang_only_vocab_chars[i][1] in vocab_lang:
+                indexed_texts_and_lang.append((temp_indexed_text, vocab_lang[texts_and_lang_only_vocab_chars[i][1]][0]))
         return indexed_texts_and_lang
     
     
