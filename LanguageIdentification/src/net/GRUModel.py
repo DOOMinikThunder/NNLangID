@@ -46,10 +46,8 @@ class GRUModel(nn.Module):
     def initHidden(self):
         return Variable(torch.zeros(self.num_layers * self.num_directions, self.batch_size, self.hidden_size))
     
-    
+
     def train(self, inputs, targets, eval=False):
-        all_pred = 0
-        correct_pred = 0
         
         inputs_size = len(inputs)
         num_inputs_minus_one = inputs_size - 1
@@ -65,26 +63,12 @@ class GRUModel(nn.Module):
 #           print('OUTPUT:\n', output)
             
             self.zero_grad()
-            
-            if(eval):
-                mean_list = [0]*output.size()[1]
-                for pred in output:
-                    for i,_ in enumerate(mean_list):
-                        mean_list[i] += pred[i].data[0]
-                mean_list = [mean/output.size()[0] for mean in mean_list]
-                prediction = mean_list.index(max(mean_list))
-                if(prediction == int(target.data[0])):
-                    correct_pred += 1
-                all_pred += 1
-            else:
-                loss = self.criterion(output, target)
-                print('RNN Loss', i, '/', num_inputs_minus_one, ':\n', float(loss.data[0]))
-                loss.backward()
-                self.optimizer.step()
-        if(eval):
-#            print('Correct:', correct_pred, '/', all_pred)
-            accuracy = correct_pred/all_pred
-            return accuracy
+
+            loss = self.criterion(output, target)
+            print('RNN Loss', i, '/', num_inputs_minus_one, ':\n', float(loss.data[0]))
+            loss.backward()
+            self.optimizer.step()
+
 
 #                    loss = criterion(output, target)
 #                    print('RNN LOSS:\n', loss)
@@ -106,3 +90,4 @@ class GRUModel(nn.Module):
 #        self.eval()
         print('Model checkpoint loaded from file:', relative_path_to_file)
         return start_epoch, best_accuracy
+

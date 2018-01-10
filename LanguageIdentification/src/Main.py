@@ -4,7 +4,7 @@ import math
 import InputData
 from embedding import EmbeddingCalculation
 from net import GRUModel
-
+import Evaluator
 
 
 def main():
@@ -16,8 +16,10 @@ def main():
     input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
 #    input_data_rel_path = "../data/input_data/test.csv"
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
+
     model_checkpoint_rel_path = "../data/model_checkpoint/model_checkpoint.pth"
     fetch_only_langs = None#['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
+
     fetch_only_first_x_tweets = math.inf#5
     calc_embed = True
     train_rnn = True
@@ -92,7 +94,7 @@ def main():
     ################
     # RNN TRAINING #
     ################
- 
+
     # INITIALIZATION
     train_embed_char_text_inp_tensors, train_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=train_set_indexed,
                                                                                                                embed_weights_rel_path=embed_weights_rel_path)
@@ -182,6 +184,7 @@ def main():
     print('Test set accuracy:', accuracy)
     print('========================================')
 
+
 #    # evaluate train set
 #    start_epoch, best_accuracy = gru_model.load_model_checkpoint_from_file(model_checkpoint_rel_path)
 ##    print(start_epoch)
@@ -191,8 +194,10 @@ def main():
 #                                   eval=True)
 #    print('FINAL EVAL ACCURACY:', cur_accuracy)
 
-    
-    
+
+    #evaluator = Evaluator.Evaluator(gru_model)
+    #evaluator.evalute_data_set(shuffled_input, target_tensors, vocab_lang)
+
 
 if __name__ == '__main__':
     main()
