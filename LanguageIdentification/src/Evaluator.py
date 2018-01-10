@@ -20,11 +20,11 @@ class Evaluator(object):
 			lang_prediction = self.evaluate_prediction(output)
 			# checks if language prediction equals most common language in target (in case there are multiple targets)
 			# todo later: multiple language predictions
-			#print('lang_pred',lang_prediction)
-			#print('target', stats.mode(target.data.numpy()).mode[0])
+			print('lang_pred %s - target %s'%(lang_prediction, stats.mode(target.data.numpy()).mode[0]))
 			target_list.append(stats.mode(target.data.numpy()).mode[0])
-			pred_true += int(lang_prediction == target_list[-1])
 			predictions.append(lang_prediction)
+			pred_true += int(lang_prediction == target_list[-1])
+
 		accuracy = pred_true/len(input_data)
 		self.confusion_matrix(predictions, target_list, vocab_lang)
 		print('accuracy', accuracy)
