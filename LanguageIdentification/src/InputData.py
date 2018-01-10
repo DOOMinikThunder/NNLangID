@@ -40,12 +40,15 @@ class InputData(object):
             filtered_tweet_text = []
             tweet_text_size = len(texts_and_lang[tweet_i][0])
             for char_j in range(tweet_text_size):
-                # check for hashtags and named entities and activate removal mode
-                if (texts_and_lang[tweet_i][0][char_j] == '#'
+                # check for hashtags and @-names and activate removal mode (keep '#' or '@')
+                if (not removal_mode
+                    and texts_and_lang[tweet_i][0][char_j] == '#'
                     or texts_and_lang[tweet_i][0][char_j] == '@'):
                     removal_mode = True
-                # check for URLs and activate removal mode
-                elif (texts_and_lang[tweet_i][0][char_j] == 'h'):
+                    filtered_tweet_text.append(texts_and_lang[tweet_i][0][char_j])
+                # check for URLs and activate removal mode (replace with '_')
+                elif (not removal_mode
+                      and texts_and_lang[tweet_i][0][char_j] == 'h'):
                     # check if not out of bounds and 'http://'
                     if (char_j+6 < tweet_text_size
                         and texts_and_lang[tweet_i][0][char_j+1] == 't'
@@ -55,6 +58,7 @@ class InputData(object):
                         and texts_and_lang[tweet_i][0][char_j+5] == '/'
                         and texts_and_lang[tweet_i][0][char_j+6] == '/'):
                         removal_mode = True
+                        filtered_tweet_text.append('_')
                     # check if not out of bounds and 'https://'
                     elif (char_j+7 < tweet_text_size
                              and texts_and_lang[tweet_i][0][char_j+1] == 't'
@@ -65,12 +69,14 @@ class InputData(object):
                              and texts_and_lang[tweet_i][0][char_j+6] == '/'
                              and texts_and_lang[tweet_i][0][char_j+7] == '/'):
                         removal_mode = True
+                        filtered_tweet_text.append('_')
                     # append char as it is a normal 'h' ocurrence
                     else:
                         filtered_tweet_text.append(texts_and_lang[tweet_i][0][char_j])
-                # check if part to be removed has ended to quit removal mode
+                # check if part to be removed has ended to quit removal mode (append ' ')
                 elif (removal_mode and texts_and_lang[tweet_i][0][char_j] == ' '):
                     removal_mode = False
+                    filtered_tweet_text.append(texts_and_lang[tweet_i][0][char_j])
                 # append char if removal mode is not active
                 elif (not removal_mode):
                     filtered_tweet_text.append(texts_and_lang[tweet_i][0][char_j])
