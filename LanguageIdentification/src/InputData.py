@@ -31,7 +31,54 @@ class InputData(object):
                 else:
                     texts_and_lang.append((row[1], row[2]))
         return texts_and_lang
-        
+    
+    
+    def filter_out_irrelevant_tweet_parts(self, texts_and_lang):
+        filtered_texts_and_lang = []
+        removal_mode = False
+        for tweet_i in range(len(texts_and_lang)):
+            filtered_tweet_text = []
+            tweet_text_size = len(texts_and_lang[tweet_i][0])
+            for char_j in range(tweet_text_size):
+                # check for hashtags and named entities and activate removal mode
+                if (texts_and_lang[tweet_i][0][char_j] == '#'
+                    or texts_and_lang[tweet_i][0][char_j] == '@'):
+                    removal_mode = True
+                # check for URLs and activate removal mode
+                elif (texts_and_lang[tweet_i][0][char_j] == 'h'):
+                    # check if not out of bounds and 'http://'
+                    if (char_j+6 < tweet_text_size
+                        and texts_and_lang[tweet_i][0][char_j+1] == 't'
+                        and texts_and_lang[tweet_i][0][char_j+2] == 't'
+                        and texts_and_lang[tweet_i][0][char_j+3] == 'p'
+                        and texts_and_lang[tweet_i][0][char_j+4] == ':'
+                        and texts_and_lang[tweet_i][0][char_j+5] == '/'
+                        and texts_and_lang[tweet_i][0][char_j+6] == '/'):
+                        removal_mode = True
+                    # check if not out of bounds and 'https://'
+                    elif (char_j+7 < tweet_text_size
+                             and texts_and_lang[tweet_i][0][char_j+1] == 't'
+                             and texts_and_lang[tweet_i][0][char_j+2] == 't'
+                             and texts_and_lang[tweet_i][0][char_j+3] == 'p'
+                             and texts_and_lang[tweet_i][0][char_j+4] == 's'
+                             and texts_and_lang[tweet_i][0][char_j+5] == ':'
+                             and texts_and_lang[tweet_i][0][char_j+6] == '/'
+                             and texts_and_lang[tweet_i][0][char_j+7] == '/'):
+                        removal_mode = True
+                    # append char as it is a normal 'h' ocurrence
+                    else:
+                        filtered_tweet_text.append(texts_and_lang[tweet_i][0][char_j])
+                # check if part to be removed has ended to quit removal mode
+                elif (removal_mode and texts_and_lang[tweet_i][0][char_j] == ' '):
+                    removal_mode = False
+                # append char if removal mode is not active
+                elif (not removal_mode):
+                    filtered_tweet_text.append(texts_and_lang[tweet_i][0][char_j])
+            # if there is still text: append tweet to list
+            if (filtered_tweet_text != []):
+                filtered_texts_and_lang.append((''.join(filtered_tweet_text), texts_and_lang[tweet_i][1]))
+        return filtered_texts_and_lang
+    
     
     # set_ratios must be: [train_ratio, val_ratio, test_ratio]
     def split_data_into_sets(self, texts_and_lang, set_ratios):
@@ -122,10 +169,12 @@ class InputData(object):
     def get_indexed_data(self, input_data_rel_path, min_char_frequency, set_ratios, fetch_only_langs=None, fetch_only_first_x_tweets=math.inf):
         texts_and_lang = self.fetch_tweet_texts_and_lang_from_file(input_data_rel_path, fetch_only_langs, fetch_only_first_x_tweets)
 #        print(texts_and_lang)
+        filtered_texts_and_lang = self.filter_out_irrelevant_tweet_parts(texts_and_lang)
+#        print(filtered_texts_and_lang)
         # initialize random number generator to facilitate testing
         random.seed(42)
-        random.shuffle(texts_and_lang)
-        train_set, val_set, test_set = self.split_data_into_sets(texts_and_lang, set_ratios)
+        random.shuffle(filtered_texts_and_lang)
+        train_set, val_set, test_set = self.split_data_into_sets(filtered_texts_and_lang, set_ratios)
 #        print(train_set, val_set, test_set)
 #        print(len(train_set), len(val_set), len(test_set))
         vocab_chars, vocab_lang = self.get_vocab_chars_and_lang(train_set, min_char_frequency)
