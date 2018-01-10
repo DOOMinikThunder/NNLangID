@@ -7,6 +7,7 @@ from net import GRUModel
 import Evaluator
 
 
+
 def main():
     
     ##############
@@ -16,10 +17,8 @@ def main():
     input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
 #    input_data_rel_path = "../data/input_data/test.csv"
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
-
     model_checkpoint_rel_path = "../data/model_checkpoint/model_checkpoint.pth"
-    fetch_only_langs = None#['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
-
+    fetch_only_langs = ['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
     fetch_only_first_x_tweets = math.inf#5
     calc_embed = True
     train_rnn = True
@@ -28,21 +27,21 @@ def main():
     set_ratios = [0.8, 0.1, 0.1]    # [train_ratio, val_ratio, test_ratio]
                                     # warning: changes may require new embedding calculation due to differently shuffled train_set
     min_char_frequency = 2
-    sampling_table_size = 100000000      # should be 100000000
+    sampling_table_size = 1000      # should be 100000000
     batch_size_embed = 2
-    max_context_window_size = 3
-    num_neg_samples = 10
+    max_context_window_size = 2
+    num_neg_samples = 5
 #    embed_dim = 2                  # will be set automatically later to: roundup(log2(vocabulary-size))
     initial_lr_embed = 0.025
-    num_epochs_embed = 3
+    num_epochs_embed = 1
     
     # HYPERPARAMETERS RNN
 #    input_size = list(train_embed_char_text_inp_tensors[0].size())[2]
 #    num_classes = len(vocab_lang)
-    hidden_size = 1000
+    hidden_size = 100
     num_layers = 1
     is_bidirectional = True
-    initial_lr_rnn = 0.005
+    initial_lr_rnn = 0.001
     lr_decay_factor_rnn = 0.1
     weight_decay_rnn = 0.00001
     
@@ -110,6 +109,7 @@ def main():
                                   initial_lr=initial_lr_rnn,
                                   weight_decay=weight_decay_rnn)
     print('Model:\n', gru_model)
+    evaluator = Evaluator.Evaluator(gru_model)
 
 
     # TRAINING
@@ -127,32 +127,12 @@ def main():
                             targets=train_target_tensors)
             
             # evaluate validation set
-            cur_accuracy = gru_model.train(inputs=val_embed_char_text_inp_tensors,
-                                           targets=val_target_tensors,
-                                           eval=True)
+            cur_accuracy = evaluator.evalute_data_set(val_embed_char_text_inp_tensors,
+                                                      val_target_tensors,
+                                                      vocab_lang)
             print('========================================')
             print('Epoch', epoch, 'validation set accuracy:', cur_accuracy)
             print('========================================')
-            
-#            # evaluate train set
-#            cur_accuracy = gru_model.train(inputs=train_embed_char_text_inp_tensors,
-#                                           targets=train_target_tensors,
-#                                           eval=True)
-#            print('EVAL ACCURACY:', cur_accuracy)
-#            print('EVAL ACCURACY:', cur_accuracy)
-#            print('EVAL ACCURACY:', cur_accuracy)
-#            print('EVAL ACCURACY:', cur_accuracy)
-#            print('EVAL ACCURACY:', cur_accuracy)
-#            print('EVAL ACCURACY:', cur_accuracy)
-#            print('EVAL ACCURACY:', cur_accuracy)
-#            print('EVAL ACCURACY:', cur_accuracy)
-#            print('EVAL ACCURACY:', cur_accuracy)
-#            print('EVAL ACCURACY:', cur_accuracy)
-#            print('EVAL ACCURACY:', cur_accuracy)
-#            print('EVAL ACCURACY:', cur_accuracy)
-#            print('EVAL ACCURACY:', cur_accuracy)
-#            print('EVAL ACCURACY:', cur_accuracy)
-#            print('EVAL ACCURACY:', cur_accuracy)
             
             # check if accuracy improved and if so, save model checkpoint to file
             if (best_accuracy < cur_accuracy):
@@ -177,26 +157,16 @@ def main():
     start_epoch, best_accuracy = gru_model.load_model_checkpoint_from_file(model_checkpoint_rel_path)
 #    print(start_epoch)
 #    print(best_accuracy)
-    accuracy = gru_model.train(inputs=test_embed_char_text_inp_tensors,
-                               targets=test_target_tensors,
-                               eval=True)
+    test_accuracy = evaluator.evalute_data_set(test_embed_char_text_inp_tensors,
+                                               test_target_tensors,
+                                               vocab_lang)
     print('========================================')
-    print('Test set accuracy:', accuracy)
+    print('Test set accuracy:', test_accuracy)
     print('========================================')
 
 
-#    # evaluate train set
-#    start_epoch, best_accuracy = gru_model.load_model_checkpoint_from_file(model_checkpoint_rel_path)
-##    print(start_epoch)
-##    print(best_accuracy)
-#    cur_accuracy = gru_model.train(inputs=train_embed_char_text_inp_tensors,
-#                                   targets=train_target_tensors,
-#                                   eval=True)
-#    print('FINAL EVAL ACCURACY:', cur_accuracy)
-
-
-    #evaluator = Evaluator.Evaluator(gru_model)
-    #evaluator.evalute_data_set(shuffled_input, target_tensors, vocab_lang)
+    
+    
 
 
 if __name__ == '__main__':
