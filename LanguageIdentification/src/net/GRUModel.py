@@ -4,13 +4,13 @@ import torch
 from torch import nn, optim
 from torch.autograd import Variable
 import torch.nn.functional as F
-
+from . import BatchGenerator
 
 
 class GRUModel(nn.Module):
     
     
-    def __init__(self, input_size, hidden_size, num_layers, num_classes, is_bidirectional, initial_lr, weight_decay):
+    def __init__(self, input_size, hidden_size, num_layers, num_classes, is_bidirectional, initial_lr, weight_decay, batch_size):
         super().__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers
@@ -27,7 +27,7 @@ class GRUModel(nn.Module):
         else:
             self.num_directions = 1
         self.output_layer = nn.Linear(hidden_size * self.num_directions, num_classes)
-        self.batch_size = 1
+        self.batch_size = batch_size
         
         self.criterion = torch.nn.NLLLoss()
         self.optimizer = optim.Adam(params=self.parameters(), lr=initial_lr, weight_decay=weight_decay)
@@ -47,26 +47,31 @@ class GRUModel(nn.Module):
         return Variable(torch.zeros(self.num_layers * self.num_directions, self.batch_size, self.hidden_size))
     
 
-    def train(self, inputs, targets, eval=False):
+    def train(self, inputs, targets):
         
         inputs_size = len(inputs)
         num_inputs_minus_one = inputs_size - 1
-        for i in range(inputs_size):
-            inp = inputs[i]
-            target = targets[i]
-            hidden = self.initHidden()
-            dims = list(inp.size())
-            
-            output, hidden = self(inp, hidden)
-            # transform 3D to 2D tensor for the criterion function
-            output = output.view(dims[0], -1)
-#           print('OUTPUT:\n', output)
-            
-            self.zero_grad()
+        batch_gen = BatchGenerator.Batches(inputs, targets, self.batch_size)
 
-            loss = self.criterion(output, target)
-            print('RNN Loss', i, '/', num_inputs_minus_one, ':\n', float(loss.data[0]))
-            loss.backward()
+        for i, (in_batch, target_batch) in enumerate(batch_gen):
+            self.zero_grad()
+            #print('in_batch size', len(in_batch))
+            for input, target in zip(in_batch, target_batch):
+                #print('in size', input.size())
+                hidden = self.initHidden()
+                #print('in_batch', type(input))
+                #print(input)
+                output, hidden = self(input, hidden)
+                # transform 3D to 2D tensor for the criterion function
+                dims = list(input.size())
+
+                output = output.view(dims[0], -1)
+                #           print('OUTPUT:\n', output)
+
+                loss = self.criterion(output, target)
+                #print('rnn Loss', float(loss.data[0]))
+                loss.backward()
+            print('RNN Loss', i, '/', num_inputs_minus_one, ': ', float(loss.data[0]))
             self.optimizer.step()
 
 
