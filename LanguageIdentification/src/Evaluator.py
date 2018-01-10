@@ -27,7 +27,7 @@ class Evaluator(object):
 
         accuracy = pred_true/len(input_data)
         self.confusion_matrix(predictions, target_list, vocab_lang)
-        print('accuracy', accuracy)
+#        print('accuracy', accuracy)
         return accuracy
 
     #prediction: tensor of languages-dimensional entries containing log softmax probabilities

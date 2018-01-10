@@ -14,17 +14,20 @@ def main():
     # PARAMETERS #
     ##############
     
-    input_data_rel_path = "../data/input_data/recall_oriented_dl.csv"
+#    input_data_rel_path = "../data/input_data/recall_oriented_dl.csv"
+    input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
 #    input_data_rel_path = "../data/input_data/test.csv"
     test_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
 
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
-    model_checkpoint_rel_path = "../data/model_checkpoint/model_checkpoint.pth"
-    fetch_only_langs = None#['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
+    val_model_checkpoint_rel_path = "../data/model_checkpoints/val_model_checkpoint.pth"
+    test_model_checkpoint_rel_path = "../data/model_checkpoints/test_model_checkpoint.pth"
+    fetch_only_langs = ['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
     fetch_only_first_x_tweets = math.inf#5
     calc_embed = True
     train_rnn = True
     eval_test_set = True
+    print_model_checkpoints = False
     
     # HYPERPARAMETERS EMBEDDING
     set_ratios = [0.8, 0.2]         # [train_ratio, val_ratio]
@@ -151,7 +154,7 @@ def main():
                                             'best_accuracy': best_accuracy,
                                             'optimizer': gru_model.optimizer.state_dict()
                                             },
-                                            model_checkpoint_rel_path)
+                                            val_model_checkpoint_rel_path)
             else:
                 is_improving = False
             epoch += 1
@@ -162,17 +165,41 @@ def main():
     # EVALUATION
     if (eval_test_set):
         # evaluate test set
-        start_epoch, best_accuracy = gru_model.load_model_checkpoint_from_file(model_checkpoint_rel_path)
+        start_epoch, val_accuracy = gru_model.load_model_checkpoint_from_file(val_model_checkpoint_rel_path)
 #        print(start_epoch)
 #        print(best_accuracy)
         test_accuracy = evaluator.evalute_data_set(test_embed_char_text_inp_tensors,
                                                    test_target_tensors,
                                                    vocab_lang)
         print('========================================')
+        print('Epochs trained:', start_epoch)
+        print('========================================')
+        print('Best validation set accuracy:', val_accuracy)
+        print('========================================')
         print('Test set accuracy:', test_accuracy)
         print('========================================')
 
+        # save test_accuracy to file
+        gru_model.save_model_checkpoint_to_file({
+                                            'start_epoch': start_epoch,
+                                            'state_dict': gru_model.state_dict(),
+                                            'best_accuracy': test_accuracy,
+                                            'optimizer': gru_model.optimizer.state_dict()
+                                            },
+                                            test_model_checkpoint_rel_path)
 
+    # print saved model checkpoints from file
+    if (print_model_checkpoints):
+        start_epoch, val_accuracy = gru_model.load_model_checkpoint_from_file(val_model_checkpoint_rel_path)
+        start_epoch, test_accuracy = gru_model.load_model_checkpoint_from_file(test_model_checkpoint_rel_path)
+        print('========================================')
+        print('Epochs trained:', start_epoch)
+        print('========================================')
+        print('Best validation set accuracy:', val_accuracy)
+        print('========================================')
+        print('Test set accuracy:', test_accuracy)
+        print('========================================')
+        
     
     
 

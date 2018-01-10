@@ -49,9 +49,8 @@ class GRUModel(nn.Module):
     
 
     def train(self, inputs, targets):
-        inputs_size = len(inputs)
-        num_inputs_minus_one = inputs_size - 1
         batch_gen = BatchGenerator.Batches(inputs, targets, self.batch_size)
+        num_batches_minus_one = batch_gen.num_batches - 1
         for i, (in_batch, target_batch) in enumerate(batch_gen):
             self.zero_grad()
             #print('in_batch size', len(in_batch))
@@ -70,7 +69,7 @@ class GRUModel(nn.Module):
                 loss = self.criterion(output, target)
                 #print('rnn Loss', float(loss.data[0]))
                 loss.backward()
-            print('RNN Loss', i, '/', num_inputs_minus_one, ': ', float(loss.data[0]))
+            print('RNN Loss', i, '/', num_batches_minus_one, ': ', float(loss.data[0]))
             self.optimizer.step()
             
         
