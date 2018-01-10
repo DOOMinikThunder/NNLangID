@@ -14,7 +14,9 @@ def main():
     # PARAMETERS #
     ##############
     
-    input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
+    input_data_rel_path = "../data/input_data/recall_oriented_dl.csv"
+    test_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
+
 #    input_data_rel_path = "../data/input_data/test.csv"
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
     model_checkpoint_rel_path = "../data/model_checkpoint/model_checkpoint.pth"
@@ -24,7 +26,7 @@ def main():
     train_rnn = True
     
     # HYPERPARAMETERS EMBEDDING
-    set_ratios = [0.8, 0.1, 0.1]    # [train_ratio, val_ratio, test_ratio]
+    set_ratios = [0.8, 0.2]    # [train_ratio, val_ratio, test_ratio]
                                     # warning: changes may require new embedding calculation due to differently shuffled train_set
     min_char_frequency = 2
     sampling_table_size = 1000      # should be 100000000
@@ -44,6 +46,8 @@ def main():
     initial_lr_rnn = 0.001
     lr_decay_factor_rnn = 0.1
     weight_decay_rnn = 0.00001
+    num_epochs = 2
+    batch_size = 5
     
     
     ###################################
@@ -62,6 +66,7 @@ def main():
         {'de': (0, 32)}
     """
     train_set_indexed, val_set_indexed, test_set_indexed, vocab_chars, vocab_lang = input_data.get_indexed_data(input_data_rel_path=input_data_rel_path,
+                                                                                                                test_data_rel_path=test_data_rel_path,
                                                                                                                 min_char_frequency=min_char_frequency,
                                                                                                                 set_ratios=set_ratios,
                                                                                                                 fetch_only_langs=fetch_only_langs,
@@ -107,19 +112,22 @@ def main():
                                   num_classes=len(vocab_lang),
                                   is_bidirectional=is_bidirectional,
                                   initial_lr=initial_lr_rnn,
-                                  weight_decay=weight_decay_rnn)
+                                  weight_decay=weight_decay_rnn,
+                                  batch_size=batch_size)
     print('Model:\n', gru_model)
     evaluator = Evaluator.Evaluator(gru_model)
 
 
     # TRAINING
+
+
     if (train_rnn):
         cur_accuracy = 0
         best_accuracy = 0
         epoch = 0
         is_improving = True
         # stop training when validation set error stops getting smaller ==> stop when overfitting occurs
-        while is_improving:
+        while is_improving and not epoch == num_epochs:
             print('RNN epoch:', epoch)
             # inputs: whole data set, every date contains the embedding of one char in one dimension
             # targets: whole target set, target is set for each character embedding
@@ -147,7 +155,6 @@ def main():
             else:
                 is_improving = False
             epoch += 1
-# TODO: does Adam optimizer already adapt learning rate? proper way of adapting?
             # decrease learning rate over time
             gru_model.optimizer.lr = gru_model.lr * lr_decay_factor_rnn
         
@@ -157,13 +164,15 @@ def main():
     start_epoch, best_accuracy = gru_model.load_model_checkpoint_from_file(model_checkpoint_rel_path)
 #    print(start_epoch)
 #    print(best_accuracy)
+
+    """
     test_accuracy = evaluator.evalute_data_set(test_embed_char_text_inp_tensors,
                                                test_target_tensors,
                                                vocab_lang)
     print('========================================')
     print('Test set accuracy:', test_accuracy)
     print('========================================')
-
+    """
 
     
     

@@ -82,15 +82,14 @@ class InputData(object):
     
     # set_ratios must be: [train_ratio, val_ratio, test_ratio]
     def split_data_into_sets(self, texts_and_lang, set_ratios):
-        if (set_ratios[0] + set_ratios[1] + set_ratios[2] != 1):
+        if (set_ratios[0] + set_ratios[1] != 1):
             print("Error: Set ratios do not sum to 1!")
             return -1
         data_size = len(texts_and_lang)
         val_size = int(set_ratios[1] * data_size)
-        test_size = int(set_ratios[2] * data_size)
         # train set size is adapted to fit total data size
         # (as it is usually the largest set, the error will be neglectible)
-        train_size = data_size - (val_size + test_size)
+        train_size = data_size - (val_size)
 
         train_set = []
         val_set = []
@@ -99,9 +98,7 @@ class InputData(object):
             train_set.append(texts_and_lang[i])
         for i in range(val_size):
             val_set.append(texts_and_lang[i+train_size])
-        for i in range(test_size):
-            test_set.append(texts_and_lang[i+train_size+val_size])
-        return train_set, val_set, test_set
+        return train_set, val_set
     
         
     def get_vocab_chars_and_lang(self, texts_and_lang, min_char_frequency):
@@ -166,15 +163,17 @@ class InputData(object):
         return indexed_texts_and_lang
     
     
-    def get_indexed_data(self, input_data_rel_path, min_char_frequency, set_ratios, fetch_only_langs=None, fetch_only_first_x_tweets=math.inf):
+    def get_indexed_data(self, input_data_rel_path, test_data_rel_path, min_char_frequency, set_ratios, fetch_only_langs=None, fetch_only_first_x_tweets=math.inf):
         texts_and_lang = self.fetch_tweet_texts_and_lang_from_file(input_data_rel_path, fetch_only_langs, fetch_only_first_x_tweets)
+        test_set = self.fetch_tweet_texts_and_lang_from_file(test_data_rel_path, fetch_only_langs, fetch_only_first_x_tweets)
+
 #        print(texts_and_lang)
         filtered_texts_and_lang = self.filter_out_irrelevant_tweet_parts(texts_and_lang)
 #        print(filtered_texts_and_lang)
         # initialize random number generator to facilitate testing
         random.seed(42)
         random.shuffle(filtered_texts_and_lang)
-        train_set, val_set, test_set = self.split_data_into_sets(filtered_texts_and_lang, set_ratios)
+        train_set, val_set = self.split_data_into_sets(filtered_texts_and_lang, set_ratios)
 #        print(train_set, val_set, test_set)
 #        print(len(train_set), len(val_set), len(test_set))
         vocab_chars, vocab_lang = self.get_vocab_chars_and_lang(train_set, min_char_frequency)
