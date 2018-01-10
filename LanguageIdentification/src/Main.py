@@ -15,18 +15,19 @@ def main():
     ##############
     
     input_data_rel_path = "../data/input_data/recall_oriented_dl.csv"
+#    input_data_rel_path = "../data/input_data/test.csv"
     test_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
 
-#    input_data_rel_path = "../data/input_data/test.csv"
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
     model_checkpoint_rel_path = "../data/model_checkpoint/model_checkpoint.pth"
-    fetch_only_langs = ['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
+    fetch_only_langs = None#['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
     fetch_only_first_x_tweets = math.inf#5
     calc_embed = True
     train_rnn = True
+    eval_test_set = True
     
     # HYPERPARAMETERS EMBEDDING
-    set_ratios = [0.8, 0.2]    # [train_ratio, val_ratio, test_ratio]
+    set_ratios = [0.8, 0.2]         # [train_ratio, val_ratio]
                                     # warning: changes may require new embedding calculation due to differently shuffled train_set
     min_char_frequency = 2
     sampling_table_size = 1000      # should be 100000000
@@ -46,8 +47,8 @@ def main():
     initial_lr_rnn = 0.001
     lr_decay_factor_rnn = 0.1
     weight_decay_rnn = 0.00001
-    num_epochs = 2
-    batch_size = 5
+    num_epochs_rnn = math.inf#2
+    batch_size_rnn = 5
     
     
     ###################################
@@ -113,21 +114,20 @@ def main():
                                   is_bidirectional=is_bidirectional,
                                   initial_lr=initial_lr_rnn,
                                   weight_decay=weight_decay_rnn,
-                                  batch_size=batch_size)
+                                  batch_size=batch_size_rnn)
     print('Model:\n', gru_model)
     evaluator = Evaluator.Evaluator(gru_model)
 
 
     # TRAINING
-
-
     if (train_rnn):
         cur_accuracy = 0
         best_accuracy = 0
         epoch = 0
         is_improving = True
         # stop training when validation set error stops getting smaller ==> stop when overfitting occurs
-        while is_improving and not epoch == num_epochs:
+        # or when maximum number of epochs reached
+        while is_improving and not epoch == num_epochs_rnn:
             print('RNN epoch:', epoch)
             # inputs: whole data set, every date contains the embedding of one char in one dimension
             # targets: whole target set, target is set for each character embedding
@@ -160,19 +160,18 @@ def main():
         
         
     # EVALUATION
-    # evaluate test set
-    start_epoch, best_accuracy = gru_model.load_model_checkpoint_from_file(model_checkpoint_rel_path)
-#    print(start_epoch)
-#    print(best_accuracy)
+    if (eval_test_set):
+        # evaluate test set
+        start_epoch, best_accuracy = gru_model.load_model_checkpoint_from_file(model_checkpoint_rel_path)
+#        print(start_epoch)
+#        print(best_accuracy)
+        test_accuracy = evaluator.evalute_data_set(test_embed_char_text_inp_tensors,
+                                                   test_target_tensors,
+                                                   vocab_lang)
+        print('========================================')
+        print('Test set accuracy:', test_accuracy)
+        print('========================================')
 
-    """
-    test_accuracy = evaluator.evalute_data_set(test_embed_char_text_inp_tensors,
-                                               test_target_tensors,
-                                               vocab_lang)
-    print('========================================')
-    print('Test set accuracy:', test_accuracy)
-    print('========================================')
-    """
 
     
     

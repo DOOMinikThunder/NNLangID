@@ -7,6 +7,7 @@ import torch.nn.functional as F
 from . import BatchGenerator
 
 
+
 class GRUModel(nn.Module):
     
     
@@ -48,11 +49,9 @@ class GRUModel(nn.Module):
     
 
     def train(self, inputs, targets):
-        
         inputs_size = len(inputs)
         num_inputs_minus_one = inputs_size - 1
         batch_gen = BatchGenerator.Batches(inputs, targets, self.batch_size)
-
         for i, (in_batch, target_batch) in enumerate(batch_gen):
             self.zero_grad()
             #print('in_batch size', len(in_batch))
@@ -66,19 +65,13 @@ class GRUModel(nn.Module):
                 dims = list(input.size())
 
                 output = output.view(dims[0], -1)
-                #           print('OUTPUT:\n', output)
+#                print('OUTPUT:\n', output)
 
                 loss = self.criterion(output, target)
                 #print('rnn Loss', float(loss.data[0]))
                 loss.backward()
             print('RNN Loss', i, '/', num_inputs_minus_one, ': ', float(loss.data[0]))
             self.optimizer.step()
-
-
-#                    loss = criterion(output, target)
-#                    print('RNN LOSS:\n', loss)
-#                    loss.backward()
-#                    optimizer.step()
             
         
     def save_model_checkpoint_to_file(self, state, relative_path_to_file):
@@ -95,4 +88,3 @@ class GRUModel(nn.Module):
 #        self.eval()
         print('Model checkpoint loaded from file:', relative_path_to_file)
         return start_epoch, best_accuracy
-
