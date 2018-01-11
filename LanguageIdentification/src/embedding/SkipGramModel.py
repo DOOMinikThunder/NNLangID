@@ -27,17 +27,30 @@ class SkipGramModel(nn.Module):
 
     def forward(self, targets, contexts, neg_samples):
         losses = []
+        # lookup the weight values for the target char
+        # for all target chars in the batch
         emb_h = self.embed_hidden(autograd.Variable(torch.LongTensor(targets)))
+        # lookup the 1-position weight value for the context char (backwards from "output layer")
+        # for all context chars in the batch
         emb_o = self.embed_output(autograd.Variable(torch.LongTensor(contexts)))
+        # calculate dot product for each target-1_pos_context pair in the batch
         score = torch.mul(emb_h, emb_o).squeeze()
         score = torch.sum(score, dim=1)
+        # apply log sigmoid function to the calculated dot products in the batch
+        # and sum up the results for the whole batch and store in list
         score = F.logsigmoid(score)
         losses.append(sum(score))
+        # use the sampled 0-positions of the context char to lookup the weight values (backwards from "output layer")
         neg_emb_o = self.embed_output(autograd.Variable(torch.LongTensor(neg_samples)))
+        # calculate dot product for each target-0_pos_context pair
+        # for the whole batch
         neg_score = torch.bmm(neg_emb_o, emb_h.unsqueeze(2)).squeeze()
         neg_score = torch.sum(neg_score, dim=1)
+        # apply log sigmoid function to the negative of the calculated dot products in the batch
+        # and sum up the results for the whole batch and store in list
         neg_score = F.logsigmoid(-1 * neg_score)
         losses.append(sum(neg_score))
+        # sum up the score and neg_score, negate and normalize the loss by dividing by the batch size
         return (-1 * sum(losses)) / len(targets)
     
     
