@@ -3,10 +3,13 @@
 import torch
 import torch.autograd as autograd
 import torch.optim as optim
+from torch.autograd import Variable
 import numpy as np
 import math
 import random
-from . import SkipGramModel
+#from . import SkipGramModel
+from embedding import SkipGramModel
+import InputData
 #from tqdm import tqdm
 
 
@@ -146,7 +149,7 @@ class EmbeddingCalculation(object):
         return np.random.choice(self.sampling_table, size=(num_pairs, num_samples)).tolist()
             
     
-    def calc_embed(self, indexed_tweet_texts, batch_size, vocab_chars, max_context_window_size, num_neg_samples, num_epochs, initial_lr, embed_weights_rel_path, sampling_table_min_char_count=1):
+    def calc_embed(self, indexed_tweet_texts, batch_size, vocab_chars, max_context_window_size, num_neg_samples, num_epochs, initial_lr, embed_weights_rel_path, print_testing, sampling_table_min_char_count=1):
         # set embedding dimension to: roundup(log2(vocabulary-size))
         embed_dim = math.ceil(math.log2(len(vocab_chars)))
     #    print(embed_dim)
@@ -194,18 +197,24 @@ class EmbeddingCalculation(object):
         # TESTING #
         ###########
         
-        print("VOCABULARY:", vocab_chars)
-        print("VOCABULARY SIZE:", len(vocab_chars))
-        
-        a = skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[0]])))
-        b = skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[1]])))
-        c = skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[2]])))
-        d = skip_gram_model.embed_hidden(autograd.Variable(torch.LongTensor([[3]])))
-        
-        print("EMBEDDING VECTOR DIFFERENCES:")
-        print("a-b", torch.FloatTensor.sum((torch.abs(a - b)).data[0]))
-        print("c-d", torch.FloatTensor.sum((torch.abs(c - d)).data[0]))
-        print("a-c", torch.FloatTensor.sum((torch.abs(a - c)).data[0]))
-        print("a-d", torch.FloatTensor.sum((torch.abs(a - d)).data[0]))
-        print("b-c", torch.FloatTensor.sum((torch.abs(b - c)).data[0]))
-        print("b-d", torch.FloatTensor.sum((torch.abs(b - d)).data[0]))
+        if (print_testing):
+#            print("VOCABULARY:\n", vocab_chars)
+            input_data = InputData.InputData()
+            embed = input_data.create_embed_from_weights_file(embed_weights_rel_path)
+            char2index, index2char = input_data.get_char2index_and_index2char(vocab_chars)
+            vocab_size = len(vocab_chars)
+            
+            # get all embed weights
+            embed_weights = [embed(Variable(torch.LongTensor([x]))) for x in range(vocab_size)]
+#            print(embed_weights)
+            
+            # print differences between the embeddings
+            # (relations on test_embed.csv: g-h, f-e-b-a-c-d)
+            print('Embedding vector differences:')
+            for i in range(vocab_size):
+                char_i = index2char[i]
+                for j in range(vocab_size):
+#                    if (j >= i):   # print each pair only once
+                    char_j = index2char[j]
+                    diff = torch.FloatTensor.sum((torch.abs(embed_weights[i] - embed_weights[j]).data[0]))
+                    print(char_i, '-', char_j, diff)

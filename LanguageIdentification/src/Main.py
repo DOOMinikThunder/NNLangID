@@ -2,23 +2,23 @@
 
 import math
 import InputData
+import Evaluator
 from embedding import EmbeddingCalculation
 from net import GRUModel
-import Evaluator
 
 
 
 def main():
-    
+
     ##############
     # PARAMETERS #
     ##############
     
 #    input_data_rel_path = "../data/input_data/recall_oriented_dl.csv"
 #    input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
-    input_data_rel_path = "../data/input_data/test.csv"
+    input_data_rel_path = "../data/input_data/test_embed.csv"
 #    test_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
-    test_data_rel_path = "../data/input_data/test.csv"
+    test_data_rel_path = "../data/input_data/test_embed.csv"
 
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
     val_model_checkpoint_rel_path = "../data/model_checkpoints/val_model_checkpoint.pth"
@@ -26,8 +26,9 @@ def main():
     fetch_only_langs = None#['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
     fetch_only_first_x_tweets = math.inf#5
     calc_embed = True
-    train_rnn = True
-    eval_test_set = True
+    train_rnn = False
+    eval_test_set = False
+    print_embed_testing = True
     print_model_checkpoints = False
     
     # HYPERPARAMETERS EMBEDDING
@@ -40,7 +41,7 @@ def main():
     num_neg_samples = 5
 #    embed_dim = 2                      # will be set automatically later to: roundup(log2(vocabulary-size))
     initial_lr_embed = 0.025
-    num_epochs_embed = 1
+    num_epochs_embed = 3
     
     # HYPERPARAMETERS RNN
 #    input_size = list(train_embed_char_text_inp_tensors[0].size())[2]
@@ -97,6 +98,7 @@ def main():
                                          num_epochs=num_epochs_embed,
                                          initial_lr=initial_lr_embed,
                                          embed_weights_rel_path=embed_weights_rel_path,
+                                         print_testing=print_embed_testing,
                                          sampling_table_min_char_count=sampling_table_min_char_count)
     
     
