@@ -210,7 +210,7 @@ class EmbeddingCalculation(object):
             
             # print differences between the embeddings
             # (relations on test_embed.csv: g-h, f-e-b-a-c-d)
-            print('Embedding vector differences:')
+            print('Embedding vector differences (relations on test_embed.csv: g-h, f-e-b-a-c-d):')
             for i in range(vocab_size):
                 char_i = index2char[i]
                 for j in range(vocab_size):
