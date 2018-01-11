@@ -37,29 +37,40 @@ class SkipGramModel(nn.Module):
         # lookup the 1-position weight values for the target char
         # for all target chars in the batch
         targets_1_pos_weights_hidden = self.embed_hidden(autograd.Variable(torch.LongTensor(targets_1_pos)))
+#        print(targets_1_pos_weights_hidden)
         # lookup the 1-position weight values for the context char (backwards from "output layer")
         # for all context chars in the batch
         contexts_1_pos_weights_output = self.embed_output(autograd.Variable(torch.LongTensor(contexts_1_pos)))
+#        print(contexts_1_pos_weights_output)
         # calculate dot product for each target_1_pos-context_1_pos pair in the batch
-        score_contexts_1_pos = torch.mul(targets_1_pos_weights_hidden, contexts_1_pos_weights_output).squeeze()
+        score_contexts_1_pos = torch.mul(targets_1_pos_weights_hidden, contexts_1_pos_weights_output)
+#        print(score_contexts_1_pos)
         score_contexts_1_pos = torch.sum(score_contexts_1_pos, dim=1)
+#        print(score_contexts_1_pos)
         # apply log sigmoid function to the calculated dot products in the batch
         # and sum up the results for the whole batch and store in list
         score_contexts_1_pos = F.logsigmoid(score_contexts_1_pos)
+#        print(score_contexts_1_pos)
         losses.append(sum(score_contexts_1_pos))
         # use the sampled 0-positions of the context char to lookup the weight values (backwards from "output layer")
         # for all context chars in the batch
         contexts_0_pos_samples_weights_output = self.embed_output(autograd.Variable(torch.LongTensor(contexts_0_pos_samples)))
+#        print(contexts_0_pos_samples_weights_output)
         # calculate dot product for each target_1_pos-context_0_pos_sample pair
         # for the whole batch
-        score_contexts_0_pos_samples = torch.bmm(contexts_0_pos_samples_weights_output, targets_1_pos_weights_hidden.unsqueeze(2)).squeeze()
+        score_contexts_0_pos_samples = torch.bmm(contexts_0_pos_samples_weights_output, targets_1_pos_weights_hidden.unsqueeze(2))
+#        print(score_contexts_0_pos_samples)
         score_contexts_0_pos_samples = torch.sum(score_contexts_0_pos_samples, dim=1)
+#        print(score_contexts_0_pos_samples)
         # apply log sigmoid function to the negative of the calculated dot products in the batch
         # and sum up the results for the whole batch and store in list
         score_contexts_0_pos_samples = F.logsigmoid(-1 * score_contexts_0_pos_samples)
+#        print(score_contexts_0_pos_samples)
         losses.append(sum(score_contexts_0_pos_samples))
         # sum up the score_contexts_1_pos and score_contexts_0_pos_samples,
-        # negate and normalize the loss by dividing by the batch size
+        # make positive (is negative because of log sigmoid function)
+        # and normalize the loss by dividing by the batch size
+#        print(losses)
         return (-1 * sum(losses)) / len(targets_1_pos)
     
     

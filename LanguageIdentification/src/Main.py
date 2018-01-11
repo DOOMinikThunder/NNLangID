@@ -15,14 +15,15 @@ def main():
     ##############
     
 #    input_data_rel_path = "../data/input_data/recall_oriented_dl.csv"
-    input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
-#    input_data_rel_path = "../data/input_data/test.csv"
-    test_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
+#    input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
+    input_data_rel_path = "../data/input_data/test.csv"
+#    test_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
+    test_data_rel_path = "../data/input_data/test.csv"
 
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
     val_model_checkpoint_rel_path = "../data/model_checkpoints/val_model_checkpoint.pth"
     test_model_checkpoint_rel_path = "../data/model_checkpoints/test_model_checkpoint.pth"
-    fetch_only_langs = ['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
+    fetch_only_langs = None#['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
     fetch_only_first_x_tweets = math.inf#5
     calc_embed = True
     train_rnn = True
@@ -30,14 +31,14 @@ def main():
     print_model_checkpoints = False
     
     # HYPERPARAMETERS EMBEDDING
-    set_ratios = [0.8, 0.2]         # [train_ratio, val_ratio]
-                                    # warning: changes may require new embedding calculation due to differently shuffled train_set
+    set_ratios = [0.8, 0.2]             # [train_ratio, val_ratio]
+                                        # warning: changes may require new embedding calculation due to differently shuffled train_set
     min_char_frequency = 2
-    sampling_table_size = 1000      # should be 100000000
+    sampling_table_min_char_count = 10  # specify the precision of the sampling (should be 10 or higher)
     batch_size_embed = 2
     max_context_window_size = 2
     num_neg_samples = 5
-#    embed_dim = 2                  # will be set automatically later to: roundup(log2(vocabulary-size))
+#    embed_dim = 2                      # will be set automatically later to: roundup(log2(vocabulary-size))
     initial_lr_embed = 0.025
     num_epochs_embed = 1
     
@@ -96,7 +97,7 @@ def main():
                                          num_epochs=num_epochs_embed,
                                          initial_lr=initial_lr_embed,
                                          embed_weights_rel_path=embed_weights_rel_path,
-                                         sampling_table_size=sampling_table_size)
+                                         sampling_table_min_char_count=sampling_table_min_char_count)
     
     
     ################
