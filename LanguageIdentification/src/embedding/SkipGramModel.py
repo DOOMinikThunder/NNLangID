@@ -7,6 +7,13 @@ import torch.nn.functional as F
 
 
 
+"""
+Loss calculation in forward method is based on the Negative sampling objective (NEG) (formula 4)
+in paper "Distributed Representations of Words and Phrases and their Compositionality"
+by Tomas Mikolov et al. (Oct. 2013).
+Initializations and optimizations are suggested by Xiaofei Sun on
+https://adoni.github.io/2017/11/08/word2vec-pytorch/ (Access: 11.01.2018)
+"""
 class SkipGramModel(nn.Module):
 
     
@@ -25,33 +32,35 @@ class SkipGramModel(nn.Module):
         self.embed_output.weight.data.uniform_(-0, 0)
 
 
-    def forward(self, targets, contexts, neg_samples):
+    def forward(self, targets_1_pos, contexts_1_pos, contexts_0_pos_samples):
         losses = []
-        # lookup the weight values for the target char
+        # lookup the 1-position weight values for the target char
         # for all target chars in the batch
-        emb_h = self.embed_hidden(autograd.Variable(torch.LongTensor(targets)))
-        # lookup the 1-position weight value for the context char (backwards from "output layer")
+        targets_1_pos_weights_hidden = self.embed_hidden(autograd.Variable(torch.LongTensor(targets_1_pos)))
+        # lookup the 1-position weight values for the context char (backwards from "output layer")
         # for all context chars in the batch
-        emb_o = self.embed_output(autograd.Variable(torch.LongTensor(contexts)))
-        # calculate dot product for each target-1_pos_context pair in the batch
-        score = torch.mul(emb_h, emb_o).squeeze()
-        score = torch.sum(score, dim=1)
+        contexts_1_pos_weights_output = self.embed_output(autograd.Variable(torch.LongTensor(contexts_1_pos)))
+        # calculate dot product for each target_1_pos-context_1_pos pair in the batch
+        score_contexts_1_pos = torch.mul(targets_1_pos_weights_hidden, contexts_1_pos_weights_output).squeeze()
+        score_contexts_1_pos = torch.sum(score_contexts_1_pos, dim=1)
         # apply log sigmoid function to the calculated dot products in the batch
         # and sum up the results for the whole batch and store in list
-        score = F.logsigmoid(score)
-        losses.append(sum(score))
+        score_contexts_1_pos = F.logsigmoid(score_contexts_1_pos)
+        losses.append(sum(score_contexts_1_pos))
         # use the sampled 0-positions of the context char to lookup the weight values (backwards from "output layer")
-        neg_emb_o = self.embed_output(autograd.Variable(torch.LongTensor(neg_samples)))
-        # calculate dot product for each target-0_pos_context pair
+        # for all context chars in the batch
+        contexts_0_pos_samples_weights_output = self.embed_output(autograd.Variable(torch.LongTensor(contexts_0_pos_samples)))
+        # calculate dot product for each target_1_pos-context_0_pos_sample pair
         # for the whole batch
-        neg_score = torch.bmm(neg_emb_o, emb_h.unsqueeze(2)).squeeze()
-        neg_score = torch.sum(neg_score, dim=1)
+        score_contexts_0_pos_samples = torch.bmm(contexts_0_pos_samples_weights_output, targets_1_pos_weights_hidden.unsqueeze(2)).squeeze()
+        score_contexts_0_pos_samples = torch.sum(score_contexts_0_pos_samples, dim=1)
         # apply log sigmoid function to the negative of the calculated dot products in the batch
         # and sum up the results for the whole batch and store in list
-        neg_score = F.logsigmoid(-1 * neg_score)
-        losses.append(sum(neg_score))
-        # sum up the score and neg_score, negate and normalize the loss by dividing by the batch size
-        return (-1 * sum(losses)) / len(targets)
+        score_contexts_0_pos_samples = F.logsigmoid(-1 * score_contexts_0_pos_samples)
+        losses.append(sum(score_contexts_0_pos_samples))
+        # sum up the score_contexts_1_pos and score_contexts_0_pos_samples,
+        # negate and normalize the loss by dividing by the batch size
+        return (-1 * sum(losses)) / len(targets_1_pos)
     
     
     def save_embed_to_file(self, relative_path_to_file):

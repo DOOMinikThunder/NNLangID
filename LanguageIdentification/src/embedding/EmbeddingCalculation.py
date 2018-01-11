@@ -166,14 +166,14 @@ class EmbeddingCalculation(object):
         num_epochs_minus_one = num_epochs - 1
         for epoch_i in range(num_epochs):
             print("Embedding epoch:", epoch_i, "/", num_epochs_minus_one)
-            for i,batch in enumerate(batched_pairs):
-                targets = [pair[0] for pair in batch]
-                contexts = [pair[1] for pair in batch]
-                neg_samples = self.get_neg_samples(len(batch), num_neg_samples)
+            for i, batch in enumerate(batched_pairs):
+                targets_1_pos = [pair[0] for pair in batch]
+                contexts_1_pos = [pair[1] for pair in batch]
+                contexts_0_pos_samples = self.get_neg_samples(len(batch), num_neg_samples)
     #            print(neg_samples)
                 
                 optimizer.zero_grad()
-                loss = skip_gram_model.forward(targets, contexts, neg_samples)
+                loss = skip_gram_model.forward(targets_1_pos, contexts_1_pos, contexts_0_pos_samples)
                 print('Embedding Loss', i, '/', len(batched_pairs), ': ', float(loss.data[0]))
                 loss.backward()
                 optimizer.step()
