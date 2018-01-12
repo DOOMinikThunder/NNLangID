@@ -24,7 +24,7 @@ class Evaluator(object):
             target_list.append(stats.mode(target.data.numpy()).mode[0])
             predictions.append(lang_prediction)
             pred_true += int(lang_prediction == target_list[-1])
-
+        
         accuracy = pred_true/len(input_data)
         self.confusion_matrix(predictions, target_list, vocab_lang)
 #        print('accuracy', accuracy)
