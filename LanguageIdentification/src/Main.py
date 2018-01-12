@@ -44,8 +44,6 @@ def main():
 #    embed_dim = 2                                           # will be set automatically later to: roundup(log2(vocabulary-size))
     initial_lr_embed = 0.025
     lr_decay_num_batches_embed = 100
-    scheduler_step_size_embed = 1                            # currently not functioning
-    scheduler_gamma_embed = 0.1                              # currently not functioning
     num_epochs_embed = 1
 
     # HYPERPARAMETERS RNN
@@ -104,8 +102,6 @@ def main():
                                          num_epochs=num_epochs_embed,
                                          initial_lr=initial_lr_embed,
                                          lr_decay_num_batches=lr_decay_num_batches_embed,
-                                         scheduler_step_size=scheduler_step_size_embed,
-                                         scheduler_gamma=scheduler_gamma_embed,
                                          embed_weights_rel_path=embed_weights_rel_path,
                                          print_testing=print_embed_testing,
                                          sampling_table_min_char_count=sampling_table_min_char_count,

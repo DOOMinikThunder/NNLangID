@@ -20,7 +20,7 @@ https://adoni.github.io/2017/11/08/word2vec-pytorch/ (Access: 11.01.2018)
 class SkipGramModel(nn.Module):
 
     
-    def __init__(self, vocab_chars, embed_dim, initial_lr, scheduler_step_size, scheduler_gamma, sampling_table_min_char_count=1, sampling_table_specified_size_cap=100000000):
+    def __init__(self, vocab_chars, embed_dim, initial_lr, sampling_table_min_char_count=1, sampling_table_specified_size_cap=100000000):
         super().__init__()
         self.vocab_size = len(vocab_chars)
         self.embed_dim = embed_dim
@@ -35,8 +35,6 @@ class SkipGramModel(nn.Module):
         # no weight_decay and momentum set because they
         # "require the global calculation on embedding matrix, which is extremely time-consuming"
         self.optimizer = optim.SGD(self.parameters(), lr=initial_lr)
-#        # decrease learning rate every epoch
-#        self.scheduler = optim.lr_scheduler.StepLR(optimizer=self.optimizer, step_size=scheduler_step_size, gamma=scheduler_gamma)
         
         
     def init_embed(self):

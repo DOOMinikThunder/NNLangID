@@ -114,7 +114,7 @@ class EmbeddingCalculation(object):
         return pairs
     
     
-    def calc_embed(self, indexed_tweet_texts, batch_size, vocab_chars, max_context_window_size, num_neg_samples, num_epochs, initial_lr, lr_decay_num_batches, scheduler_step_size, scheduler_gamma, embed_weights_rel_path, print_testing, sampling_table_min_char_count=1, sampling_table_specified_size_cap=100000000):
+    def calc_embed(self, indexed_tweet_texts, batch_size, vocab_chars, max_context_window_size, num_neg_samples, num_epochs, initial_lr, lr_decay_num_batches, embed_weights_rel_path, print_testing, sampling_table_min_char_count=1, sampling_table_specified_size_cap=100000000):
         # set embedding dimension to: roundup(log2(vocabulary-size))
         embed_dim = math.ceil(math.log2(len(vocab_chars)))
     #    print(embed_dim)
@@ -128,8 +128,6 @@ class EmbeddingCalculation(object):
         skip_gram_model = SkipGramModel.SkipGramModel(vocab_chars=vocab_chars,
                                                       embed_dim=embed_dim,
                                                       initial_lr=initial_lr,
-                                                      scheduler_step_size=scheduler_step_size,
-                                                      scheduler_gamma=scheduler_gamma,
                                                       sampling_table_min_char_count=sampling_table_min_char_count,
                                                       sampling_table_specified_size_cap=sampling_table_specified_size_cap)
         
