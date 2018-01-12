@@ -15,15 +15,15 @@ def main():
     ##############
     
 #    input_data_rel_path = "../data/input_data/recall_oriented_dl.csv"
-    input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
-#    input_data_rel_path = "../data/input_data/test_embed.csv"
-    test_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
-#    test_data_rel_path = "../data/input_data/test_embed.csv"
+#    input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
+    input_data_rel_path = "../data/input_data/test_embed.csv"
+#    test_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
+    test_data_rel_path = "../data/input_data/test_embed.csv"
 
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
     val_model_checkpoint_rel_path = "../data/model_checkpoints/val_model_checkpoint.pth"
     test_model_checkpoint_rel_path = "../data/model_checkpoints/test_model_checkpoint.pth"
-    fetch_only_langs = ['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
+    fetch_only_langs = None#['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
     fetch_only_first_x_tweets = math.inf#5
     calc_embed = True
     train_rnn = True
@@ -38,26 +38,61 @@ def main():
     sampling_table_min_char_count = 10                       # determines the precision of the sampling (should be 10 or higher)
     sampling_table_specified_size_cap = 1000#math.inf        # caps specified sampling table size to this value (no matter how big it would be according to sampling_table_min_char_count)
                                                              # note: this is only the specified size, the actual table size may slightly deviate due to roundings in the calculation
-    batch_size_embed = 2
+#    embed_dim = 2                                           # will be set automatically later to: roundup(log2(vocabulary-size))
     max_context_window_size = 2
     num_neg_samples = 5
-#    embed_dim = 2                                           # will be set automatically later to: roundup(log2(vocabulary-size))
+    batch_size_embed = 2
     initial_lr_embed = 0.025
     lr_decay_num_batches_embed = 100
     num_epochs_embed = 1
-
+   
     # HYPERPARAMETERS RNN
 #    input_size = list(train_embed_char_text_inp_tensors[0].size())[2]
 #    num_classes = len(vocab_lang)
-    hidden_size = 100
-    num_layers = 1
+    hidden_size_rnn = 100
+    num_layers_rnn = 1
     is_bidirectional = True
+    batch_size_rnn = 5
     initial_lr_rnn = 0.001
     scheduler_step_size_rnn = 1                              # currently not functioning
     scheduler_gamma_rnn = 0.1                                # currently not functioning
     weight_decay_rnn = 0.00001
     num_epochs_rnn = 10#math.inf#2
-    batch_size_rnn = 5
+    
+    # set dict to later store parameters to file
+    system_param_dict = {
+        'input_data_rel_path' : input_data_rel_path,
+        'test_data_rel_path' : test_data_rel_path,
+        'embed_weights_rel_path' : embed_weights_rel_path,
+        'val_model_checkpoint_rel_path' : val_model_checkpoint_rel_path,
+        'test_model_checkpoint_rel_path' : test_model_checkpoint_rel_path,
+        'fetch_only_langs' : fetch_only_langs,
+        'fetch_only_first_x_tweets' : fetch_only_first_x_tweets,
+        'calc_embed' : calc_embed,
+        'train_rnn' : train_rnn,
+        'eval_test_set' : eval_test_set,
+        'print_embed_testing': print_embed_testing,
+        'print_model_checkpoints' : print_model_checkpoints,
+        'set_ratios' : set_ratios,
+        'min_char_frequency' : min_char_frequency,
+        'sampling_table_min_char_count' : sampling_table_min_char_count,
+        'sampling_table_specified_size_cap' : sampling_table_specified_size_cap,
+        'max_context_window_size' : max_context_window_size,
+        'num_neg_samples' : num_neg_samples,
+        'batch_size_embed' : batch_size_embed,
+        'initial_lr_embed' : initial_lr_embed,
+        'lr_decay_num_batches_embed' : lr_decay_num_batches_embed,
+        'num_epochs_embed' : num_epochs_embed,
+        'hidden_size_rnn' : hidden_size_rnn,
+        'num_layers_rnn' : num_layers_rnn,
+        'is_bidirectional' : is_bidirectional,
+        'batch_size_rnn' : batch_size_rnn,
+        'initial_lr_rnn' : initial_lr_rnn,
+        'scheduler_step_size_rnn' : scheduler_step_size_rnn,
+        'scheduler_gamma_rnn' : scheduler_gamma_rnn,
+        'weight_decay_rnn' : weight_decay_rnn,
+        'num_epochs_rnn' : num_epochs_rnn,
+        }
     
     
     ###################################
@@ -120,8 +155,8 @@ def main():
     test_embed_char_text_inp_tensors, test_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=test_set_indexed,
                                                                                                              embed_weights_rel_path=embed_weights_rel_path)
     gru_model = GRUModel.GRUModel(input_size=list(train_embed_char_text_inp_tensors[0].size())[2],
-                                  hidden_size=hidden_size,
-                                  num_layers=num_layers,
+                                  hidden_size=hidden_size_rnn,
+                                  num_layers=num_layers_rnn,
                                   num_classes=len(vocab_lang),
                                   is_bidirectional=is_bidirectional,
                                   initial_lr=initial_lr_rnn,
@@ -161,7 +196,8 @@ def main():
                                             'start_epoch': epoch + 1,
                                             'state_dict': gru_model.state_dict(),
                                             'best_accuracy': best_accuracy,
-                                            'optimizer': gru_model.optimizer.state_dict()
+                                            'optimizer': gru_model.optimizer.state_dict(),
+                                            'system_param_dict' : system_param_dict,
                                             },
                                             val_model_checkpoint_rel_path)
             else:
@@ -172,7 +208,7 @@ def main():
     # EVALUATION
     if (eval_test_set):
         # evaluate test set
-        start_epoch, val_accuracy = gru_model.load_model_checkpoint_from_file(val_model_checkpoint_rel_path)
+        start_epoch, val_accuracy, system_param_dict = gru_model.load_model_checkpoint_from_file(val_model_checkpoint_rel_path)
 #        print(start_epoch)
 #        print(best_accuracy)
         test_accuracy = evaluator.evalute_data_set(test_embed_char_text_inp_tensors,
@@ -185,20 +221,26 @@ def main():
         print('========================================')
         print('Test set accuracy:', test_accuracy)
         print('========================================')
+        print('System parameters used:')
+        for param in system_param_dict:
+            print(repr(param), ':', system_param_dict[param])
+        print('========================================')
 
         # save test_accuracy to file
         gru_model.save_model_checkpoint_to_file({
                                             'start_epoch': start_epoch,
                                             'state_dict': gru_model.state_dict(),
                                             'best_accuracy': test_accuracy,
-                                            'optimizer': gru_model.optimizer.state_dict()
+                                            'optimizer': gru_model.optimizer.state_dict(),
+                                            'system_param_dict' : system_param_dict,
                                             },
                                             test_model_checkpoint_rel_path)
 
+
     # print saved model checkpoints from file
     if (print_model_checkpoints):
-        start_epoch, val_accuracy = gru_model.load_model_checkpoint_from_file(val_model_checkpoint_rel_path)
-        start_epoch, test_accuracy = gru_model.load_model_checkpoint_from_file(test_model_checkpoint_rel_path)
+        start_epoch, val_accuracy, system_param_dict = gru_model.load_model_checkpoint_from_file(val_model_checkpoint_rel_path)
+        start_epoch, test_accuracy, system_param_dict = gru_model.load_model_checkpoint_from_file(test_model_checkpoint_rel_path)
         print('========================================')
         print('Epochs trained:', start_epoch)
         print('========================================')
@@ -206,7 +248,10 @@ def main():
         print('========================================')
         print('Test set accuracy:', test_accuracy)
         print('========================================')
-        
+        print('System parameters used:')
+        for param in system_param_dict:
+            print(repr(param), ':', system_param_dict[param])
+        print('========================================')
     
     
 

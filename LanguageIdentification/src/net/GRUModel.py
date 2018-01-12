@@ -82,6 +82,7 @@ class GRUModel(nn.Module):
         best_accuracy = checkpoint['best_accuracy']
         self.load_state_dict(checkpoint['state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer'])
+        system_param_dict = checkpoint['system_param_dict']
 #        self.eval()
         print('Model checkpoint loaded from file:', relative_path_to_file)
-        return start_epoch, best_accuracy
+        return start_epoch, best_accuracy, system_param_dict
