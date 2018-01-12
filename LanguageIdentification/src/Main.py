@@ -14,22 +14,23 @@ def main():
     # PARAMETERS #
     ##############
     
-#    input_data_rel_path = "../data/input_data/recall_oriented_dl.csv"
+    input_data_rel_path = "../data/input_data/recall_oriented_dl.csv"
 #    input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
-    input_data_rel_path = "../data/input_data/test_embed.csv"
-#    test_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
-    test_data_rel_path = "../data/input_data/test_embed.csv"
+#    input_data_rel_path = "../data/input_data/test_embed.csv"
+    test_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
+#    test_data_rel_path = "../data/input_data/test_embed.csv"
 
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
     val_model_checkpoint_rel_path = "../data/model_checkpoints/val_model_checkpoint.pth"
     test_model_checkpoint_rel_path = "../data/model_checkpoints/test_model_checkpoint.pth"
-    fetch_only_langs = None#['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
+    fetch_only_langs = ['de', 'en']#['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
     fetch_only_first_x_tweets = math.inf#5
     calc_embed = True
     train_rnn = True
     eval_test_set = True
     print_embed_testing = False
     print_model_checkpoints = False
+    terminal = False
     
     # HYPERPARAMETERS EMBEDDING
     set_ratios = [0.8, 0.2]                                  # [train_ratio, val_ratio]
@@ -120,7 +121,41 @@ def main():
 #    print(vocab_chars)
 #    print(vocab_lang)
     
+    if (terminal):
+        # simple terminal for testing
+        embed = input_data.create_embed_from_weights_file(embed_weights_rel_path)
+#        print(embed.weight.size()[1])
+        gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],
+                                      hidden_size=hidden_size_rnn,
+                                      num_layers=num_layers_rnn,
+                                      num_classes=len(vocab_lang),
+                                      is_bidirectional=is_bidirectional,
+                                      initial_lr=initial_lr_rnn,
+                                      weight_decay=weight_decay_rnn,
+                                      batch_size=batch_size_rnn)
+#        print('Model:\n', gru_model)
+        evaluator = Evaluator.Evaluator(gru_model)
+        start_epoch, val_accuracy, system_param_dict = gru_model.load_model_checkpoint_from_file(val_model_checkpoint_rel_path)
+        input_text = ''
+        while input_text != 'exit':
+            input_text = input('Type text: ')
+    #        print(input_text)
+            input_text_lang_tuple = [(input_text, 'pl')]
+            
+            filtered_texts_and_lang = input_data.filter_out_irrelevant_tweet_parts(input_text_lang_tuple)
+#            print(filtered_texts_and_lang)
+            input_text_only_vocab_chars = input_data.get_texts_with_only_vocab_chars(filtered_texts_and_lang, vocab_chars)
+#            print(input_text_only_vocab_chars)
+            input_text_indexed = input_data.get_indexed_texts_and_lang(input_text_only_vocab_chars, vocab_chars, vocab_lang)
+#            print(input_text_indexed)
+            input_text_embed_char_text_inp_tensors, input_text_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=input_text_indexed,
+                                                                                                                                 embed_weights_rel_path=embed_weights_rel_path)
+            input_accuracy = evaluator.evalute_data_set(input_text_embed_char_text_inp_tensors,
+                                                        input_text_target_tensors,
+                                                        vocab_lang)
+            print(vocab_lang)
 
+    
     #########################
     # EMBEDDING CALCULATION #
     #########################
