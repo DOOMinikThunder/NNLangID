@@ -20,7 +20,7 @@ https://adoni.github.io/2017/11/08/word2vec-pytorch/ (Access: 11.01.2018)
 class SkipGramModel(nn.Module):
 
     
-    def __init__(self, vocab_chars, embed_dim, initial_lr, scheduler_step_size, scheduler_gamma, sampling_table_min_char_count=1):
+    def __init__(self, vocab_chars, embed_dim, initial_lr, scheduler_step_size, scheduler_gamma, sampling_table_min_char_count=1, sampling_table_specified_size_cap=100000000):
         super().__init__()
         self.vocab_size = len(vocab_chars)
         self.embed_dim = embed_dim
@@ -28,9 +28,9 @@ class SkipGramModel(nn.Module):
         self.embed_output = nn.Embedding(self.vocab_size, embed_dim, sparse=True)
         self.sampling_table = []
         self.init_embed()
-        self.init_sampling_table(vocab_chars, sampling_table_min_char_count)
-#        print(sampling_table)
-#        print(len(sampling_table))
+        self.init_sampling_table(vocab_chars, sampling_table_min_char_count, sampling_table_specified_size_cap)
+#        print(self.sampling_table)
+#        print(len(self.sampling_table))
         # no weight_decay and momentum set because they
         # "require the global calculation on embedding matrix, which is extremely time-consuming"
         self.optimizer = optim.SGD(self.parameters(), lr=initial_lr)
@@ -44,7 +44,7 @@ class SkipGramModel(nn.Module):
         self.embed_output.weight.data.uniform_(-0, 0)
 
 
-    def init_sampling_table(self, vocab_chars, min_char_count=1):
+    def init_sampling_table(self, vocab_chars, min_char_count=1, specified_size_cap=100000000):
         char_pow_frequencies = {}
         char_pow_frequencies_acc = 0
         min_char_pow_frequency = math.inf
@@ -57,12 +57,15 @@ class SkipGramModel(nn.Module):
                 min_char_pow_frequency = char_pow_frequency
 #        print(char_pow_frequencies)
         # calculate the necessary table_size to have at least min_char_count of each char in the table
-        table_size = math.ceil((char_pow_frequencies_acc / min_char_pow_frequency) * min_char_count)
+        table_specified_size = math.ceil((char_pow_frequencies_acc / min_char_pow_frequency) * min_char_count)
+        # cap table size to table_size_cap
+        if (table_specified_size > specified_size_cap):
+            table_specified_size = specified_size_cap
 #        print(table_size)
         # get the number of occurrences of each char in the table (depending on the probability function)
         # and fill the table accordingly
         for char_index in char_pow_frequencies:
-            num_of_char = np.round((char_pow_frequencies[char_index] / char_pow_frequencies_acc) * table_size)
+            num_of_char = np.round((char_pow_frequencies[char_index] / char_pow_frequencies_acc) * table_specified_size)
 
             for i in range(int(num_of_char)):
                 self.sampling_table.append(char_index)

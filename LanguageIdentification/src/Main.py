@@ -32,17 +32,19 @@ def main():
     print_model_checkpoints = False
     
     # HYPERPARAMETERS EMBEDDING
-    set_ratios = [0.8, 0.2]             # [train_ratio, val_ratio]
-                                        # warning: changes may require new embedding calculation due to differently shuffled train_set
+    set_ratios = [0.8, 0.2]                                  # [train_ratio, val_ratio]
+                                                             # warning: changes may require new embedding calculation due to differently shuffled train_set
     min_char_frequency = 2
-    sampling_table_min_char_count = 10  # specify the precision of the sampling (should be 10 or higher)
+    sampling_table_min_char_count = 10                       # determines the precision of the sampling (should be 10 or higher)
+    sampling_table_specified_size_cap = 100000#math.inf      # caps specified sampling table size to this value (no matter how big it would be according to sampling_table_min_char_count)
+                                                             # note: this is only the specified size, the actual table size may slightly deviate due to roundings in the calculation
     batch_size_embed = 2
     max_context_window_size = 2
     num_neg_samples = 5
-#    embed_dim = 2                      # will be set automatically later to: roundup(log2(vocabulary-size))
+#    embed_dim = 2                                           # will be set automatically later to: roundup(log2(vocabulary-size))
     initial_lr_embed = 0.025
-    scheduler_step_size_embed = 1       # currently not functioning
-    scheduler_gamma_embed = 0.1         # currently not functioning
+    scheduler_step_size_embed = 1                            # currently not functioning
+    scheduler_gamma_embed = 0.1                              # currently not functioning
     num_epochs_embed = 1
 
     # HYPERPARAMETERS RNN
@@ -52,8 +54,8 @@ def main():
     num_layers = 1
     is_bidirectional = True
     initial_lr_rnn = 0.001
-    scheduler_step_size_rnn = 1         # currently not functioning
-    scheduler_gamma_rnn = 0.1           # currently not functioning
+    scheduler_step_size_rnn = 1                              # currently not functioning
+    scheduler_gamma_rnn = 0.1                                # currently not functioning
     weight_decay_rnn = 0.00001
     num_epochs_rnn = 10#math.inf#2
     batch_size_rnn = 5
@@ -104,7 +106,8 @@ def main():
                                          scheduler_gamma=scheduler_gamma_embed,
                                          embed_weights_rel_path=embed_weights_rel_path,
                                          print_testing=print_embed_testing,
-                                         sampling_table_min_char_count=sampling_table_min_char_count)
+                                         sampling_table_min_char_count=sampling_table_min_char_count,
+                                         sampling_table_specified_size_cap=sampling_table_specified_size_cap)
     
     
     ################
