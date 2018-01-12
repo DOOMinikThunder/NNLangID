@@ -16,8 +16,6 @@ class GRUModel(nn.Module):
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.num_classes = num_classes
-        self.lr = initial_lr
-        self.weight_decay = weight_decay
         self.log_softmax = nn.LogSoftmax()
         self.gru_layer = nn.GRU(input_size=input_size,
                                 hidden_size=hidden_size,
@@ -34,6 +32,10 @@ class GRUModel(nn.Module):
         self.optimizer = optim.Adam(params=self.parameters(), lr=initial_lr, weight_decay=weight_decay)
 
 
+    def initHidden(self):
+        return Variable(torch.zeros(self.num_layers * self.num_directions, self.batch_size, self.hidden_size))
+    
+
     def forward(self, inp, hidden=None):
         output, next_hidden = self.gru_layer(inp, hidden)
         output = self.output_layer(output)
@@ -43,10 +45,6 @@ class GRUModel(nn.Module):
         output = self.log_softmax(output)
         return output, next_hidden
 
-
-    def initHidden(self):
-        return Variable(torch.zeros(self.num_layers * self.num_directions, self.batch_size, self.hidden_size))
-    
 
     def train(self, inputs, targets):
         batch_gen = BatchGenerator.Batches(inputs, targets, self.batch_size)

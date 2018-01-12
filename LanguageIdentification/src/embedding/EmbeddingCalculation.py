@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 
-import torch
-import torch.autograd as autograd
-import torch.optim as optim
-from torch.autograd import Variable
-import numpy as np
 import math
 import random
+import torch
+import torch.autograd as autograd
+from torch.autograd import Variable
 #from . import SkipGramModel
 from embedding import SkipGramModel
 import InputData
@@ -15,10 +13,6 @@ import InputData
 
 
 class EmbeddingCalculation(object):
-
-    
-    def __init__(self):
-        self.sampling_table = []
         
     
     # create onehot-vectors for every char and its surrounding context chars (of all tweets)
@@ -120,36 +114,7 @@ class EmbeddingCalculation(object):
         return pairs
     
     
-    def set_sampling_table(self, vocab_chars, min_char_count=1):
-        char_pow_frequencies = {}
-        char_pow_frequencies_acc = 0
-        min_char_pow_frequency = math.inf
-        for char in vocab_chars:
-            char_pow_frequency = math.pow(vocab_chars[char][1], 0.75)
-            char_pow_frequencies_acc = char_pow_frequencies_acc + char_pow_frequency
-            char_pow_frequencies[vocab_chars[char][0]] = char_pow_frequency
-            # get smallest char_pow_frequency
-            if (char_pow_frequency < min_char_pow_frequency):
-                min_char_pow_frequency = char_pow_frequency
-#        print(char_pow_frequencies)
-        # calculate the necessary table_size to have at least min_char_count of each char in the table
-        table_size = math.ceil((char_pow_frequencies_acc / min_char_pow_frequency) * min_char_count)
-#        print(table_size)
-        # get the number of occurrences of each char in the table (depending on the probability function)
-        # and fill the table accordingly
-        for char_index in char_pow_frequencies:
-            num_of_char = np.round((char_pow_frequencies[char_index] / char_pow_frequencies_acc) * table_size)
-
-            for i in range(int(num_of_char)):
-                self.sampling_table.append(char_index)
-#        print(self.sampling_table)
-              
-        
-    def get_neg_samples(self, num_pairs, num_samples):
-        return np.random.choice(self.sampling_table, size=(num_pairs, num_samples)).tolist()
-            
-    
-    def calc_embed(self, indexed_tweet_texts, batch_size, vocab_chars, max_context_window_size, num_neg_samples, num_epochs, initial_lr, embed_weights_rel_path, print_testing, sampling_table_min_char_count=1):
+    def calc_embed(self, indexed_tweet_texts, batch_size, vocab_chars, max_context_window_size, num_neg_samples, num_epochs, initial_lr, scheduler_step_size, scheduler_gamma, embed_weights_rel_path, print_testing, sampling_table_min_char_count=1):
         # set embedding dimension to: roundup(log2(vocabulary-size))
         embed_dim = math.ceil(math.log2(len(vocab_chars)))
     #    print(embed_dim)
@@ -158,39 +123,25 @@ class EmbeddingCalculation(object):
         # SKIP-GRAM-MODEL WITH NEGATIVE SAMPLING #
         ##########################################
         
-        self.set_sampling_table(vocab_chars, sampling_table_min_char_count)
-    #    print(embedding_calculation.sampling_table)
-    #    print(len(embedding_calculation.sampling_table))
         batched_pairs = self.get_batched_target_context_index_pairs(indexed_tweet_texts, batch_size, max_context_window_size)
 #        print(batched_pairs)
-        
-        skip_gram_model = SkipGramModel.SkipGramModel(len(vocab_chars), embed_dim)
-        optimizer = optim.SGD(skip_gram_model.parameters(), lr=initial_lr)
+        skip_gram_model = SkipGramModel.SkipGramModel(vocab_chars=vocab_chars,
+                                                      embed_dim=embed_dim,
+                                                      initial_lr=initial_lr,
+                                                      scheduler_step_size=scheduler_step_size,
+                                                      scheduler_gamma=scheduler_gamma,
+                                                      sampling_table_min_char_count=sampling_table_min_char_count)
         
         # train skip-gram with negative sampling
         num_epochs_minus_one = num_epochs - 1
-        num_batched_pairs_minus_one = len(batched_pairs) - 1
         for epoch_i in range(num_epochs):
             print("Embedding epoch:", epoch_i, "/", num_epochs_minus_one)
-            for i, batch in enumerate(batched_pairs):
-                targets_1_pos = [pair[0] for pair in batch]
-                contexts_1_pos = [pair[1] for pair in batch]
-                contexts_0_pos_samples = self.get_neg_samples(len(batch), num_neg_samples)
-    #            print(neg_samples)
-                
-                optimizer.zero_grad()
-                loss = skip_gram_model.forward(targets_1_pos, contexts_1_pos, contexts_0_pos_samples)
-                if (i % 100 == 0):
-                    print('Embedding Loss', i, '/', num_batched_pairs_minus_one, ': ', float(loss.data[0]))
-                loss.backward()
-                optimizer.step()
+#            skip_gram_model.scheduler.step()
+            skip_gram_model.train(batched_pairs, num_neg_samples)
         
         # write embedding weights to file
         skip_gram_model.save_embed_to_file(embed_weights_rel_path)
     #    print(skip_gram_model.embed_hidden.weight)
-        
-        
-    # TODO: maybe adapt learning rate
         
         
         ###########

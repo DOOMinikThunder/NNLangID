@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import math
+import numpy as np
 import torch
 import torch.autograd as autograd
+import torch.optim as optim
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -17,13 +20,22 @@ https://adoni.github.io/2017/11/08/word2vec-pytorch/ (Access: 11.01.2018)
 class SkipGramModel(nn.Module):
 
     
-    def __init__(self, vocab_size, embed_dim):
+    def __init__(self, vocab_chars, embed_dim, initial_lr, scheduler_step_size, scheduler_gamma, sampling_table_min_char_count=1):
         super().__init__()
-        self.vocab_size = vocab_size
+        self.vocab_size = len(vocab_chars)
         self.embed_dim = embed_dim
-        self.embed_hidden = nn.Embedding(vocab_size, embed_dim, sparse=True)
-        self.embed_output = nn.Embedding(vocab_size, embed_dim, sparse=True)
+        self.embed_hidden = nn.Embedding(self.vocab_size, embed_dim, sparse=True)
+        self.embed_output = nn.Embedding(self.vocab_size, embed_dim, sparse=True)
+        self.sampling_table = []
         self.init_embed()
+        self.init_sampling_table(vocab_chars, sampling_table_min_char_count)
+#        print(sampling_table)
+#        print(len(sampling_table))
+        # no weight_decay and momentum set because they
+        # "require the global calculation on embedding matrix, which is extremely time-consuming"
+        self.optimizer = optim.SGD(self.parameters(), lr=initial_lr)
+#        # decrease learning rate every epoch
+#        self.scheduler = optim.lr_scheduler.StepLR(optimizer=self.optimizer, step_size=scheduler_step_size, gamma=scheduler_gamma)
         
         
     def init_embed(self):
@@ -31,6 +43,35 @@ class SkipGramModel(nn.Module):
         self.embed_hidden.weight.data.uniform_(-init_range, init_range)
         self.embed_output.weight.data.uniform_(-0, 0)
 
+
+    def init_sampling_table(self, vocab_chars, min_char_count=1):
+        char_pow_frequencies = {}
+        char_pow_frequencies_acc = 0
+        min_char_pow_frequency = math.inf
+        for char in vocab_chars:
+            char_pow_frequency = math.pow(vocab_chars[char][1], 0.75)
+            char_pow_frequencies_acc = char_pow_frequencies_acc + char_pow_frequency
+            char_pow_frequencies[vocab_chars[char][0]] = char_pow_frequency
+            # get smallest char_pow_frequency
+            if (char_pow_frequency < min_char_pow_frequency):
+                min_char_pow_frequency = char_pow_frequency
+#        print(char_pow_frequencies)
+        # calculate the necessary table_size to have at least min_char_count of each char in the table
+        table_size = math.ceil((char_pow_frequencies_acc / min_char_pow_frequency) * min_char_count)
+#        print(table_size)
+        # get the number of occurrences of each char in the table (depending on the probability function)
+        # and fill the table accordingly
+        for char_index in char_pow_frequencies:
+            num_of_char = np.round((char_pow_frequencies[char_index] / char_pow_frequencies_acc) * table_size)
+
+            for i in range(int(num_of_char)):
+                self.sampling_table.append(char_index)
+#        print(self.sampling_table)
+                
+    
+    def get_neg_samples(self, num_pairs, num_samples):
+        return np.random.choice(self.sampling_table, size=(num_pairs, num_samples)).tolist()
+                
 
     def forward(self, targets_1_pos, contexts_1_pos, contexts_0_pos_samples):
         losses = []
@@ -73,6 +114,22 @@ class SkipGramModel(nn.Module):
 #        print(losses)
         return (-1 * sum(losses)) / len(targets_1_pos)
     
+    
+    def train(self, batched_pairs, num_neg_samples):
+        num_batched_pairs_minus_one = len(batched_pairs) - 1
+        for i, batch in enumerate(batched_pairs):
+            targets_1_pos = [pair[0] for pair in batch]
+            contexts_1_pos = [pair[1] for pair in batch]
+            contexts_0_pos_samples = self.get_neg_samples(len(batch), num_neg_samples)
+#            print(neg_samples)
+            
+            self.optimizer.zero_grad()
+            loss = self.forward(targets_1_pos, contexts_1_pos, contexts_0_pos_samples)
+            if (i % 100 == 0):
+                print('Embedding Loss', i, '/', num_batched_pairs_minus_one, ': ', float(loss.data[0]))
+            loss.backward()
+            self.optimizer.step()
+
     
     def save_embed_to_file(self, relative_path_to_file):
         weights_array = self.embed_hidden.weight.data.numpy()
