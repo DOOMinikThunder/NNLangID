@@ -74,6 +74,7 @@ def main():
         'eval_test_set' : eval_test_set,
         'print_embed_testing': print_embed_testing,
         'print_model_checkpoints' : print_model_checkpoints,
+        'terminal' : terminal,
         'set_ratios' : set_ratios,
         'min_char_frequency' : min_char_frequency,
         'sampling_table_min_char_count' : sampling_table_min_char_count,
