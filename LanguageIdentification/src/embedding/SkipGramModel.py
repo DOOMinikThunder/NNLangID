@@ -24,6 +24,7 @@ class SkipGramModel(nn.Module):
         super().__init__()
         self.vocab_size = len(vocab_chars)
         self.embed_dim = embed_dim
+        self.initial_lr = initial_lr
         self.embed_hidden = nn.Embedding(self.vocab_size, embed_dim, sparse=True)
         self.embed_output = nn.Embedding(self.vocab_size, embed_dim, sparse=True)
         self.sampling_table = []
@@ -118,21 +119,33 @@ class SkipGramModel(nn.Module):
         return (-1 * sum(losses)) / len(targets_1_pos)
     
     
-    def train(self, batched_pairs, num_neg_samples):
-        num_batched_pairs_minus_one = len(batched_pairs) - 1
-        for i, batch in enumerate(batched_pairs):
-            targets_1_pos = [pair[0] for pair in batch]
-            contexts_1_pos = [pair[1] for pair in batch]
-            contexts_0_pos_samples = self.get_neg_samples(len(batch), num_neg_samples)
-#            print(neg_samples)
-            
-            self.optimizer.zero_grad()
-            loss = self.forward(targets_1_pos, contexts_1_pos, contexts_0_pos_samples)
-            if (i % 100 == 0):
-                print('Embedding Loss', i, '/', num_batched_pairs_minus_one, ': ', float(loss.data[0]))
-            loss.backward()
-            self.optimizer.step()
-
+    def train(self, batched_pairs, num_neg_samples, num_epochs, lr_decay_num_batches):
+        num_batched_pairs = len(batched_pairs)
+        num_batched_pairs_minus_one = num_batched_pairs - 1
+        num_epochs_minus_one = num_epochs - 1
+        total_batch_counter = 0
+        total_batch_counter_max = num_epochs * num_batched_pairs
+        for epoch_i in range(num_epochs):
+            for batch_j, batch in enumerate(batched_pairs):
+                targets_1_pos = [pair[0] for pair in batch]
+                contexts_1_pos = [pair[1] for pair in batch]
+                contexts_0_pos_samples = self.get_neg_samples(len(batch), num_neg_samples)
+    #            print(neg_samples)
+                total_batch_counter = (epoch_i * num_batched_pairs) + batch_j            
+    
+                self.optimizer.zero_grad()
+                loss = self.forward(targets_1_pos, contexts_1_pos, contexts_0_pos_samples)
+                if (batch_j % 100 == 0):
+                    print('[EMBEDDING] Epoch', epoch_i, '/', num_epochs_minus_one, '| Batch', batch_j, '/', num_batched_pairs_minus_one, '| Loss: ', float(loss.data[0]))
+                loss.backward()
+                self.optimizer.step()
+                
+                # decrease learning rate every lr_decay_num_batches
+                if (total_batch_counter % lr_decay_num_batches == 0):
+                    updated_lr = self.initial_lr * (1.0 - 1.0 * total_batch_counter / total_batch_counter_max)
+                    for param_group in self.optimizer.param_groups:
+                        param_group['lr'] = updated_lr
+    
     
     def save_embed_to_file(self, relative_path_to_file):
         weights_array = self.embed_hidden.weight.data.numpy()

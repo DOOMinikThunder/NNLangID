@@ -114,7 +114,7 @@ class EmbeddingCalculation(object):
         return pairs
     
     
-    def calc_embed(self, indexed_tweet_texts, batch_size, vocab_chars, max_context_window_size, num_neg_samples, num_epochs, initial_lr, scheduler_step_size, scheduler_gamma, embed_weights_rel_path, print_testing, sampling_table_min_char_count=1, sampling_table_specified_size_cap=100000000):
+    def calc_embed(self, indexed_tweet_texts, batch_size, vocab_chars, max_context_window_size, num_neg_samples, num_epochs, initial_lr, lr_decay_num_batches, scheduler_step_size, scheduler_gamma, embed_weights_rel_path, print_testing, sampling_table_min_char_count=1, sampling_table_specified_size_cap=100000000):
         # set embedding dimension to: roundup(log2(vocabulary-size))
         embed_dim = math.ceil(math.log2(len(vocab_chars)))
     #    print(embed_dim)
@@ -134,11 +134,11 @@ class EmbeddingCalculation(object):
                                                       sampling_table_specified_size_cap=sampling_table_specified_size_cap)
         
         # train skip-gram with negative sampling
-        num_epochs_minus_one = num_epochs - 1
-        for epoch_i in range(num_epochs):
-            print("Embedding epoch:", epoch_i, "/", num_epochs_minus_one)
-#            skip_gram_model.scheduler.step()
-            skip_gram_model.train(batched_pairs, num_neg_samples)
+#        skip_gram_model.scheduler.step()
+        skip_gram_model.train(batched_pairs=batched_pairs,
+                              num_neg_samples=num_neg_samples,
+                              num_epochs=num_epochs,
+                              lr_decay_num_batches=lr_decay_num_batches)
         
         # write embedding weights to file
         skip_gram_model.save_embed_to_file(embed_weights_rel_path)

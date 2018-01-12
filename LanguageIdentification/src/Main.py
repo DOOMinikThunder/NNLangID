@@ -36,13 +36,14 @@ def main():
                                                              # warning: changes may require new embedding calculation due to differently shuffled train_set
     min_char_frequency = 2
     sampling_table_min_char_count = 10                       # determines the precision of the sampling (should be 10 or higher)
-    sampling_table_specified_size_cap = 100000#math.inf      # caps specified sampling table size to this value (no matter how big it would be according to sampling_table_min_char_count)
+    sampling_table_specified_size_cap = 1000#math.inf        # caps specified sampling table size to this value (no matter how big it would be according to sampling_table_min_char_count)
                                                              # note: this is only the specified size, the actual table size may slightly deviate due to roundings in the calculation
     batch_size_embed = 2
     max_context_window_size = 2
     num_neg_samples = 5
 #    embed_dim = 2                                           # will be set automatically later to: roundup(log2(vocabulary-size))
     initial_lr_embed = 0.025
+    lr_decay_num_batches_embed = 100
     scheduler_step_size_embed = 1                            # currently not functioning
     scheduler_gamma_embed = 0.1                              # currently not functioning
     num_epochs_embed = 1
@@ -102,6 +103,7 @@ def main():
                                          num_neg_samples=num_neg_samples,
                                          num_epochs=num_epochs_embed,
                                          initial_lr=initial_lr_embed,
+                                         lr_decay_num_batches=lr_decay_num_batches_embed,
                                          scheduler_step_size=scheduler_step_size_embed,
                                          scheduler_gamma=scheduler_gamma_embed,
                                          embed_weights_rel_path=embed_weights_rel_path,
