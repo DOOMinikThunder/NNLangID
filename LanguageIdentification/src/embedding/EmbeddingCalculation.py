@@ -152,7 +152,7 @@ class EmbeddingCalculation(object):
 #            print("VOCABULARY:\n", vocab_chars)
             input_data = InputData.InputData()
             embed, num_classes = input_data.create_embed_from_weights_file(embed_weights_rel_path)
-            char2index, index2char = input_data.get_char2index_and_index2char(vocab_chars)
+            char2index, index2char = input_data.get_string2index_and_index2string(vocab_chars)
             vocab_size = len(vocab_chars)
             
             # get all embed weights
