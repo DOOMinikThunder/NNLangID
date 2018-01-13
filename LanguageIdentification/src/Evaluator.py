@@ -20,7 +20,7 @@ class Evaluator(object):
             lang_prediction = self.evaluate_prediction(output)
             # checks if language prediction equals most common language in target (in case there are multiple targets)
             # todo later: multiple language predictions
-            print('lang_pred %s - target %s'%(lang_prediction, stats.mode(target.data.numpy()).mode[0]))
+            #print('lang_pred %s - target %s'%(lang_prediction, stats.mode(target.data.numpy()).mode[0]))
             target_list.append(stats.mode(target.data.numpy()).mode[0])
             predictions.append(lang_prediction)
             pred_true += int(lang_prediction == target_list[-1])

@@ -3,22 +3,38 @@
 import math
 import InputData
 import Evaluator
+import DataSplit
 from embedding import EmbeddingCalculation
 from net import GRUModel
-
+from pathlib import Path
 
 
 def main():
 
+
+    ##############
+    # DATA FILES #
+    ##############
+    create_data_files = True
+    prefix = "../data/input_data/"
+
+    input_data_rel_path = prefix+"recall_test.csv" #training, validation and test will be generated from this file
+
+    tr_data_rel_path = "../data/input_data/training.csv"
+    va_data_rel_path = "../data/input_data/validation.csv"
+    te_data_rel_path = "../data/input_data/test.csv"
+    rt_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv" #to change later, rt = real test
+    files_exist = Path(tr_data_rel_path).is_file() and Path(va_data_rel_path).is_file() and Path(te_data_rel_path).is_file()
+    if(create_data_files or not files_exist):
+        ratios = [0.4, 0.4, 0.2]
+        out_filenames = [prefix + "training.csv", prefix + "validation.csv", prefix + "test.csv"] #same size as ratios
+        data_splitter = DataSplit.DataSplit()
+        splitted_data = data_splitter.split_percent_of_languages(input_data_rel_path, ratios, out_filenames)
+
+
     ##############
     # PARAMETERS #
     ##############
-    
-#    input_data_rel_path = "../data/input_data/recall_oriented_dl.csv"
-    input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
-#    input_data_rel_path = "../data/input_data/test_embed.csv"
-    test_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
-#    test_data_rel_path = "../data/input_data/test_embed.csv"
 
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
     trained_embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
@@ -26,7 +42,7 @@ def main():
     model_checkpoint_rel_path = "../data/model_checkpoints/model_checkpoint.pth"
     trained_model_checkpoint_rel_path = "../data/model_checkpoints/model_checkpoint.pth"
 #    trained_model_checkpoint_rel_path = "../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"
-    fetch_only_langs = ['pl', 'sv']#['de', 'en', 'es', 'fr', 'it', 'und']#['el', 'fa', 'hi', 'ca']#None
+    fetch_only_langs = None#['pl', 'sv']#['de', 'en', 'es', 'fr', 'it', 'und']#['el', 'fa', 'hi', 'ca']#None
     fetch_only_first_x_tweets = math.inf#5
     calc_embed = True
     train_rnn = True
@@ -34,11 +50,12 @@ def main():
     print_embed_testing = False
     print_model_checkpoint_embed_weights = None#"../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"#None
     print_model_checkpoint = None#"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
-    terminal = True                                          # if True: disables all other calculations
+
+
+    terminal = False                                          # if True: disables all other calculations
     
     # HYPERPARAMETERS EMBEDDING
-    set_ratios = [0.8, 0.2]                                  # [train_ratio, val_ratio]
-                                                             # warning: changes may require new embedding calculation due to differently shuffled train_set
+
     min_char_frequency = 2
     sampling_table_min_char_count = 10                       # determines the precision of the sampling (should be 10 or higher)
     sampling_table_specified_size_cap = 1000#math.inf        # caps specified sampling table size to this value (no matter how big it would be according to sampling_table_min_char_count)
@@ -49,25 +66,25 @@ def main():
     batch_size_embed = 2
     initial_lr_embed = 0.025
     lr_decay_num_batches_embed = 100
-    num_epochs_embed = 1
+    num_epochs_embed = 2
    
     # HYPERPARAMETERS RNN
 #    input_size = list(train_embed_char_text_inp_tensors[0].size())[2]
 #    num_classes = len(vocab_lang)
-    hidden_size_rnn = 100
+    hidden_size_rnn = 200
     num_layers_rnn = 1
     is_bidirectional = True
-    batch_size_rnn = 5
-    initial_lr_rnn = 0.001
+    batch_size_rnn = 30
+    initial_lr_rnn = 0.01
     scheduler_step_size_rnn = 1                              # currently not functioning
     scheduler_gamma_rnn = 0.1                                # currently not functioning
     weight_decay_rnn = 0.00001
-    num_epochs_rnn = 10#math.inf#2
+    num_epochs_rnn = 3#math.inf#2
+
     
     # set dict to later store parameters to file
     system_param_dict = {
         'input_data_rel_path' : input_data_rel_path,
-        'test_data_rel_path' : test_data_rel_path,
         'embed_weights_rel_path' : embed_weights_rel_path,
         'trained_embed_weights_rel_path' : trained_embed_weights_rel_path,
         'model_checkpoint_rel_path' : model_checkpoint_rel_path,
@@ -81,7 +98,6 @@ def main():
         'print_model_checkpoint_embed_weights' : print_model_checkpoint_embed_weights,
         'print_model_checkpoint' : print_model_checkpoint,
         'terminal' : terminal,
-        'set_ratios' : set_ratios,
         'min_char_frequency' : min_char_frequency,
         'sampling_table_min_char_count' : sampling_table_min_char_count,
         'sampling_table_specified_size_cap' : sampling_table_specified_size_cap,
@@ -118,8 +134,7 @@ def main():
                                       num_classes=num_classes,
                                       is_bidirectional=is_bidirectional,
                                       initial_lr=initial_lr_rnn,
-                                      weight_decay=weight_decay_rnn,
-                                      batch_size=batch_size_rnn)
+                                      weight_decay=weight_decay_rnn)
         start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(trained_model_checkpoint_rel_path)
 #        print('Model:\n', gru_model)
         evaluator = Evaluator.Evaluator(gru_model)
@@ -143,11 +158,11 @@ def main():
                                                         vocab_lang)
             print(vocab_lang)
     
-    
+
     ###################################
     # DATA RETRIEVAL & TRANSFORMATION #
     ###################################
-    
+
     train_set_indexed = []
     val_set_indexed = []
     test_set_indexed = []
@@ -165,18 +180,21 @@ def main():
         vocab_lang: every language occurence as a dict of language: index, occurences, e.g. 
             {'de': (0, 32)}
         """
-        train_set_indexed, val_set_indexed, test_set_indexed, vocab_chars, vocab_lang = input_data.get_indexed_data(input_data_rel_path=input_data_rel_path,
-                                                                                                                    test_data_rel_path=test_data_rel_path,
-                                                                                                                    min_char_frequency=min_char_frequency,
-                                                                                                                    set_ratios=set_ratios,
-                                                                                                                    fetch_only_langs=fetch_only_langs,
-                                                                                                                    fetch_only_first_x_tweets=fetch_only_first_x_tweets)
+        train_set_indexed, val_set_indexed, test_set_indexed, real_test_set_indexed, vocab_chars, vocab_lang = input_data.get_indexed_data(
+            input_data_rel_path=tr_data_rel_path,
+            validation_data_rel_path=va_data_rel_path,
+            test_data_rel_path=te_data_rel_path,
+            real_test_data_rel_path=rt_data_rel_path,
+            min_char_frequency=min_char_frequency,
+            fetch_only_langs=fetch_only_langs,
+            fetch_only_first_x_tweets=fetch_only_first_x_tweets)
 #        print(train_set_indexed, val_set_indexed, test_set_indexed)
 #        print(vocab_chars)
 #        print(len(vocab_chars))
 #        print(vocab_lang)
 #        print(len(vocab_lang))
-    
+
+
     
     #########################
     # EMBEDDING CALCULATION #
@@ -211,19 +229,20 @@ def main():
                                                                                                                    embed_weights_rel_path=embed_weights_rel_path)
         val_embed_char_text_inp_tensors, val_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=val_set_indexed,
                                                                                                                embed_weights_rel_path=embed_weights_rel_path)
+
         gru_model = GRUModel.GRUModel(input_size=list(train_embed_char_text_inp_tensors[0].size())[2],  # equals embedding dimension
                                       hidden_size=hidden_size_rnn,
                                       num_layers=num_layers_rnn,
                                       num_classes=len(vocab_lang),
                                       is_bidirectional=is_bidirectional,
                                       initial_lr=initial_lr_rnn,
-                                      weight_decay=weight_decay_rnn,
-                                      batch_size=batch_size_rnn)
+                                      weight_decay=weight_decay_rnn)
         print('Model:\n', gru_model)
         evaluator = Evaluator.Evaluator(gru_model)
         
         cur_val_accuracy = 0
         best_val_accuracy = -1.0
+
         epoch = 0
         is_improving = True
         # stop training when validation set error stops getting smaller ==> stop when overfitting occurs
@@ -233,7 +252,8 @@ def main():
             # inputs: whole data set, every date contains the embedding of one char in one dimension
             # targets: whole target set, target is set for each character embedding
             gru_model.train(inputs=train_embed_char_text_inp_tensors,
-                            targets=train_target_tensors)
+                            targets=train_target_tensors,
+                            batch_size=batch_size_rnn)
             
             # evaluate validation set
             cur_val_accuracy = evaluator.evalute_data_set(val_embed_char_text_inp_tensors,
@@ -278,8 +298,7 @@ def main():
                                       num_classes=num_classes,
                                       is_bidirectional=is_bidirectional,
                                       initial_lr=initial_lr_rnn,
-                                      weight_decay=weight_decay_rnn,
-                                      batch_size=batch_size_rnn)
+                                      weight_decay=weight_decay_rnn)
         start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(model_checkpoint_rel_path)
 #        print('Model:\n', gru_model)
         evaluator = Evaluator.Evaluator(gru_model)
@@ -323,8 +342,7 @@ def main():
                                       num_classes=num_classes,
                                       is_bidirectional=is_bidirectional,
                                       initial_lr=initial_lr_rnn,
-                                      weight_decay=weight_decay_rnn,
-                                      batch_size=batch_size_rnn)
+                                      weight_decay=weight_decay_rnn)
 #        print('Model:\n', gru_model)
         start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(print_model_checkpoint)
         print('========================================')
