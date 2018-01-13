@@ -53,7 +53,7 @@ def main():
     print_model_checkpoint = None#"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
 
 
-    terminal = False                                          # if True: disables all other calculations
+    terminal = True                                          # if True: disables all other calculations
     
     # HYPERPARAMETERS EMBEDDING
 
@@ -144,7 +144,7 @@ def main():
         while input_text != 'exit':
             input_text = input('Enter text: ')
 #            print(input_text)
-            input_text_lang_tuple = [(input_text, 'pl')]    # language must be in vocab_lang
+            input_text_lang_tuple = [(input_text, 'de')]    # language must be in vocab_lang
             
             filtered_texts_and_lang = input_data.filter_out_irrelevant_tweet_parts(input_text_lang_tuple)
 #            print(filtered_texts_and_lang)
@@ -156,7 +156,8 @@ def main():
                                                                                                                                  embed_weights_rel_path=trained_embed_weights_rel_path)
             input_accuracy = evaluator.evalute_data_set(input_text_embed_char_text_inp_tensors,
                                                         input_text_target_tensors,
-                                                        vocab_lang)
+                                                        vocab_lang,
+                                                        5)
             print(vocab_lang)
     
 
