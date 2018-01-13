@@ -12,56 +12,45 @@ from net import GRUModel
 
 def main():
 
-
-    ##############
-    # DATA FILES #
-    ##############
     
-    # split into training, validation and test set from an original file
-    create_splitted_data_files = False
-    
-    input_tr_va_te_data_rel_path = "../data/input_data/original/recall_oriented_dl.csv" #training, validation and test will be generated from this file
-#    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_embed.csv" #training, validation and test will be generated from this file
-    input_rt_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #to change later, rt = real test
-    
-    
-    out_tr_data_rel_path = "../data/input_data/original_splitted/training.csv"
-    out_va_data_rel_path = "../data/input_data/original_splitted/validation.csv"
-    out_te_data_rel_path = "../data/input_data/original_splitted/test.csv"
-    files_exist = Path(out_tr_data_rel_path).is_file() and Path(out_va_data_rel_path).is_file() and Path(out_te_data_rel_path).is_file()
-    if(create_splitted_data_files or not files_exist):
-        out_filenames = [out_tr_data_rel_path, out_va_data_rel_path, out_te_data_rel_path] #same size as ratios
-        ratios = [0.8, 0.1, 0.1]
-        shuffle_seed = 42
-        data_splitter = DataSplit.DataSplit()
-        splitted_data = data_splitter.split_percent_of_languages(input_tr_va_te_data_rel_path, ratios, out_filenames, shuffle_seed)
-
-
     ##############
     # PARAMETERS #
     ##############
 
+
+    # SYSTEM
+    create_splitted_data_files = True                        # split into training, validation and test set from an original file
+    calc_embed = True
+    train_rnn = True
+    eval_test_set = False
+    
+    print_embed_testing = False
+    print_model_checkpoint_embed_weights = None#"../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"#None
+    print_model_checkpoint = None#"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
+    
+    terminal = False                                         # if True: disables all other calculations
+    
+    
+    # DATA
+    input_tr_va_te_data_rel_path = "../data/input_data/original/recall_oriented_dl.csv" #training, validation and test will be generated from this file
+#    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_embed.csv" #training, validation and test will be generated from this file
+    input_rt_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #to change later, rt = real test
+    
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
     trained_embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
 #    trained_embed_weights_rel_path = "../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"
     model_checkpoint_rel_path = "../data/model_checkpoints/model_checkpoint.pth"
     trained_model_checkpoint_rel_path = "../data/model_checkpoints/model_checkpoint.pth"
 #    trained_model_checkpoint_rel_path = "../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"
+    
+    tr_va_te_split_ratios = [0.8, 0.1, 0.1]                  # [train_ratio, val_ratio, test_ratio]
+    split_shuffle_seed = 42                                  # ensures that splitted sets (training, validation, test) are always created identically (given a specified ratio)
     fetch_only_langs = None#['pl', 'sv']#['de', 'en', 'es', 'fr', 'it', 'und']#['el', 'fa', 'hi', 'ca']#None
     fetch_only_first_x_tweets = math.inf#5
-    calc_embed = True
-    train_rnn = True
-    eval_test_set = False
-    print_embed_testing = False
-    print_model_checkpoint_embed_weights = None#"../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"#None
-    print_model_checkpoint = None#"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
-
-
-    terminal = False                                          # if True: disables all other calculations
+    min_char_frequency = 2                                   # chars appearing less than min_char_frequency in the training set will not be used to create the vocabulary vocab_chars
     
     
     # HYPERPARAMETERS EMBEDDING
-    min_char_frequency = 2
     sampling_table_min_char_count = 10                       # determines the precision of the sampling (should be 10 or higher)
     sampling_table_specified_size_cap = 1000#math.inf        # caps specified sampling table size to this value (no matter how big it would be according to sampling_table_min_char_count)
                                                              # note: this is only the specified size, the actual table size may slightly deviate due to roundings in the calculation
@@ -73,6 +62,7 @@ def main():
     lr_decay_num_batches_embed = 100
     num_epochs_embed = 1
    
+    
     # HYPERPARAMETERS RNN
 #    input_size = list(train_embed_char_text_inp_tensors[0].size())[2]
 #    num_classes = len(vocab_lang)
@@ -89,13 +79,8 @@ def main():
     
     # set dict to later store parameters to file
     system_param_dict = {
-        'input_tr_va_te_data_rel_path' : input_tr_va_te_data_rel_path,
-        'embed_weights_rel_path' : embed_weights_rel_path,
-        'trained_embed_weights_rel_path' : trained_embed_weights_rel_path,
-        'model_checkpoint_rel_path' : model_checkpoint_rel_path,
-        'trained_model_checkpoint_rel_path' : trained_model_checkpoint_rel_path,
-        'fetch_only_langs' : fetch_only_langs,
-        'fetch_only_first_x_tweets' : fetch_only_first_x_tweets,
+        # SYSTEM
+        'create_splitted_data_files' : create_splitted_data_files,
         'calc_embed' : calc_embed,
         'train_rnn' : train_rnn,
         'eval_test_set' : eval_test_set,
@@ -103,7 +88,19 @@ def main():
         'print_model_checkpoint_embed_weights' : print_model_checkpoint_embed_weights,
         'print_model_checkpoint' : print_model_checkpoint,
         'terminal' : terminal,
+        # DATA
+        'input_tr_va_te_data_rel_path' : input_tr_va_te_data_rel_path,
+        'input_rt_data_rel_path' : input_rt_data_rel_path,
+        'embed_weights_rel_path' : embed_weights_rel_path,
+        'trained_embed_weights_rel_path' : trained_embed_weights_rel_path,
+        'model_checkpoint_rel_path' : model_checkpoint_rel_path,
+        'trained_model_checkpoint_rel_path' : trained_model_checkpoint_rel_path,
+        'tr_va_te_split_ratios' : tr_va_te_split_ratios,
+        'split_shuffle_seed' : split_shuffle_seed,
+        'fetch_only_langs' : fetch_only_langs,
+        'fetch_only_first_x_tweets' : fetch_only_first_x_tweets,
         'min_char_frequency' : min_char_frequency,
+        # HYPERPARAMETERS EMBEDDING
         'sampling_table_min_char_count' : sampling_table_min_char_count,
         'sampling_table_specified_size_cap' : sampling_table_specified_size_cap,
         'max_context_window_size' : max_context_window_size,
@@ -112,6 +109,7 @@ def main():
         'initial_lr_embed' : initial_lr_embed,
         'lr_decay_num_batches_embed' : lr_decay_num_batches_embed,
         'num_epochs_embed' : num_epochs_embed,
+        # HYPERPARAMETERS RNN
         'hidden_size_rnn' : hidden_size_rnn,
         'num_layers_rnn' : num_layers_rnn,
         'is_bidirectional' : is_bidirectional,
@@ -123,6 +121,22 @@ def main():
         'num_epochs_rnn' : num_epochs_rnn,
         }
     
+    
+    ########################
+    # DATA FILES SPLITTING #
+    ########################
+    
+    # split into training, validation and test set from an original file
+    if (create_splitted_data_files):
+        out_tr_data_rel_path = "../data/input_data/original_splitted/training.csv"
+        out_va_data_rel_path = "../data/input_data/original_splitted/validation.csv"
+        out_te_data_rel_path = "../data/input_data/original_splitted/test.csv"
+    #    files_exist = Path(out_tr_data_rel_path).is_file() and Path(out_va_data_rel_path).is_file() and Path(out_te_data_rel_path).is_file()
+    #    if(create_splitted_data_files or not files_exist):
+        out_filenames = [out_tr_data_rel_path, out_va_data_rel_path, out_te_data_rel_path] #same size as ratios
+        data_splitter = DataSplit.DataSplit()
+        splitted_data = data_splitter.split_percent_of_languages(input_tr_va_te_data_rel_path, tr_va_te_split_ratios, out_filenames, split_shuffle_seed)
+        
     
     ############
     # TERMINAL #
@@ -201,7 +215,6 @@ def main():
 #        print(len(vocab_lang))
 
 
-    
     #########################
     # EMBEDDING CALCULATION #
     #########################
