@@ -7,7 +7,7 @@ import torch.autograd as autograd
 from torch.autograd import Variable
 #from . import SkipGramModel
 from embedding import SkipGramModel
-import InputData
+from input import InputData
 #from tqdm import tqdm
 
 

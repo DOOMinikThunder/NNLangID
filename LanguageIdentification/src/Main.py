@@ -2,9 +2,8 @@
 
 import math
 from pathlib import Path
-import InputData
 import Evaluator
-import DataSplit
+from input import DataSplit, InputData
 from embedding import EmbeddingCalculation
 from net import GRUModel
 
