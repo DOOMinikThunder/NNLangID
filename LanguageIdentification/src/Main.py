@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import math
-#from pathlib import Path
+from pathlib import Path
 import InputData
 import Evaluator
 import DataSplit
@@ -19,7 +19,7 @@ def main():
 
 
     # SYSTEM
-    create_splitted_data_files = True                        # split into training, validation and test set from an original file
+    create_splitted_data_files = True                       # split into training, validation and test set from an original file
     calc_embed = True
     train_rnn = True
     eval_test_set = False
@@ -28,12 +28,12 @@ def main():
     print_model_checkpoint_embed_weights = None#"../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"#None
     print_model_checkpoint = None#"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
     
-    terminal = False                                         # if True: disables all other calculations
+    terminal = False                                      # if True: disables all other calculations
     
     
     # DATA
-    input_tr_va_te_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #training, validation and test will be generated from this file
-#    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_embed.csv" #training, validation and test will be generated from this file
+    #input_tr_va_te_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #training, validation and test will be generated from this file
+    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_recall_de_en_es.csv" #training, validation and test will be generated from this file
     input_rt_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #to change later, rt = real test
     
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
@@ -45,7 +45,7 @@ def main():
     
     tr_va_te_split_ratios = [0.8, 0.1, 0.1]                  # [train_ratio, val_ratio, test_ratio]
     split_shuffle_seed = 42                                  # ensures that splitted sets (training, validation, test) are always created identically (given a specified ratio)
-    fetch_only_langs = ['pl', 'sv']#['de', 'en', 'es', 'fr', 'it', 'und']#['el', 'fa', 'hi', 'ca']#None
+    fetch_only_langs = ['de', 'en', 'es']#['de', 'en', 'es', 'fr', 'it', 'und']#['el', 'fa', 'hi', 'ca']#None
     fetch_only_first_x_tweets = math.inf#5
     min_char_frequency = 2                                   # chars appearing less than min_char_frequency in the training set will not be used to create the vocabulary vocab_chars
     
@@ -127,12 +127,11 @@ def main():
     ########################
     
     # split into training, validation and test set from an original file
-    if (create_splitted_data_files):
-        out_tr_data_rel_path = "../data/input_data/original_splitted/training.csv"
-        out_va_data_rel_path = "../data/input_data/original_splitted/validation.csv"
-        out_te_data_rel_path = "../data/input_data/original_splitted/test.csv"
-    #    files_exist = Path(out_tr_data_rel_path).is_file() and Path(out_va_data_rel_path).is_file() and Path(out_te_data_rel_path).is_file()
-    #    if(create_splitted_data_files or not files_exist):
+    out_tr_data_rel_path = "../data/input_data/original_splitted/training.csv"
+    out_va_data_rel_path = "../data/input_data/original_splitted/validation.csv"
+    out_te_data_rel_path = "../data/input_data/original_splitted/test.csv"
+    files_exist = Path(out_tr_data_rel_path).is_file() and Path(out_va_data_rel_path).is_file() and Path(out_te_data_rel_path).is_file()
+    if (create_splitted_data_files or not files_exist):
         out_filenames = [out_tr_data_rel_path, out_va_data_rel_path, out_te_data_rel_path] #same size as ratios
         data_splitter = DataSplit.DataSplit()
         splitted_data = data_splitter.split_percent_of_languages(input_tr_va_te_data_rel_path, tr_va_te_split_ratios, out_filenames, split_shuffle_seed)
@@ -172,10 +171,8 @@ def main():
 #            print(input_text_indexed)
             input_text_embed_char_text_inp_tensors, input_text_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=input_text_indexed,
                                                                                                                                  embed_weights_rel_path=trained_embed_weights_rel_path)
-            input_accuracy = evaluator.evalute_data_set(input_text_embed_char_text_inp_tensors,
-                                                        input_text_target_tensors,
-                                                        vocab_lang,
-                                                        5)
+            input_accuracy = evaluator.evaluate_single_date(input_text_embed_char_text_inp_tensors[0], 5)
+            print(input_accuracy)
             print(vocab_lang)
     
 

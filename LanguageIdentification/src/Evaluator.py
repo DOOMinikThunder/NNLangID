@@ -18,13 +18,8 @@ class Evaluator(object):
         target_list = []
         val_loss = 0
         for input, target in zip(input_data, target_data):
-            output,_ = self.model(input)
-            val_loss += self.model.criterion(output, target)
-            lang_prediction = self.evaluate_prediction(output, n_highest_probs)
+            lang_prediction = self.evaluate_single_date(input, n_highest_probs)
             print(lang_prediction)
-            # checks if language prediction equals most common language in target (in case there are multiple targets)
-            # todo later: multiple language predictions
-            #print('lang_pred %s - target %s'%(lang_prediction, stats.mode(target.data.numpy()).mode[0]))
             target_list.append(stats.mode(target.data.numpy()).mode[0])
             predictions.append(lang_prediction[0][1])
             pred_true += int(lang_prediction[0][1] == target_list[-1])
@@ -34,9 +29,11 @@ class Evaluator(object):
 #        print('accuracy', accuracy)
         return accuracy
 
-#todo
-    def evaluate_single_date(self, input, target, vocab_lang, n_highest_probs):
-        pass
+    def evaluate_single_date(self, input, n_highest_probs):
+        hidden = self.model.initHidden()
+        output,hidden = self.model(input, hidden)
+        lang_prediction = self.evaluate_prediction(output, n_highest_probs)
+        return lang_prediction
 
     #prediction: tensor of languages-dimensional entries containing log softmax probabilities
     def evaluate_prediction(self, prediction, n_highest_probs):
