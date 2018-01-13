@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import math
+from pathlib import Path
 import InputData
 import Evaluator
 import DataSplit
 from embedding import EmbeddingCalculation
 from net import GRUModel
-from pathlib import Path
+
 
 
 def main():
@@ -15,22 +16,25 @@ def main():
     ##############
     # DATA FILES #
     ##############
-    create_data_files = False
-    prefix = "../data/input_data/"
-
-    input_data_rel_path = prefix+"recall_test.csv" #training, validation and test will be generated from this file
-
-    tr_data_rel_path = "../data/input_data/training.csv"
-    va_data_rel_path = "../data/input_data/validation.csv"
-    te_data_rel_path = "../data/input_data/test.csv"
-    rt_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv" #to change later, rt = real test
-    files_exist = Path(tr_data_rel_path).is_file() and Path(va_data_rel_path).is_file() and Path(te_data_rel_path).is_file()
-    if(create_data_files or not files_exist):
-        ratios = [0.4, 0.4, 0.2]
-        shuffle_seed = 55
-        out_filenames = [prefix + "training.csv", prefix + "validation.csv", prefix + "test.csv"] #same size as ratios
+    
+    # split into training, validation and test set from an original file
+    create_splitted_data_files = False
+    
+    input_tr_va_te_data_rel_path = "../data/input_data/original/recall_oriented_dl.csv" #training, validation and test will be generated from this file
+#    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_embed.csv" #training, validation and test will be generated from this file
+    input_rt_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #to change later, rt = real test
+    
+    
+    out_tr_data_rel_path = "../data/input_data/original_splitted/training.csv"
+    out_va_data_rel_path = "../data/input_data/original_splitted/validation.csv"
+    out_te_data_rel_path = "../data/input_data/original_splitted/test.csv"
+    files_exist = Path(out_tr_data_rel_path).is_file() and Path(out_va_data_rel_path).is_file() and Path(out_te_data_rel_path).is_file()
+    if(create_splitted_data_files or not files_exist):
+        out_filenames = [out_tr_data_rel_path, out_va_data_rel_path, out_te_data_rel_path] #same size as ratios
+        ratios = [0.8, 0.1, 0.1]
+        shuffle_seed = 42
         data_splitter = DataSplit.DataSplit()
-        splitted_data = data_splitter.split_percent_of_languages(input_data_rel_path, ratios, out_filenames, shuffle_seed)
+        splitted_data = data_splitter.split_percent_of_languages(input_tr_va_te_data_rel_path, ratios, out_filenames, shuffle_seed)
 
 
     ##############
@@ -53,10 +57,10 @@ def main():
     print_model_checkpoint = None#"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
 
 
-    terminal = True                                          # if True: disables all other calculations
+    terminal = False                                          # if True: disables all other calculations
+    
     
     # HYPERPARAMETERS EMBEDDING
-
     min_char_frequency = 2
     sampling_table_min_char_count = 10                       # determines the precision of the sampling (should be 10 or higher)
     sampling_table_specified_size_cap = 1000#math.inf        # caps specified sampling table size to this value (no matter how big it would be according to sampling_table_min_char_count)
@@ -85,7 +89,7 @@ def main():
     
     # set dict to later store parameters to file
     system_param_dict = {
-        'input_data_rel_path' : input_data_rel_path,
+        'input_tr_va_te_data_rel_path' : input_tr_va_te_data_rel_path,
         'embed_weights_rel_path' : embed_weights_rel_path,
         'trained_embed_weights_rel_path' : trained_embed_weights_rel_path,
         'model_checkpoint_rel_path' : model_checkpoint_rel_path,
@@ -183,10 +187,10 @@ def main():
             {'de': (0, 32)}
         """
         train_set_indexed, val_set_indexed, test_set_indexed, real_test_set_indexed, vocab_chars, vocab_lang = input_data.get_indexed_data(
-            input_data_rel_path=tr_data_rel_path,
-            validation_data_rel_path=va_data_rel_path,
-            test_data_rel_path=te_data_rel_path,
-            real_test_data_rel_path=rt_data_rel_path,
+            train_data_rel_path=out_tr_data_rel_path,
+            validation_data_rel_path=out_va_data_rel_path,
+            test_data_rel_path=out_te_data_rel_path,
+            real_test_data_rel_path=input_rt_data_rel_path,
             min_char_frequency=min_char_frequency,
             fetch_only_langs=fetch_only_langs,
             fetch_only_first_x_tweets=fetch_only_first_x_tweets)
