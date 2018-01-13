@@ -26,7 +26,7 @@ class GRUModel(nn.Module):
         else:
             self.num_directions = 1
         self.output_layer = nn.Linear(hidden_size * self.num_directions, num_classes)
-        self.batch_size = 1
+        self.batch_size = 1     # unused dimension
         
         self.criterion = torch.nn.NLLLoss()
         self.optimizer = optim.Adam(params=self.parameters(), lr=initial_lr, weight_decay=weight_decay)
