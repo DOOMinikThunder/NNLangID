@@ -11,7 +11,7 @@ from . import BatchGenerator
 class GRUModel(nn.Module):
     
     
-    def __init__(self, input_size, hidden_size, num_layers, num_classes, is_bidirectional, initial_lr, weight_decay, batch_size):
+    def __init__(self, input_size, hidden_size, num_layers, num_classes, is_bidirectional, initial_lr, weight_decay):
         super().__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers
@@ -26,7 +26,7 @@ class GRUModel(nn.Module):
         else:
             self.num_directions = 1
         self.output_layer = nn.Linear(hidden_size * self.num_directions, num_classes)
-        self.batch_size = batch_size
+        self.batch_size = 1
         
         self.criterion = torch.nn.NLLLoss()
         self.optimizer = optim.Adam(params=self.parameters(), lr=initial_lr, weight_decay=weight_decay)
@@ -46,8 +46,8 @@ class GRUModel(nn.Module):
         return output, next_hidden
 
 
-    def train(self, inputs, targets):
-        batch_gen = BatchGenerator.Batches(inputs, targets, self.batch_size)
+    def train(self, inputs, targets, batch_size):
+        batch_gen = BatchGenerator.Batches(inputs, targets, batch_size)
         num_batches_minus_one = batch_gen.num_batches - 1
         for i, (in_batch, target_batch) in enumerate(batch_gen):
             self.zero_grad()

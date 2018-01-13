@@ -3,22 +3,38 @@
 import math
 import InputData
 import Evaluator
+import DataSplit
 from embedding import EmbeddingCalculation
 from net import GRUModel
-
+from pathlib import Path
 
 
 def main():
 
+
+    ##############
+    # DATA FILES #
+    ##############
+    create_data_files = False
+    prefix = "../data/input_data/"
+
+    input_data_rel_path = prefix+"uniformly_sampled_dl.csv" #training, validation and test will be generated from this file
+
+    tr_data_rel_path = "../data/input_data/training.csv"
+    va_data_rel_path = "../data/input_data/validation.csv"
+    te_data_rel_path = "../data/input_data/test.csv"
+    rt_data_rel_path = "../data/input_data/recall_test.csv" #to change later, rt = real test
+    files_exist = Path(tr_data_rel_path).is_file() and Path(va_data_rel_path).is_file() and Path(te_data_rel_path).is_file()
+    if(create_data_files or not files_exist):
+        ratios = [0.4, 0.4, 0.2]
+        out_filenames = [prefix + "training.csv", prefix + "validation.csv", prefix + "test.csv"]
+        data_splitter = DataSplit.DataSplit()
+        splitted_data = data_splitter.split_percent_of_languages(input_data_rel_path, ratios, out_filenames)
+
+
     ##############
     # PARAMETERS #
     ##############
-    
-#    input_data_rel_path = "../data/input_data/recall_oriented_dl.csv"
-    input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
-#    input_data_rel_path = "../data/input_data/test_embed.csv"
-    test_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
-#    test_data_rel_path = "../data/input_data/test_embed.csv"
 
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
     val_model_checkpoint_rel_path = "../data/model_checkpoints/val_model_checkpoint.pth"
@@ -32,8 +48,6 @@ def main():
     print_model_checkpoints = False
     
     # HYPERPARAMETERS EMBEDDING
-    set_ratios = [0.8, 0.2]             # [train_ratio, val_ratio]
-                                        # warning: changes may require new embedding calculation due to differently shuffled train_set
     min_char_frequency = 2
     sampling_table_min_char_count = 10  # specify the precision of the sampling (should be 10 or higher)
     batch_size_embed = 2
@@ -57,8 +71,7 @@ def main():
     weight_decay_rnn = 0.00001
     num_epochs_rnn = 10#math.inf#2
     batch_size_rnn = 5
-    
-    
+
     ###################################
     # DATA RETRIEVAL & TRANSFORMATION #
     ###################################
@@ -74,12 +87,13 @@ def main():
     vocab_lang: every language occurence as a dict of language: index, occurences, e.g. 
         {'de': (0, 32)}
     """
-    train_set_indexed, val_set_indexed, test_set_indexed, vocab_chars, vocab_lang = input_data.get_indexed_data(input_data_rel_path=input_data_rel_path,
-                                                                                                                test_data_rel_path=test_data_rel_path,
-                                                                                                                min_char_frequency=min_char_frequency,
-                                                                                                                set_ratios=set_ratios,
-                                                                                                                fetch_only_langs=fetch_only_langs,
-                                                                                                                fetch_only_first_x_tweets=fetch_only_first_x_tweets)
+    train_set_indexed, val_set_indexed, test_set_indexed, real_test_set_indexed, vocab_chars, vocab_lang = input_data.get_indexed_data(input_data_rel_path=tr_data_rel_path,
+                                                                                                                                       validation_data_rel_path=va_data_rel_path,
+                                                                                                                                       test_data_rel_path=te_data_rel_path,
+                                                                                                                                        real_test_set_indexed=rt_data_rel_path,
+                                                                                                                                        min_char_frequency=min_char_frequency,
+                                                                                                                                        fetch_only_langs=fetch_only_langs,
+                                                                                                                                        fetch_only_first_x_tweets=fetch_only_first_x_tweets)
 #    print(train_set_indexed, val_set_indexed, test_set_indexed)
 #    print(vocab_chars)
 #    print(vocab_lang)
@@ -124,8 +138,7 @@ def main():
                                   num_classes=len(vocab_lang),
                                   is_bidirectional=is_bidirectional,
                                   initial_lr=initial_lr_rnn,
-                                  weight_decay=weight_decay_rnn,
-                                  batch_size=batch_size_rnn)
+                                  weight_decay=weight_decay_rnn)
     print('Model:\n', gru_model)
     evaluator = Evaluator.Evaluator(gru_model)
 
@@ -143,7 +156,8 @@ def main():
             # inputs: whole data set, every date contains the embedding of one char in one dimension
             # targets: whole target set, target is set for each character embedding
             gru_model.train(inputs=train_embed_char_text_inp_tensors,
-                            targets=train_target_tensors)
+                            targets=train_target_tensors,
+                            batch_size=batch_size_rnn)
             
             # evaluate validation set
             cur_accuracy = evaluator.evalute_data_set(val_embed_char_text_inp_tensors,
