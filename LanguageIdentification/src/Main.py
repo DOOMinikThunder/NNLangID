@@ -28,7 +28,7 @@ def main():
     print_model_checkpoint_embed_weights = None#"../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"#None
     print_model_checkpoint = None#"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
     
-    terminal = False                                      # if True: disables all other calculations
+    terminal = True                                      # if True: disables all other calculations
     
     
     # DATA
@@ -162,7 +162,7 @@ def main():
         while input_text != 'exit':
             input_text = input('Enter text: ')
 #            print(input_text)
-            input_text_lang_tuple = [(input_text, 'pl')]    # language must be in vocab_lang
+            input_text_lang_tuple = [(input_text, index2lang[0])]    # language must be in vocab_lang
             
             filtered_texts_and_lang = input_data.filter_out_irrelevant_tweet_parts(input_text_lang_tuple)
 #            print(filtered_texts_and_lang)
