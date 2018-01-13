@@ -15,7 +15,7 @@ def main():
     ##############
     # DATA FILES #
     ##############
-    create_data_files = True
+    create_data_files = False
     prefix = "../data/input_data/"
 
     input_data_rel_path = prefix+"recall_test.csv" #training, validation and test will be generated from this file
@@ -27,9 +27,10 @@ def main():
     files_exist = Path(tr_data_rel_path).is_file() and Path(va_data_rel_path).is_file() and Path(te_data_rel_path).is_file()
     if(create_data_files or not files_exist):
         ratios = [0.4, 0.4, 0.2]
+        shuffle_seed = 55
         out_filenames = [prefix + "training.csv", prefix + "validation.csv", prefix + "test.csv"] #same size as ratios
         data_splitter = DataSplit.DataSplit()
-        splitted_data = data_splitter.split_percent_of_languages(input_data_rel_path, ratios, out_filenames)
+        splitted_data = data_splitter.split_percent_of_languages(input_data_rel_path, ratios, out_filenames, shuffle_seed)
 
 
     ##############
@@ -66,7 +67,7 @@ def main():
     batch_size_embed = 2
     initial_lr_embed = 0.025
     lr_decay_num_batches_embed = 100
-    num_epochs_embed = 2
+    num_epochs_embed = 1
    
     # HYPERPARAMETERS RNN
 #    input_size = list(train_embed_char_text_inp_tensors[0].size())[2]
@@ -79,7 +80,7 @@ def main():
     scheduler_step_size_rnn = 1                              # currently not functioning
     scheduler_gamma_rnn = 0.1                                # currently not functioning
     weight_decay_rnn = 0.00001
-    num_epochs_rnn = 3#math.inf#2
+    num_epochs_rnn = 1#math.inf#2
 
     
     # set dict to later store parameters to file

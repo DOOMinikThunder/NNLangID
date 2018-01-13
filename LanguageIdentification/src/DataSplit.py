@@ -1,15 +1,15 @@
-from random import shuffle
+from random import shuffle, seed
 import unicodecsv as csv
 
 class DataSplit(object):
 
-	def split_percent_of_languages(self, input_file, ratio, out_filenames):
+	def split_percent_of_languages(self, input_file, ratio, out_filenames, shuffle_seed):
 		if(len(ratio) != len(out_filenames)):
 			print("ratio and output files must have same size!")
 			return []
 		texts_and_languages = self.read_input(input_file)
 		languages_splitted = self.split_by_languages(texts_and_languages)
-		splitted_data = self.merge_splitted_languages(languages_splitted, ratio)
+		splitted_data = self.merge_splitted_languages(languages_splitted, ratio, shuffle_seed)
 		self.write_to_file(splitted_data,out_filenames)
 		return splitted_data
 
@@ -30,10 +30,10 @@ class DataSplit(object):
 		return data
 
 
-	def merge_splitted_languages(self, languages_splitted, ratio):
+	def merge_splitted_languages(self, languages_splitted, ratio, shuffle_seed):
 		splitted_data = [[] for i in range(len(ratio))]
 		for language in languages_splitted:
-			language_in_ratios = self.split_language_with_ratio(languages_splitted[language], ratio)#
+			language_in_ratios = self.split_language_with_ratio(languages_splitted[language], ratio, shuffle_seed)#
 			for i,set in enumerate(language_in_ratios):
 				splitted_data[i] += set
 
@@ -52,9 +52,10 @@ class DataSplit(object):
 
 	#ratio is a list of ratios, e.g. [0.5,0.5] for two lists, [0.4,0.4,0.2] for three lists
 	#returns list of split lists with len(ratio)
-	def split_language_with_ratio(self, input, ratio):
+	def split_language_with_ratio(self, input, ratio, shuffle_seed):
 		in_size = len(input)
 		idx_list = [i for i in range(len(input))]
+		seed(shuffle_seed)
 		shuffle(idx_list)
 		split_languages = []
 		for percentage in ratio[:-1]:

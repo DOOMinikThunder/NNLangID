@@ -180,9 +180,12 @@ class InputData(object):
 
 #        print(texts_and_lang)
         filtered_texts_and_lang = self.filter_out_irrelevant_tweet_parts(tr_texts_and_lang)
+        filtered_va_texts_and_lang = self.filter_out_irrelevant_tweet_parts(va_texts_and_lang)
+        filtered_te_texts_and_lang = self.filter_out_irrelevant_tweet_parts(te_texts_and_lang)
+        filtered_rt_texts_and_lang = self.filter_out_irrelevant_tweet_parts(rt_texts_and_lang)
+
 #        print(filtered_texts_and_lang)
         # initialize random number generator to facilitate testing
-        random.seed(42)
         random.shuffle(filtered_texts_and_lang)
         #train_set, val_set = self.split_data_into_sets(filtered_texts_and_lang, set_ratios)
 #        print(train_set, val_set, test_set)
@@ -191,9 +194,9 @@ class InputData(object):
 #        print(vocab_chars)
 #        print(vocab_lang)
         train_set_only_vocab_chars = self.get_texts_with_only_vocab_chars(filtered_texts_and_lang, vocab_chars)
-        val_set_only_vocab_chars = self.get_texts_with_only_vocab_chars(va_texts_and_lang, vocab_chars)
-        test_set_only_vocab_chars = self.get_texts_with_only_vocab_chars(te_texts_and_lang, vocab_chars)
-        real_test_set_only_vocab_chars = self.get_texts_with_only_vocab_chars(rt_texts_and_lang, vocab_chars)
+        val_set_only_vocab_chars = self.get_texts_with_only_vocab_chars(filtered_va_texts_and_lang, vocab_chars)
+        test_set_only_vocab_chars = self.get_texts_with_only_vocab_chars(filtered_te_texts_and_lang, vocab_chars)
+        real_test_set_only_vocab_chars = self.get_texts_with_only_vocab_chars(filtered_rt_texts_and_lang, vocab_chars)
 
 #        print(train_set_only_vocab_chars, val_set_only_vocab_chars, test_set_only_vocab_chars)
         train_set_indexed = self.get_indexed_texts_and_lang(train_set_only_vocab_chars, vocab_chars, vocab_lang)

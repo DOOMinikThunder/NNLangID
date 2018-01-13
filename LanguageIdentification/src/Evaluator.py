@@ -15,8 +15,10 @@ class Evaluator(object):
         pred_true = 0
         predictions = []
         target_list = []
+        val_loss = 0
         for input, target in zip(input_data, target_data):
             output,_ = self.model(input)
+            val_loss += self.model.criterion(output, target)
             lang_prediction = self.evaluate_prediction(output)
             # checks if language prediction equals most common language in target (in case there are multiple targets)
             # todo later: multiple language predictions
@@ -24,7 +26,7 @@ class Evaluator(object):
             target_list.append(stats.mode(target.data.numpy()).mode[0])
             predictions.append(lang_prediction)
             pred_true += int(lang_prediction == target_list[-1])
-        
+        print('val_loss', val_loss)
         accuracy = pred_true/len(input_data)
         self.confusion_matrix(predictions, target_list, vocab_lang)
 #        print('accuracy', accuracy)
