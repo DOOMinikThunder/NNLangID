@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import math
-from pathlib import Path
+#from pathlib import Path
 import InputData
 import Evaluator
 import DataSplit
@@ -32,7 +32,7 @@ def main():
     
     
     # DATA
-    input_tr_va_te_data_rel_path = "../data/input_data/original/recall_oriented_dl.csv" #training, validation and test will be generated from this file
+    input_tr_va_te_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #training, validation and test will be generated from this file
 #    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_embed.csv" #training, validation and test will be generated from this file
     input_rt_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #to change later, rt = real test
     
@@ -45,7 +45,7 @@ def main():
     
     tr_va_te_split_ratios = [0.8, 0.1, 0.1]                  # [train_ratio, val_ratio, test_ratio]
     split_shuffle_seed = 42                                  # ensures that splitted sets (training, validation, test) are always created identically (given a specified ratio)
-    fetch_only_langs = None#['pl', 'sv']#['de', 'en', 'es', 'fr', 'it', 'und']#['el', 'fa', 'hi', 'ca']#None
+    fetch_only_langs = ['pl', 'sv']#['de', 'en', 'es', 'fr', 'it', 'und']#['el', 'fa', 'hi', 'ca']#None
     fetch_only_first_x_tweets = math.inf#5
     min_char_frequency = 2                                   # chars appearing less than min_char_frequency in the training set will not be used to create the vocabulary vocab_chars
     
@@ -74,7 +74,7 @@ def main():
     scheduler_step_size_rnn = 1                              # currently not functioning
     scheduler_gamma_rnn = 0.1                                # currently not functioning
     weight_decay_rnn = 0.00001
-    num_epochs_rnn = 1#math.inf#2
+    num_epochs_rnn = math.inf#2
 
     
     # set dict to later store parameters to file
@@ -183,11 +183,6 @@ def main():
     # DATA RETRIEVAL & TRANSFORMATION #
     ###################################
 
-    train_set_indexed = []
-    val_set_indexed = []
-    test_set_indexed = []
-    vocab_chars = {}
-    vocab_lang = {}
     if (not terminal):
         input_data = InputData.InputData()
         """
