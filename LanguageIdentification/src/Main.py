@@ -36,12 +36,12 @@ def main():
     input_tr_va_te_data_rel_path = "../data/input_data/testing/test_embed.csv" #training, validation and test will be generated from this file
     input_rt_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #to change later, rt = real test
     
-    embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
-    trained_embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
-#    trained_embed_weights_rel_path = "../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"
-    model_checkpoint_rel_path = "../data/model_checkpoints/model_checkpoint.pth"
-    trained_model_checkpoint_rel_path = "../data/model_checkpoints/model_checkpoint.pth"
-#    trained_model_checkpoint_rel_path = "../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"
+    embed_weights_rel_path = "../data/save/embed_weights.txt"
+    trained_embed_weights_rel_path = "../data/save/embed_weights.txt"
+#    trained_embed_weights_rel_path = "../data/save/trained/embed_weights_de_en_es_fr_it_und.txt"
+    model_checkpoint_rel_path = "../data/save/model_checkpoint.pth"
+    trained_model_checkpoint_rel_path = "../data/save/model_checkpoint.pth"
+#    trained_model_checkpoint_rel_path = "../data/save/trained/model_checkpoint_de_en_es_fr_it_und.pth"
     
     tr_va_te_split_ratios = [0.8, 0.1, 0.1]                  # [train_ratio, val_ratio, test_ratio]
     split_shuffle_seed = 42                                  # ensures that splitted sets (training, validation, test) are always created identically (given a specified ratio)
