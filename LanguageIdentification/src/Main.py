@@ -157,12 +157,13 @@ def main():
         start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(trained_model_checkpoint_rel_path)
 #        print('Model:\n', gru_model)
         evaluator = Evaluator.Evaluator(gru_model)
+        lang2index, index2lang = input_data.get_string2index_and_index2string(vocab_lang)
         
         input_text = ''
         while input_text != 'exit':
             input_text = input('Enter text: ')
 #            print(input_text)
-            input_text_lang_tuple = [(input_text, 'de')]    # language must be in vocab_lang
+            input_text_lang_tuple = [(input_text, 'pl')]    # language must be in vocab_lang
             
             filtered_texts_and_lang = input_data.filter_out_irrelevant_tweet_parts(input_text_lang_tuple)
 #            print(filtered_texts_and_lang)
@@ -172,12 +173,15 @@ def main():
 #            print(input_text_indexed)
             input_text_embed_char_text_inp_tensors, input_text_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=input_text_indexed,
                                                                                                                                  embed_weights_rel_path=trained_embed_weights_rel_path)
-            input_accuracy = evaluator.evalute_data_set(input_text_embed_char_text_inp_tensors,
-                                                        input_text_target_tensors,
-                                                        vocab_lang,
-                                                        5)
-            print(vocab_lang)
-    
+            input_accuracy, lang_prediction = evaluator.evalute_data_set(input_text_embed_char_text_inp_tensors,
+                                                                         input_text_target_tensors,
+                                                                         vocab_lang,
+                                                                         5)
+            print('Prediction:')
+            for pred in lang_prediction:
+                print(pred[0], ':', index2lang[pred[1]])
+#            print(vocab_lang)
+            
 
     ###################################
     # DATA RETRIEVAL & TRANSFORMATION #

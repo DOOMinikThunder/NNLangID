@@ -204,13 +204,13 @@ class InputData(object):
         return train_set_indexed, val_set_indexed, test_set_indexed, real_test_set_indexed, vocab_chars, vocab_lang
     
     
-    def get_char2index_and_index2char(self, vocab_chars):
-        char2index = {}
-        index2char = {}
-        for char in vocab_chars:
-            char2index[char] = vocab_chars[char][0]
-            index2char[vocab_chars[char][0]] = char
-        return char2index, index2char
+    def get_string2index_and_index2string(self, vocab_dict):
+        string2index = {}
+        index2string = {}
+        for string in vocab_dict:
+            string2index[string] = vocab_dict[string][0]
+            index2string[vocab_dict[string][0]] = string
+        return string2index, index2string
     
     
     def get_only_indexed_texts(self, indexed_texts_and_lang):

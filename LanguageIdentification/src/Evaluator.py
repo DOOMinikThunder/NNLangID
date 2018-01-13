@@ -21,18 +21,18 @@ class Evaluator(object):
             output,_ = self.model(input)
             val_loss += self.model.criterion(output, target)
             lang_prediction = self.evaluate_prediction(output, n_highest_probs)
-            print(lang_prediction)
+#            print(lang_prediction)
             # checks if language prediction equals most common language in target (in case there are multiple targets)
             # todo later: multiple language predictions
             #print('lang_pred %s - target %s'%(lang_prediction, stats.mode(target.data.numpy()).mode[0]))
             target_list.append(stats.mode(target.data.numpy()).mode[0])
             predictions.append(lang_prediction[0][1])
             pred_true += int(lang_prediction[0][1] == target_list[-1])
-        print('val_loss', val_loss)
+#        print('val_loss', val_loss)
         accuracy = pred_true/len(input_data)
-        self.confusion_matrix(predictions, target_list, vocab_lang)
+#        self.confusion_matrix(predictions, target_list, vocab_lang)
 #        print('accuracy', accuracy)
-        return accuracy
+        return accuracy, lang_prediction
 
 #todo
     def evaluate_single_date(self, input, target, vocab_lang, n_highest_probs):
