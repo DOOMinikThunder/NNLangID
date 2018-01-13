@@ -114,7 +114,7 @@ class EmbeddingCalculation(object):
         return pairs
     
     
-    def calc_embed(self, indexed_tweet_texts, batch_size, vocab_chars, max_context_window_size, num_neg_samples, num_epochs, initial_lr, lr_decay_num_batches, embed_weights_rel_path, print_testing, sampling_table_min_char_count=1, sampling_table_specified_size_cap=100000000):
+    def calc_embed(self, indexed_tweet_texts, batch_size, vocab_chars, vocab_lang, max_context_window_size, num_neg_samples, num_epochs, initial_lr, lr_decay_num_batches, embed_weights_rel_path, print_testing, sampling_table_min_char_count=1, sampling_table_specified_size_cap=100000000):
         # set embedding dimension to: roundup(log2(vocabulary-size))
         embed_dim = math.ceil(math.log2(len(vocab_chars)))
     #    print(embed_dim)
@@ -126,6 +126,7 @@ class EmbeddingCalculation(object):
         batched_pairs = self.get_batched_target_context_index_pairs(indexed_tweet_texts, batch_size, max_context_window_size)
 #        print(batched_pairs)
         skip_gram_model = SkipGramModel.SkipGramModel(vocab_chars=vocab_chars,
+                                                      vocab_lang=vocab_lang,
                                                       embed_dim=embed_dim,
                                                       initial_lr=initial_lr,
                                                       sampling_table_min_char_count=sampling_table_min_char_count,
@@ -150,7 +151,7 @@ class EmbeddingCalculation(object):
         if (print_testing):
 #            print("VOCABULARY:\n", vocab_chars)
             input_data = InputData.InputData()
-            embed = input_data.create_embed_from_weights_file(embed_weights_rel_path)
+            embed, num_classes = input_data.create_embed_from_weights_file(embed_weights_rel_path)
             char2index, index2char = input_data.get_char2index_and_index2char(vocab_chars)
             vocab_size = len(vocab_chars)
             

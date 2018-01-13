@@ -20,13 +20,14 @@ https://adoni.github.io/2017/11/08/word2vec-pytorch/ (Access: 11.01.2018)
 class SkipGramModel(nn.Module):
 
     
-    def __init__(self, vocab_chars, embed_dim, initial_lr, sampling_table_min_char_count=1, sampling_table_specified_size_cap=100000000):
+    def __init__(self, vocab_chars, vocab_lang, embed_dim, initial_lr, sampling_table_min_char_count=1, sampling_table_specified_size_cap=100000000):
         super().__init__()
-        self.vocab_size = len(vocab_chars)
+        self.vocab_chars_size = len(vocab_chars)
+        self.vocab_lang_size = len(vocab_lang)
         self.embed_dim = embed_dim
         self.initial_lr = initial_lr
-        self.embed_hidden = nn.Embedding(self.vocab_size, embed_dim, sparse=True)
-        self.embed_output = nn.Embedding(self.vocab_size, embed_dim, sparse=True)
+        self.embed_hidden = nn.Embedding(self.vocab_chars_size, embed_dim, sparse=True)
+        self.embed_output = nn.Embedding(self.vocab_chars_size, embed_dim, sparse=True)
         self.sampling_table = []
         self.init_embed()
         self.init_sampling_table(vocab_chars, sampling_table_min_char_count, sampling_table_specified_size_cap)
@@ -149,9 +150,9 @@ class SkipGramModel(nn.Module):
         weights_array = self.embed_hidden.weight.data.numpy()
         writer = open(relative_path_to_file, 'w')
         # write vocabulary size and embedding dimension to file
-        writer.write('%d %d' % (self.vocab_size, self.embed_dim))
+        writer.write('%d %d %d' % (self.vocab_chars_size, self.embed_dim, self.vocab_lang_size))
         # write weights to file (one row for each char of the vocabulary)
-        for i in range(self.vocab_size):
+        for i in range(self.vocab_chars_size):
             line = ' '.join([str(x) for x in weights_array[i]])
             writer.write('\n%s' % line)
         print('Embedding weights saved to file:', relative_path_to_file)

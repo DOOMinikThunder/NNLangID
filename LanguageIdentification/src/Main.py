@@ -14,24 +14,27 @@ def main():
     # PARAMETERS #
     ##############
     
-    input_data_rel_path = "../data/input_data/recall_oriented_dl.csv"
-#    input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
+#    input_data_rel_path = "../data/input_data/recall_oriented_dl.csv"
+    input_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
 #    input_data_rel_path = "../data/input_data/test_embed.csv"
     test_data_rel_path = "../data/input_data/uniformly_sampled_dl.csv"
 #    test_data_rel_path = "../data/input_data/test_embed.csv"
 
     embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
-    val_model_checkpoint_rel_path = "../data/model_checkpoints/val_model_checkpoint.pth"
-    test_model_checkpoint_rel_path = "../data/model_checkpoints/test_model_checkpoint.pth"
-    trained_model_checkpoint_rel_path = "../data/model_checkpoints/trained/val_model_checkpoint_de_en.pth"
-    fetch_only_langs = ['de', 'en']#['pl', 'sv']#['el', 'fa', 'hi', 'ca']#None
+    trained_embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
+#    trained_embed_weights_rel_path = "../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"
+    model_checkpoint_rel_path = "../data/model_checkpoints/model_checkpoint.pth"
+    trained_model_checkpoint_rel_path = "../data/model_checkpoints/model_checkpoint.pth"
+#    trained_model_checkpoint_rel_path = "../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"
+    fetch_only_langs = ['pl', 'sv']#['de', 'en', 'es', 'fr', 'it', 'und']#['el', 'fa', 'hi', 'ca']#None
     fetch_only_first_x_tweets = math.inf#5
-    calc_embed = False
-    train_rnn = False
+    calc_embed = True
+    train_rnn = True
     eval_test_set = False
     print_embed_testing = False
-    print_model_checkpoint = None#"../data/model_checkpoints/trained/val_model_checkpoint_de_en.pth"
-    terminal = True
+    print_model_checkpoint_embed_weights = None#"../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"#None
+    print_model_checkpoint = None#"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
+    terminal = True                                          # if True: disables all other calculations
     
     # HYPERPARAMETERS EMBEDDING
     set_ratios = [0.8, 0.2]                                  # [train_ratio, val_ratio]
@@ -66,8 +69,8 @@ def main():
         'input_data_rel_path' : input_data_rel_path,
         'test_data_rel_path' : test_data_rel_path,
         'embed_weights_rel_path' : embed_weights_rel_path,
-        'val_model_checkpoint_rel_path' : val_model_checkpoint_rel_path,
-        'test_model_checkpoint_rel_path' : test_model_checkpoint_rel_path,
+        'trained_embed_weights_rel_path' : trained_embed_weights_rel_path,
+        'model_checkpoint_rel_path' : model_checkpoint_rel_path,
         'trained_model_checkpoint_rel_path' : trained_model_checkpoint_rel_path,
         'fetch_only_langs' : fetch_only_langs,
         'fetch_only_first_x_tweets' : fetch_only_first_x_tweets,
@@ -75,6 +78,7 @@ def main():
         'train_rnn' : train_rnn,
         'eval_test_set' : eval_test_set,
         'print_embed_testing': print_embed_testing,
+        'print_model_checkpoint_embed_weights' : print_model_checkpoint_embed_weights,
         'print_model_checkpoint' : print_model_checkpoint,
         'terminal' : terminal,
         'set_ratios' : set_ratios,
@@ -99,52 +103,32 @@ def main():
         }
     
     
-    ###################################
-    # DATA RETRIEVAL & TRANSFORMATION #
-    ###################################
-    
-    input_data = InputData.InputData()
-    """
-    train_set_indexed: list of every date where each character and target gets unique id, e.g. 
-        ([0,1,0,1],0),([2,3,2,3],1) for ([a,b,a,b], 'de'), ([c,d,c,d], 'en)
-    val_set_indexed: see train_set_indexed
-    test_set_indexed: see train_set_indexed
-    vocab_chars: every character occurence as a dict of character: index, occurrences, e.g. 
-        {'a': (0, 700), 'b': (1, 700)}
-    vocab_lang: every language occurence as a dict of language: index, occurences, e.g. 
-        {'de': (0, 32)}
-    """
-    train_set_indexed, val_set_indexed, test_set_indexed, vocab_chars, vocab_lang = input_data.get_indexed_data(input_data_rel_path=input_data_rel_path,
-                                                                                                                test_data_rel_path=test_data_rel_path,
-                                                                                                                min_char_frequency=min_char_frequency,
-                                                                                                                set_ratios=set_ratios,
-                                                                                                                fetch_only_langs=fetch_only_langs,
-                                                                                                                fetch_only_first_x_tweets=fetch_only_first_x_tweets)
-#    print(train_set_indexed, val_set_indexed, test_set_indexed)
-#    print(vocab_chars)
-#    print(vocab_lang)
+    ############
+    # TERMINAL #
+    ############    
     
     # simple terminal for testing
     if (terminal):
-        embed = input_data.create_embed_from_weights_file(embed_weights_rel_path)
+        input_data = InputData.InputData()
+        embed, num_classes = input_data.create_embed_from_weights_file(trained_embed_weights_rel_path)
 #        print(embed.weight.size()[1])
         gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],    # equals embedding dimension
                                       hidden_size=hidden_size_rnn,
                                       num_layers=num_layers_rnn,
-                                      num_classes=len(vocab_lang),
+                                      num_classes=num_classes,
                                       is_bidirectional=is_bidirectional,
                                       initial_lr=initial_lr_rnn,
                                       weight_decay=weight_decay_rnn,
                                       batch_size=batch_size_rnn)
+        start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(trained_model_checkpoint_rel_path)
 #        print('Model:\n', gru_model)
-        start_epoch, val_accuracy, system_param_dict = gru_model.load_model_checkpoint_from_file(trained_model_checkpoint_rel_path)
         evaluator = Evaluator.Evaluator(gru_model)
         
         input_text = ''
         while input_text != 'exit':
-            input_text = input('Type text: ')
-    #        print(input_text)
-            input_text_lang_tuple = [(input_text, 'de')]
+            input_text = input('Enter text: ')
+#            print(input_text)
+            input_text_lang_tuple = [(input_text, 'pl')]    # language must be in vocab_lang
             
             filtered_texts_and_lang = input_data.filter_out_irrelevant_tweet_parts(input_text_lang_tuple)
 #            print(filtered_texts_and_lang)
@@ -153,24 +137,59 @@ def main():
             input_text_indexed = input_data.get_indexed_texts_and_lang(input_text_only_vocab_chars, vocab_chars, vocab_lang)
 #            print(input_text_indexed)
             input_text_embed_char_text_inp_tensors, input_text_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=input_text_indexed,
-                                                                                                                                 embed_weights_rel_path=embed_weights_rel_path)
+                                                                                                                                 embed_weights_rel_path=trained_embed_weights_rel_path)
             input_accuracy = evaluator.evalute_data_set(input_text_embed_char_text_inp_tensors,
                                                         input_text_target_tensors,
                                                         vocab_lang)
             print(vocab_lang)
-
+    
+    
+    ###################################
+    # DATA RETRIEVAL & TRANSFORMATION #
+    ###################################
+    
+    train_set_indexed = []
+    val_set_indexed = []
+    test_set_indexed = []
+    vocab_chars = {}
+    vocab_lang = {}
+    if (not terminal):
+        input_data = InputData.InputData()
+        """
+        train_set_indexed: list of every date where each character and target gets unique id, e.g. 
+            ([0,1,0,1],0),([2,3,2,3],1) for ([a,b,a,b], 'de'), ([c,d,c,d], 'en)
+        val_set_indexed: see train_set_indexed
+        test_set_indexed: see train_set_indexed
+        vocab_chars: every character occurence as a dict of character: index, occurrences, e.g. 
+            {'a': (0, 700), 'b': (1, 700)}
+        vocab_lang: every language occurence as a dict of language: index, occurences, e.g. 
+            {'de': (0, 32)}
+        """
+        train_set_indexed, val_set_indexed, test_set_indexed, vocab_chars, vocab_lang = input_data.get_indexed_data(input_data_rel_path=input_data_rel_path,
+                                                                                                                    test_data_rel_path=test_data_rel_path,
+                                                                                                                    min_char_frequency=min_char_frequency,
+                                                                                                                    set_ratios=set_ratios,
+                                                                                                                    fetch_only_langs=fetch_only_langs,
+                                                                                                                    fetch_only_first_x_tweets=fetch_only_first_x_tweets)
+#        print(train_set_indexed, val_set_indexed, test_set_indexed)
+#        print(vocab_chars)
+#        print(len(vocab_chars))
+#        print(vocab_lang)
+#        print(len(vocab_lang))
+    
     
     #########################
     # EMBEDDING CALCULATION #
     #########################
     
-    if (calc_embed):
+    if (not terminal and calc_embed):
         indexed_texts = input_data.get_only_indexed_texts(train_set_indexed)
 #        print(indexed_texts)
         embedding_calculation = EmbeddingCalculation.EmbeddingCalculation()
         embedding_calculation.calc_embed(indexed_tweet_texts=indexed_texts,
                                          batch_size=batch_size_embed,
                                          vocab_chars=vocab_chars,
+                                         vocab_lang=vocab_lang,
                                          max_context_window_size=max_context_window_size,
                                          num_neg_samples=num_neg_samples,
                                          num_epochs=num_epochs_embed,
@@ -186,29 +205,25 @@ def main():
     # RNN TRAINING #
     ################
 
-    # INITIALIZATION
-    train_embed_char_text_inp_tensors, train_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=train_set_indexed,
+    # train RNN model
+    if (not terminal and train_rnn):
+        train_embed_char_text_inp_tensors, train_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=train_set_indexed,
+                                                                                                                   embed_weights_rel_path=embed_weights_rel_path)
+        val_embed_char_text_inp_tensors, val_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=val_set_indexed,
                                                                                                                embed_weights_rel_path=embed_weights_rel_path)
-    val_embed_char_text_inp_tensors, val_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=val_set_indexed,
-                                                                                                           embed_weights_rel_path=embed_weights_rel_path)
-    test_embed_char_text_inp_tensors, test_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=test_set_indexed,
-                                                                                                             embed_weights_rel_path=embed_weights_rel_path)
-    gru_model = GRUModel.GRUModel(input_size=list(train_embed_char_text_inp_tensors[0].size())[2],  # equals embedding dimension
-                                  hidden_size=hidden_size_rnn,
-                                  num_layers=num_layers_rnn,
-                                  num_classes=len(vocab_lang),
-                                  is_bidirectional=is_bidirectional,
-                                  initial_lr=initial_lr_rnn,
-                                  weight_decay=weight_decay_rnn,
-                                  batch_size=batch_size_rnn)
-    print('Model:\n', gru_model)
-    evaluator = Evaluator.Evaluator(gru_model)
-
-
-    # TRAINING
-    if (train_rnn):
-        cur_accuracy = 0
-        best_accuracy = 0
+        gru_model = GRUModel.GRUModel(input_size=list(train_embed_char_text_inp_tensors[0].size())[2],  # equals embedding dimension
+                                      hidden_size=hidden_size_rnn,
+                                      num_layers=num_layers_rnn,
+                                      num_classes=len(vocab_lang),
+                                      is_bidirectional=is_bidirectional,
+                                      initial_lr=initial_lr_rnn,
+                                      weight_decay=weight_decay_rnn,
+                                      batch_size=batch_size_rnn)
+        print('Model:\n', gru_model)
+        evaluator = Evaluator.Evaluator(gru_model)
+        
+        cur_val_accuracy = 0
+        best_val_accuracy = -1.0
         epoch = 0
         is_improving = True
         # stop training when validation set error stops getting smaller ==> stop when overfitting occurs
@@ -221,42 +236,61 @@ def main():
                             targets=train_target_tensors)
             
             # evaluate validation set
-            cur_accuracy = evaluator.evalute_data_set(val_embed_char_text_inp_tensors,
-                                                      val_target_tensors,
-                                                      vocab_lang)
+            cur_val_accuracy = evaluator.evalute_data_set(val_embed_char_text_inp_tensors,
+                                                          val_target_tensors,
+                                                          vocab_lang)
             print('========================================')
-            print('Epoch', epoch, 'validation set accuracy:', cur_accuracy)
+            print('Epoch', epoch, 'validation set accuracy:', cur_val_accuracy)
             print('========================================')
             
             # check if accuracy improved and if so, save model checkpoint to file
-            if (best_accuracy < cur_accuracy):
-                best_accuracy = cur_accuracy
+            if (best_val_accuracy < cur_val_accuracy):
+                best_val_accuracy = cur_val_accuracy
                 gru_model.save_model_checkpoint_to_file({
                                             'start_epoch': epoch + 1,
+                                            'best_val_accuracy': best_val_accuracy,
+                                            'test_accuracy' : -1.0,
                                             'state_dict': gru_model.state_dict(),
-                                            'best_accuracy': best_accuracy,
                                             'optimizer': gru_model.optimizer.state_dict(),
                                             'system_param_dict' : system_param_dict,
+                                            'vocab_chars' : vocab_chars,
+                                            'vocab_lang' : vocab_lang,
                                             },
-                                            val_model_checkpoint_rel_path)
+                                            model_checkpoint_rel_path)
             else:
                 is_improving = False
             epoch += 1
+           
             
+    ##############
+    # EVALUATION #
+    ##############
+    
+    # evaluate test set
+    if (not terminal and eval_test_set):
+        test_embed_char_text_inp_tensors, test_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=test_set_indexed,
+                                                                                                                 embed_weights_rel_path=embed_weights_rel_path)
+        input_data = InputData.InputData()
+        embed, num_classes = input_data.create_embed_from_weights_file(embed_weights_rel_path)
+        gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],    # equals embedding dimension
+                                      hidden_size=hidden_size_rnn,
+                                      num_layers=num_layers_rnn,
+                                      num_classes=num_classes,
+                                      is_bidirectional=is_bidirectional,
+                                      initial_lr=initial_lr_rnn,
+                                      weight_decay=weight_decay_rnn,
+                                      batch_size=batch_size_rnn)
+        start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(model_checkpoint_rel_path)
+#        print('Model:\n', gru_model)
+        evaluator = Evaluator.Evaluator(gru_model)
         
-    # EVALUATION
-    if (eval_test_set):
-        # evaluate test set
-        start_epoch, val_accuracy, system_param_dict = gru_model.load_model_checkpoint_from_file(val_model_checkpoint_rel_path)
-#        print(start_epoch)
-#        print(best_accuracy)
         test_accuracy = evaluator.evalute_data_set(test_embed_char_text_inp_tensors,
                                                    test_target_tensors,
                                                    vocab_lang)
         print('========================================')
         print('Epochs trained:', start_epoch)
         print('========================================')
-        print('Best validation set accuracy:', val_accuracy)
+        print('Best validation set accuracy:', best_val_accuracy)
         print('========================================')
         print('Test set accuracy:', test_accuracy)
         print('========================================')
@@ -268,21 +302,37 @@ def main():
         # save test_accuracy to file
         gru_model.save_model_checkpoint_to_file({
                                             'start_epoch': start_epoch,
+                                            'best_val_accuracy': best_val_accuracy,
+                                            'test_accuracy' : test_accuracy,
                                             'state_dict': gru_model.state_dict(),
-                                            'best_accuracy': test_accuracy,
                                             'optimizer': gru_model.optimizer.state_dict(),
                                             'system_param_dict' : system_param_dict,
+                                            'vocab_chars' : vocab_chars,
+                                            'vocab_lang' : vocab_lang,
                                             },
-                                            test_model_checkpoint_rel_path)
+                                            model_checkpoint_rel_path)
 
 
     # print saved model checkpoint from file
-    if (print_model_checkpoint != None):
-        start_epoch, best_accuracy, system_param_dict = gru_model.load_model_checkpoint_from_file(print_model_checkpoint)
+    if (not terminal and print_model_checkpoint != None and print_model_checkpoint_embed_weights != None):
+        input_data = InputData.InputData()
+        embed, num_classes = input_data.create_embed_from_weights_file(print_model_checkpoint_embed_weights)
+        gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],    # equals embedding dimension
+                                      hidden_size=hidden_size_rnn,
+                                      num_layers=num_layers_rnn,
+                                      num_classes=num_classes,
+                                      is_bidirectional=is_bidirectional,
+                                      initial_lr=initial_lr_rnn,
+                                      weight_decay=weight_decay_rnn,
+                                      batch_size=batch_size_rnn)
+#        print('Model:\n', gru_model)
+        start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(print_model_checkpoint)
         print('========================================')
         print('Epochs trained:', start_epoch)
         print('========================================')
-        print('Best accuracy:', best_accuracy)
+        print('Best validation set accuracy:', best_val_accuracy)
+        print('========================================')
+        print('Test set accuracy:', test_accuracy)
         print('========================================')
         print('System parameters used:')
         for param in system_param_dict:

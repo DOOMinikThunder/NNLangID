@@ -79,10 +79,13 @@ class GRUModel(nn.Module):
     def load_model_checkpoint_from_file(self, relative_path_to_file):
         checkpoint = torch.load(relative_path_to_file)
         start_epoch = checkpoint['start_epoch']
-        best_accuracy = checkpoint['best_accuracy']
+        best_val_accuracy = checkpoint['best_val_accuracy']
+        test_accuracy = checkpoint['test_accuracy']
         self.load_state_dict(checkpoint['state_dict'])
         self.optimizer.load_state_dict(checkpoint['optimizer'])
         system_param_dict = checkpoint['system_param_dict']
+        vocab_chars = checkpoint['vocab_chars']
+        vocab_lang = checkpoint['vocab_lang']
 #        self.eval()
         print('Model checkpoint loaded from file:', relative_path_to_file)
-        return start_epoch, best_accuracy, system_param_dict
+        return start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang

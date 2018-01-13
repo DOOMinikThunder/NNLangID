@@ -233,12 +233,13 @@ class InputData(object):
             weights_tensor_param = torch.nn.Parameter(weights_tensor, requires_grad=False)
             embed = torch.nn.Embedding(embed_dims[0], embed_dims[1])
             embed.weight = weights_tensor_param
+            num_classes = embed_dims[2]     # embed_dims[2] is the number of classes
         print('Embedding weights loaded from file:', relative_path_to_file)
-        return embed
+        return embed, num_classes
     
     
     def create_embed_input_and_target_tensors(self, indexed_texts_and_lang, embed_weights_rel_path):
-        embed = self.create_embed_from_weights_file(embed_weights_rel_path)
+        embed, num_classes = self.create_embed_from_weights_file(embed_weights_rel_path)
 
         embed_char_text_inp_tensors = []
         target_tensors = []
