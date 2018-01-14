@@ -19,7 +19,7 @@ def main():
 
 
     # SYSTEM
-    create_splitted_data_files = True                       # split into training, validation and test set from an original file
+    create_splitted_data_files = False                     # split into training, validation and test set from an original file
     calc_embed = True
     train_rnn = True
     eval_test_set = True
@@ -123,7 +123,7 @@ def main():
     
     
     cuda_is_avail = torch.cuda.is_available()
-    
+    print('cuda on') if cuda_is_avail else print('cuda off')
     
     ########################
     # DATA FILES SPLITTING #
@@ -256,10 +256,10 @@ def main():
                                                                                                                embed_weights_rel_path=embed_weights_rel_path)
         # transfer tensors to GPU if available
         if (cuda_is_avail):
-            train_embed_char_text_inp_tensors = train_embed_char_text_inp_tensors.cuda()
-            train_target_tensors = train_target_tensors.cuda()
-            val_embed_char_text_inp_tensors = val_embed_char_text_inp_tensors.cuda()
-            val_target_tensors = val_target_tensors.cuda()
+            train_embed_char_text_inp_tensors = [tensor.cuda() for tensor in train_embed_char_text_inp_tensors]
+            train_target_tensors = [tensor.cuda() for tensor in train_target_tensors]
+            val_embed_char_text_inp_tensors = [tensor.cuda() for tensor in val_embed_char_text_inp_tensors]
+            val_target_tensors = [tensor.cuda() for tensor in val_target_tensors]
 
         gru_model = GRUModel.GRUModel(input_size=list(train_embed_char_text_inp_tensors[0].size())[2],  # equals embedding dimension
                                       hidden_size=hidden_size_rnn,
