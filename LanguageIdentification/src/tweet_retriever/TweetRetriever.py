@@ -32,11 +32,11 @@ class TweetRetriever(object):
 
 	def retrieve_single_tweet(self, id):
 		print("looking up: %s"%id)
-		tweet = self.twitter.statuses.show(id=id)
+		tweet = self.twitter.statuses.show(tweet_mode='extended',id=id)
 		return tweet
 
 	def retrieve_list_of_tweets(self, ids):
-		tweets = self.twitter.statuses.lookup(_id=ids)
+		tweets = self.twitter.statuses.lookup(tweet_mode='extended',_id=ids)
 		tweet_texts = [tweet["text"] for tweet in tweets]
 		tweet_ids = [tweet["id"] for tweet in tweets]
 		short_tweets = {}
@@ -45,11 +45,11 @@ class TweetRetriever(object):
 		return short_tweets
 
 	def retrieve_sample_tweets(self, amount):
-		iterator = self.twitter_stream.statuses.sample()
+		iterator = self.twitter_stream.statuses.sample(tweet_mode='extended')
 		return self.retrieve_from_iterator(iterator, amount)
 
 	def retrieve_specified_track_and_language(self, amount, track, languages=None):
-		iterator = self.twitter_stream.statuses.filter(track=track, language=languages)
+		iterator = self.twitter_stream.statuses.filter(tweet_mode='extended',track=track, language=languages)
 		return self.retrieve_from_iterator(iterator, amount)
 
 	def retrieve_from_iterator(self, iterator, amount):

@@ -175,6 +175,7 @@ def main():
 
         if terminal_live_tweets:
             tweet_retriever = TweetRetriever.TweetRetriever()
+            print(tweet_retriever.retrieve_single_tweet('952332335999062016'))
 
         while input_text != 'exit':
             if terminal_live_tweets:
