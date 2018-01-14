@@ -203,7 +203,7 @@ def main():
             n_highest_probs = 5
             for i, input_tensor in enumerate(input_text_embed_char_text_inp_tensors):
                 lang_prediction = evaluator.evaluate_single_date(input_tensor, n_highest_probs)
-                print("====================\ntweet detected: \n\n%s"%input_text[i])
+                print("====================\ntweet detected: \n\n%s\n"%input_text[i])
 
                 # print n_highest_probs for input
                 print('Language:')
