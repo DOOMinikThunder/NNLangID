@@ -19,8 +19,8 @@ def main():
 
 
     # SYSTEM
-    create_splitted_data_files = False                     # split into training, validation and test set from an original file
-    calc_embed = False
+    create_splitted_data_files = True                     # split into training, validation and test set from an original file
+    calc_embed = True
     train_rnn = True
     eval_test_set = True
     

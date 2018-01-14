@@ -95,9 +95,10 @@ class Evaluator(object):
         horizontal_lang = ""
         for _, lang in idx_lang:
             horizontal_lang += '{0: >{pad}}'.format(lang, pad=pad)+"\t"
-        print_matrix = "t\p\t" + horizontal_lang +"\n"
+        print_matrix = "t\p\t" + horizontal_lang +"\taccuracy\n"
         for i,row in enumerate(confusion_matrix):
-            print_matrix += idx_lang[i][1] + "\t" + self.row_as_string(row, pad) + "\n"
+            row_accuracy = (row[i]/sum(row))*100
+            print_matrix += idx_lang[i][1] + "\t" + self.row_as_string(row, pad) + '{0: >9}'.format(str(row_accuracy)) + "%\n"
         return print_matrix
 
     def row_as_string(self, row, pad):
