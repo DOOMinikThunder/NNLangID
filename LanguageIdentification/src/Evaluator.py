@@ -10,6 +10,14 @@ class Evaluator(object):
         self.model = model
 
     def evaluate_data_set(self, input_data, target_data, vocab_lang, n_highest_probs=1):
+        """
+        evaluates a whole data set
+        :param input_data: input data set
+        :param target_data: target set of same size as input data
+        :param vocab_lang: dictionary containing 'language':(index, frequency)
+        :param n_highest_probs: the n languages with the highest probabilites to be calculated
+        :return: accuracy, confusion matrix
+        """
         if(len(input_data) != len(target_data)):
             print("input and target size different for 'evaluate_data_set()'")
             return -1
@@ -26,6 +34,12 @@ class Evaluator(object):
         return accuracy, conf_matrix
 
     def evaluate_single_date(self, input, n_highest_probs):
+        """
+        evaluates a single date
+        :param input: the input date/tweet
+        :param n_highest_probs: the n languages with the highest probabilites to be calculated
+        :return: list of (probability, language index)
+        """
         hidden = self.model.initHidden()
         output,hidden = self.model(input, hidden)
         lang_prediction = self.evaluate_prediction(output, n_highest_probs)
@@ -33,6 +47,12 @@ class Evaluator(object):
 
     #prediction: tensor of languages-dimensional entries containing log softmax probabilities
     def evaluate_prediction(self, prediction, n_highest_probs):
+        """
+        given a single date (tweet), calculates the respective language predictions
+        :param prediction: the predicted date/tweet
+        :param n_highest_probs: the n languages with the highest probabilites
+        :return: list of (probability, language index)
+        """
         lang_predictions = np.zeros([prediction.size()[1]])
         pred_size = prediction.size()[0]
         for pred in prediction:
@@ -61,6 +81,13 @@ class Evaluator(object):
         return conf_matrix
 
     def to_string_confusion_matrix(self, confusion_matrix, vocab_lang, pad):
+        """
+        converts calculated confusion matrix to string
+        :param confusion_matrix: the confusion matrix
+        :param vocab_lang: dict containing 'language':(index, frequency)
+        :param pad: padding for printout, use a number >= len(max(frequency in vocab lang)
+        :return: string confusion matrix
+        """
         idx_lang = []
         for language, (language_idx, _)  in vocab_lang.items():
             idx_lang.append((language_idx, language))
@@ -74,6 +101,12 @@ class Evaluator(object):
         return print_matrix
 
     def row_as_string(self, row, pad):
+        """
+        single confusion matrix row as a string
+        :param row: the confusion matrix row
+        :param pad: padding for printout, use a number >= len(max(frequency in vocab lang)
+        :return: the string row
+        """
         str_row = ""
         for item in row:
             str_row += '{0: >{pad}}'.format(str(int(item)), pad=pad) + "\t"
