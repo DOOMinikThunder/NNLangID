@@ -19,7 +19,7 @@ def main():
 
 
     # SYSTEM
-    create_splitted_data_files = True                       # split into training, validation and test set from an original file
+    create_splitted_data_files = True                     # split into training, validation and test set from an original file
     calc_embed = True
     train_rnn = True
     eval_test_set = True
@@ -35,6 +35,7 @@ def main():
     input_tr_va_te_data_rel_path = "../data/input_data/original/recall_oriented_dl.csv" #training, validation and test will be generated from this file
 #    input_tr_va_te_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #training, validation and test will be generated from this file
 #    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_embed.csv" #training, validation and test will be generated from this file
+#    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_recall_de_en_es.csv" #training, validation and test will be generated from this file
     input_rt_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #to change later, rt = real test
     
     embed_weights_rel_path = "../data/save/embed_weights.txt"
@@ -124,8 +125,10 @@ def main():
     
     
     cuda_is_avail = torch.cuda.is_available()
+    cuda_is_avail = False #cuda not working on some builds
+    print('cuda on') if cuda_is_avail else print('cuda off')
     
-
+ 
     ############
     # TERMINAL #
     ############    
@@ -264,10 +267,10 @@ def main():
                                                                                                                embed_weights_rel_path=embed_weights_rel_path)
         # transfer tensors to GPU if available
         if (cuda_is_avail):
-            train_embed_char_text_inp_tensors = train_embed_char_text_inp_tensors.cuda()
-            train_target_tensors = train_target_tensors.cuda()
-            val_embed_char_text_inp_tensors = val_embed_char_text_inp_tensors.cuda()
-            val_target_tensors = val_target_tensors.cuda()
+            train_embed_char_text_inp_tensors = [tensor.cuda() for tensor in train_embed_char_text_inp_tensors]
+            train_target_tensors = [tensor.cuda() for tensor in train_target_tensors]
+            val_embed_char_text_inp_tensors = [tensor.cuda() for tensor in val_embed_char_text_inp_tensors]
+            val_target_tensors = [tensor.cuda() for tensor in val_target_tensors]
 
         gru_model = GRUModel.GRUModel(input_size=list(train_embed_char_text_inp_tensors[0].size())[2],  # equals embedding dimension
                                       hidden_size=hidden_size_rnn,
@@ -298,9 +301,12 @@ def main():
                             batch_size=batch_size_rnn)
             
             # evaluate validation set
-            cur_val_accuracy = evaluator.evalute_data_set(val_embed_char_text_inp_tensors,
-                                                          val_target_tensors,
-                                                          vocab_lang)
+            cur_val_accuracy, val_conf_matrix = evaluator.evaluate_data_set(val_embed_char_text_inp_tensors,
+                                                           val_target_tensors,
+                                                           vocab_lang)
+            print('========================================')
+            print('confusion matrix:\n')
+            print(evaluator.to_string_confusion_matrix(confusion_matrix=val_conf_matrix, vocab_lang=vocab_lang, pad=5))
             print('========================================')
             print('Epoch', epoch, 'validation set accuracy:', cur_val_accuracy)
             print('========================================')
@@ -353,9 +359,9 @@ def main():
 #        print('Model:\n', gru_model)
         evaluator = Evaluator.Evaluator(gru_model)
         
-        test_accuracy = evaluator.evalute_data_set(test_embed_char_text_inp_tensors,
-                                                   test_target_tensors,
-                                                   vocab_lang)
+        test_accuracy, test_conf_matrix = evaluator.evaluate_data_set(test_embed_char_text_inp_tensors,
+                                                                 test_target_tensors,
+                                                                 vocab_lang)
         print('========================================')
         print('Epochs trained:', start_epoch)
         print('========================================')

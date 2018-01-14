@@ -42,6 +42,13 @@ class TweetRetriever(object):
 			short_tweets[str(tweet["id"])] = tweet["text"]
 		return short_tweets
 
+	def retrieve_sample_tweets(self):
+		iterator = self.twitter_stream.statuses.sample()
+		short_tweets = {}
+		for tweet in iterator:
+			short_tweets[str(tweet["id"])] = tweet["text"]
+		return short_tweets
+
 	def read_language_id_csv(self, csv_file):
 		tweet_id_to_language = {}
 		with open(csv_file, 'rb') as file:
