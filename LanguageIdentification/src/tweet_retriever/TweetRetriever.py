@@ -3,8 +3,10 @@ try:
 	import json
 except:
 	import simplejson as json
-
-from twitter import Twitter, OAuth, TwitterHTTPError, TwitterStream
+try:
+	from twitter import Twitter, OAuth, TwitterHTTPError, TwitterStream
+except ImportError:
+	raise
 #import csv
 import unicodecsv as csv
 import os

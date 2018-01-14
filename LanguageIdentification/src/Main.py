@@ -8,9 +8,13 @@ import torch
 
 from embedding import EmbeddingCalculation
 from input import DataSplit, InputData
-from net import Evaluator
+from evaluation import Evaluator
 from net import GRUModel
-from tweet_retriever import TweetRetriever
+try:
+    from tweet_retriever import TweetRetriever
+    can_use_tweets = True
+except ImportError:
+    can_use_tweets = False
 
 
 def str_to_int(string):
@@ -40,7 +44,10 @@ def main():
     print_model_checkpoint = None#"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
     
     terminal = True                                      # if True: disables all other calculations
-    terminal_live_tweets = True
+    if can_use_tweets:
+        terminal_live_tweets = True #change this if you want to sample live tweets
+    else:
+        terminal_live_tweets = False
 
     
     
@@ -166,7 +173,8 @@ def main():
         
         input_text = ''
 
-        tweet_retriever = TweetRetriever.TweetRetriever()
+        if terminal_live_tweets:
+            tweet_retriever = TweetRetriever.TweetRetriever()
 
         while input_text != 'exit':
             if terminal_live_tweets:
