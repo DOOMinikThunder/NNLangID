@@ -11,9 +11,9 @@ class Evaluator(object):
 
     def evaluate_data_set(self, input_data, target_data, vocab_lang, n_highest_probs=1):
         """
-        evaluates a whole data set
-        :param input_data: input data set
-        :param target_data: target set of same size as input data
+        evaluates a whole tweet_retriever_data set
+        :param input_data: input tweet_retriever_data set
+        :param target_data: target set of same size as input tweet_retriever_data
         :param vocab_lang: dictionary containing 'language':(index, frequency)
         :param n_highest_probs: the n languages with the highest probabilites to be calculated
         :return: accuracy, confusion matrix

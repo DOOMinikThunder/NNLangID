@@ -94,7 +94,7 @@ class InputData(object):
             return -1
         data_size = len(texts_and_lang)
         val_size = int(set_ratios[1] * data_size)
-        # train set size is adapted to fit total data size
+        # train set size is adapted to fit total tweet_retriever_data size
         # (as it is usually the largest set, the error will be neglectible)
         train_size = data_size - (val_size)
 
@@ -179,7 +179,7 @@ class InputData(object):
         te_texts_and_lang = self.fetch_tweet_texts_and_lang_from_file(test_data_rel_path, fetch_only_langs, fetch_only_first_x_tweets)
         rt_texts_and_lang = self.fetch_tweet_texts_and_lang_from_file(real_test_data_rel_path, fetch_only_langs, fetch_only_first_x_tweets)
         
-        # (true) randomly shuffle each data set
+        # (true) randomly shuffle each tweet_retriever_data set
         random.shuffle(tr_texts_and_lang)
         random.shuffle(va_texts_and_lang)
         random.shuffle(te_texts_and_lang)

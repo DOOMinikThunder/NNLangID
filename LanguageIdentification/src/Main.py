@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import math
+import sys
 from pathlib import Path
-import torch
-import Evaluator
-from input import DataSplit, InputData
-from embedding import EmbeddingCalculation
-from net import GRUModel
 
-import sys, os
-tweet_path = os.path.abspath(os.path.join(__file__,'..','..','TweetRetriever'))
-sys.path.insert(0, tweet_path)
-from TweetRetriever import TweetRetriever
+import torch
+
+from embedding import EmbeddingCalculation
+from input import DataSplit, InputData
+from net import Evaluator
+from net import GRUModel
+from tweet_retriever import TweetRetriever
 
 
 def str_to_int(string):

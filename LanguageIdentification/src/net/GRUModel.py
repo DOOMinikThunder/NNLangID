@@ -41,7 +41,7 @@ class GRUModel(nn.Module):
         output = self.output_layer(output)
         output = output.view(-1, self.num_classes)
 #        for i in range(len(output)):
-#            output[i] = F.tanh(output.data[i])
+#            output[i] = F.tanh(output.tweet_retriever_data[i])
         output = self.log_softmax(output)
         return output, next_hidden
 
@@ -65,7 +65,7 @@ class GRUModel(nn.Module):
 #                print('OUTPUT:\n', output)
 
                 loss = self.criterion(output, target)
-                #print('rnn Loss', float(loss.data[0]))
+                #print('rnn Loss', float(loss.tweet_retriever_data[0]))
                 loss.backward()
             print('RNN Loss', i, '/', num_batches_minus_one, ': ', float(loss.data[0]))
             self.optimizer.step()

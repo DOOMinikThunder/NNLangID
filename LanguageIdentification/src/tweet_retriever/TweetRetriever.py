@@ -118,8 +118,8 @@ class TweetRetriever(object):
 
 def main():
 	cur_dir = os.path.dirname(os.path.abspath(__file__))
-	tweet_file = cur_dir+"/data/uniformly_sampled4.csv"
-	output_file = cur_dir + "/data/uniformly_sampled_dl.csv"
+	tweet_file = cur_dir+"/tweet_retriever_data/uniformly_sampled4.csv"
+	output_file = cur_dir + "/tweet_retriever_data/uniformly_sampled_dl.csv"
 	tr = TweetRetriever()
 
 	tweets = tr.read_tweets_from_file(tweet_file)
