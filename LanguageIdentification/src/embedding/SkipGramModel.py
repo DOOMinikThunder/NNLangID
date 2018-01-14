@@ -3,10 +3,10 @@
 import math
 import numpy as np
 import torch
-import torch.autograd as autograd
 import torch.optim as optim
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.autograd import Variable
 
 
 
@@ -31,6 +31,7 @@ class SkipGramModel(nn.Module):
         self.sampling_table = []
         self.init_embed()
         self.init_sampling_table(vocab_chars, sampling_table_min_char_count, sampling_table_specified_size_cap)
+        self.cuda_is_avail = torch.cuda.is_available()
 #        print(self.sampling_table)
 #        print(len(self.sampling_table))
         # no weight_decay and momentum set because they
@@ -80,11 +81,11 @@ class SkipGramModel(nn.Module):
         losses = []
         # lookup the 1-position weight values for the target char
         # for all target chars in the batch
-        targets_1_pos_weights_hidden = self.embed_hidden(autograd.Variable(torch.LongTensor(targets_1_pos)))
+        targets_1_pos_weights_hidden = self.embed_hidden(targets_1_pos)
 #        print(targets_1_pos_weights_hidden)
         # lookup the 1-position weight values for the context char (backwards from "output layer")
         # for all context chars in the batch
-        contexts_1_pos_weights_output = self.embed_output(autograd.Variable(torch.LongTensor(contexts_1_pos)))
+        contexts_1_pos_weights_output = self.embed_output(contexts_1_pos)
 #        print(contexts_1_pos_weights_output)
         # calculate dot product for each target_1_pos-context_1_pos pair in the batch
         score_contexts_1_pos = torch.mul(targets_1_pos_weights_hidden, contexts_1_pos_weights_output)
@@ -98,7 +99,7 @@ class SkipGramModel(nn.Module):
         losses.append(sum(score_contexts_1_pos))
         # use the sampled 0-positions of the context char to lookup the weight values (backwards from "output layer")
         # for all context chars in the batch
-        contexts_0_pos_samples_weights_output = self.embed_output(autograd.Variable(torch.LongTensor(contexts_0_pos_samples)))
+        contexts_0_pos_samples_weights_output = self.embed_output(contexts_0_pos_samples)
 #        print(contexts_0_pos_samples_weights_output)
         # calculate dot product for each target_1_pos-context_0_pos_sample pair
         # for the whole batch
@@ -129,7 +130,15 @@ class SkipGramModel(nn.Module):
                 targets_1_pos = [pair[0] for pair in batch]
                 contexts_1_pos = [pair[1] for pair in batch]
                 contexts_0_pos_samples = self.get_neg_samples(len(batch), num_neg_samples)
-    #            print(neg_samples)
+#                print(neg_samples)
+                targets_1_pos = Variable(torch.LongTensor(targets_1_pos))
+                contexts_1_pos = Variable(torch.LongTensor(contexts_1_pos))
+                contexts_0_pos_samples = Variable(torch.LongTensor(contexts_0_pos_samples))
+                # transfer tensors to GPU if available
+                if (self.cuda_is_avail):
+                    targets_1_pos = targets_1_pos.cuda()
+                    contexts_1_pos = contexts_1_pos.cuda()
+                    contexts_0_pos_samples = contexts_0_pos_samples.cuda()
                 total_batch_counter = (epoch_i * num_batched_pairs) + batch_j            
     
                 self.optimizer.zero_grad()
@@ -147,7 +156,11 @@ class SkipGramModel(nn.Module):
     
     
     def save_embed_to_file(self, relative_path_to_file):
-        weights_array = self.embed_hidden.weight.data.numpy()
+        # transfer back from GPU to CPU if GPU available
+        if (self.cuda_is_avail):
+            weights_array = self.embed_hidden.weight.cpu().data.numpy()
+        else:
+            weights_array = self.embed_hidden.weight.data.numpy()
         writer = open(relative_path_to_file, 'w')
         # write vocabulary size and embedding dimension to file
         writer.write('%d %d %d' % (self.vocab_chars_size, self.embed_dim, self.vocab_lang_size))

@@ -2,9 +2,9 @@
 
 import math
 from pathlib import Path
-import InputData
+import torch
 import Evaluator
-import DataSplit
+from input import DataSplit, InputData
 from embedding import EmbeddingCalculation
 from net import GRUModel
 
@@ -22,13 +22,13 @@ def main():
     create_splitted_data_files = True                       # split into training, validation and test set from an original file
     calc_embed = True
     train_rnn = True
-    eval_test_set = False
+    eval_test_set = True
     
     print_embed_testing = False
     print_model_checkpoint_embed_weights = None#"../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"#None
     print_model_checkpoint = None#"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
     
-    terminal = True                                      # if True: disables all other calculations
+    terminal = False                                      # if True: disables all other calculations
     
     
     # DATA
@@ -36,12 +36,12 @@ def main():
     input_tr_va_te_data_rel_path = "../data/input_data/testing/test_embed.csv" #training, validation and test will be generated from this file
     input_rt_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #to change later, rt = real test
     
-    embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
-    trained_embed_weights_rel_path = "../data/embed_weights/embed_weights.txt"
-#    trained_embed_weights_rel_path = "../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"
-    model_checkpoint_rel_path = "../data/model_checkpoints/model_checkpoint.pth"
-    trained_model_checkpoint_rel_path = "../data/model_checkpoints/model_checkpoint.pth"
-#    trained_model_checkpoint_rel_path = "../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"
+    embed_weights_rel_path = "../data/save/embed_weights.txt"
+    trained_embed_weights_rel_path = "../data/save/embed_weights.txt"
+#    trained_embed_weights_rel_path = "../data/save/trained/embed_weights_de_en_es_fr_it_und.txt"
+    model_checkpoint_rel_path = "../data/save/model_checkpoint.pth"
+    trained_model_checkpoint_rel_path = "../data/save/model_checkpoint.pth"
+#    trained_model_checkpoint_rel_path = "../data/save/trained/model_checkpoint_de_en_es_fr_it_und.pth"
     
     tr_va_te_split_ratios = [0.8, 0.1, 0.1]                  # [train_ratio, val_ratio, test_ratio]
     split_shuffle_seed = 42                                  # ensures that splitted sets (training, validation, test) are always created identically (given a specified ratio)
@@ -122,6 +122,9 @@ def main():
         }
     
     
+    cuda_is_avail = torch.cuda.is_available()
+    
+    
     ########################
     # DATA FILES SPLITTING #
     ########################
@@ -154,6 +157,9 @@ def main():
                                       initial_lr=initial_lr_rnn,
                                       weight_decay=weight_decay_rnn)
         start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(trained_model_checkpoint_rel_path)
+        # run on GPU if available
+        if (cuda_is_avail):
+            gru_model.cuda()
 #        print('Model:\n', gru_model)
         evaluator = Evaluator.Evaluator(gru_model)
         lang2index, index2lang = input_data.get_string2index_and_index2string(vocab_lang)
@@ -172,6 +178,11 @@ def main():
 #            print(input_text_indexed)
             input_text_embed_char_text_inp_tensors, input_text_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=input_text_indexed,
                                                                                                                                  embed_weights_rel_path=trained_embed_weights_rel_path)
+            # transfer tensors to GPU if available
+            if (cuda_is_avail):
+                input_text_embed_char_text_inp_tensors = input_text_embed_char_text_inp_tensors.cuda()
+                input_text_target_tensors = input_text_target_tensors.cuda()
+            
             lang_prediction = evaluator.evaluate_single_date(input_text_embed_char_text_inp_tensors[0],
                                                              5)
             print('Prediction:')
@@ -243,6 +254,12 @@ def main():
                                                                                                                    embed_weights_rel_path=embed_weights_rel_path)
         val_embed_char_text_inp_tensors, val_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=val_set_indexed,
                                                                                                                embed_weights_rel_path=embed_weights_rel_path)
+        # transfer tensors to GPU if available
+        if (cuda_is_avail):
+            train_embed_char_text_inp_tensors = train_embed_char_text_inp_tensors.cuda()
+            train_target_tensors = train_target_tensors.cuda()
+            val_embed_char_text_inp_tensors = val_embed_char_text_inp_tensors.cuda()
+            val_target_tensors = val_target_tensors.cuda()
 
         gru_model = GRUModel.GRUModel(input_size=list(train_embed_char_text_inp_tensors[0].size())[2],  # equals embedding dimension
                                       hidden_size=hidden_size_rnn,
@@ -251,6 +268,9 @@ def main():
                                       is_bidirectional=is_bidirectional,
                                       initial_lr=initial_lr_rnn,
                                       weight_decay=weight_decay_rnn)
+        # run on GPU if available
+        if (cuda_is_avail):
+            gru_model.cuda()
         print('Model:\n', gru_model)
         evaluator = Evaluator.Evaluator(gru_model)
         
@@ -304,6 +324,11 @@ def main():
     if (not terminal and eval_test_set):
         test_embed_char_text_inp_tensors, test_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=test_set_indexed,
                                                                                                                  embed_weights_rel_path=embed_weights_rel_path)
+        # transfer tensors to GPU if available
+        if (cuda_is_avail):
+            test_embed_char_text_inp_tensors = test_embed_char_text_inp_tensors.cuda()
+            test_target_tensors = test_target_tensors.cuda()
+            
         input_data = InputData.InputData()
         embed, num_classes = input_data.create_embed_from_weights_file(embed_weights_rel_path)
         gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],    # equals embedding dimension
@@ -314,6 +339,9 @@ def main():
                                       initial_lr=initial_lr_rnn,
                                       weight_decay=weight_decay_rnn)
         start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(model_checkpoint_rel_path)
+        # run on GPU if available
+        if (cuda_is_avail):
+            gru_model.cuda()
 #        print('Model:\n', gru_model)
         evaluator = Evaluator.Evaluator(gru_model)
         
