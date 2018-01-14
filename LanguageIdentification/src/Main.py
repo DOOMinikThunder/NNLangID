@@ -42,35 +42,38 @@ def main():
     
     terminal = True                                      # if True: disables all other calculations
     terminal_live_tweets = True
+
     
     
     # DATA
-    #input_tr_va_te_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #training, validation and test will be generated from this file
-    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_recall_de_en_es.csv" #training, validation and test will be generated from this file
+    input_tr_va_te_data_rel_path = "../data/input_data/original/recall_oriented_dl.csv" #training, validation and test will be generated from this file
+#    input_tr_va_te_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #training, validation and test will be generated from this file
+#    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_embed.csv" #training, validation and test will be generated from this file
+#    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_recall_de_en_es.csv" #training, validation and test will be generated from this file
     input_rt_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #to change later, rt = real test
     
     embed_weights_rel_path = "../data/save/embed_weights.txt"
-    trained_embed_weights_rel_path = "../data/save/embed_weights.txt"
-#    trained_embed_weights_rel_path = "../data/save/trained/embed_weights_de_en_es_fr_it_und.txt"
+#    trained_embed_weights_rel_path = "../data/save/embed_weights.txt"
+    trained_embed_weights_rel_path = "../data/save/trained/embed_weights_de_en_es_fr_it.txt"
     model_checkpoint_rel_path = "../data/save/model_checkpoint.pth"
-    trained_model_checkpoint_rel_path = "../data/save/model_checkpoint.pth"
-#    trained_model_checkpoint_rel_path = "../data/save/trained/model_checkpoint_de_en_es_fr_it_und.pth"
+#    trained_model_checkpoint_rel_path = "../data/save/model_checkpoint.pth"
+    trained_model_checkpoint_rel_path = "../data/save/trained/model_checkpoint_de_en_es_fr_it.pth"
     
     tr_va_te_split_ratios = [0.8, 0.1, 0.1]                  # [train_ratio, val_ratio, test_ratio]
     split_shuffle_seed = 42                                  # ensures that splitted sets (training, validation, test) are always created identically (given a specified ratio)
-    fetch_only_langs = ['de', 'en', 'es']#['de', 'en', 'es', 'fr', 'it', 'und']#['el', 'fa', 'hi', 'ca']#None
+    fetch_only_langs = ['de', 'en', 'es', 'fr', 'it']#['de', 'en', 'es']#['el', 'fa', 'hi', 'ca']#None
     fetch_only_first_x_tweets = math.inf#5
     min_char_frequency = 2                                   # chars appearing less than min_char_frequency in the training set will not be used to create the vocabulary vocab_chars
     
     
     # HYPERPARAMETERS EMBEDDING
     sampling_table_min_char_count = 10                       # determines the precision of the sampling (should be 10 or higher)
-    sampling_table_specified_size_cap = 1000#math.inf        # caps specified sampling table size to this value (no matter how big it would be according to sampling_table_min_char_count)
+    sampling_table_specified_size_cap = 10000#math.inf        # caps specified sampling table size to this value (no matter how big it would be according to sampling_table_min_char_count)
                                                              # note: this is only the specified size, the actual table size may slightly deviate due to roundings in the calculation
 #    embed_dim = 2                                           # will be set automatically later to: roundup(log2(vocabulary-size))
     max_context_window_size = 2
     num_neg_samples = 5
-    batch_size_embed = 2
+    batch_size_embed = 10
     initial_lr_embed = 0.025
     lr_decay_num_batches_embed = 100
     num_epochs_embed = 1
@@ -82,12 +85,12 @@ def main():
     hidden_size_rnn = 100
     num_layers_rnn = 1
     is_bidirectional = True
-    batch_size_rnn = 30
+    batch_size_rnn = 10
     initial_lr_rnn = 0.01
     scheduler_step_size_rnn = 1                              # currently not functioning
     scheduler_gamma_rnn = 0.1                                # currently not functioning
     weight_decay_rnn = 0.00001
-    num_epochs_rnn = math.inf#2
+    num_epochs_rnn = 10#math.inf#2
 
     
     # set dict to later store parameters to file
@@ -139,21 +142,7 @@ def main():
     cuda_is_avail = False #cuda not working on some builds
     print('cuda on') if cuda_is_avail else print('cuda off')
     
-    ########################
-    # DATA FILES SPLITTING #
-    ########################
-    
-    # split into training, validation and test set from an original file
-    out_tr_data_rel_path = "../data/input_data/original_splitted/training.csv"
-    out_va_data_rel_path = "../data/input_data/original_splitted/validation.csv"
-    out_te_data_rel_path = "../data/input_data/original_splitted/test.csv"
-    files_exist = Path(out_tr_data_rel_path).is_file() and Path(out_va_data_rel_path).is_file() and Path(out_te_data_rel_path).is_file()
-    if (create_splitted_data_files or not files_exist):
-        out_filenames = [out_tr_data_rel_path, out_va_data_rel_path, out_te_data_rel_path] #same size as ratios
-        data_splitter = DataSplit.DataSplit()
-        splitted_data = data_splitter.split_percent_of_languages(input_tr_va_te_data_rel_path, tr_va_te_split_ratios, out_filenames, split_shuffle_seed)
-        
-    
+ 
     ############
     # TERMINAL #
     ############    
@@ -162,7 +151,6 @@ def main():
     if (terminal):
         input_data = InputData.InputData()
         embed, num_classes = input_data.create_embed_from_weights_file(trained_embed_weights_rel_path)
-#        print(embed.weight.size()[1])
         gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],    # equals embedding dimension
                                       hidden_size=hidden_size_rnn,
                                       num_layers=num_layers_rnn,
@@ -174,7 +162,6 @@ def main():
         # run on GPU if available
         if (cuda_is_avail):
             gru_model.cuda()
-#        print('Model:\n', gru_model)
         evaluator = Evaluator.Evaluator(gru_model)
         lang2index, index2lang = input_data.get_string2index_and_index2string(vocab_lang)
         
@@ -199,17 +186,43 @@ def main():
             input_text_indexed = input_data.get_indexed_texts_and_lang(input_text_only_vocab_chars, vocab_chars, vocab_lang)
             #print('input_text_indexed',input_text_indexed)
             input_text_embed_char_text_inp_tensors, input_text_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=input_text_indexed,
-                                                                                                                                 embed_weights_rel_path=trained_embed_weights_rel_path)
+                                                                                                                                 embed_weights_rel_path=trained_embed_weights_rel_path,
+                                                                                                                                 embed=embed)
             # transfer tensors to GPU if available
             if (cuda_is_avail):
                 input_text_embed_char_text_inp_tensors = input_text_embed_char_text_inp_tensors.cuda()
                 input_text_target_tensors = input_text_target_tensors.cuda()
 
-            for i,input_tensor in enumerate(input_text_embed_char_text_inp_tensors):
-                lang_prediction = evaluator.evaluate_single_date(input_tensor, 5)
+            n_highest_probs = 5
+            for i, input_tensor in enumerate(input_text_embed_char_text_inp_tensors):
+                lang_prediction = evaluator.evaluate_single_date(input_tensor, n_highest_probs)
                 print("====================\ntweet detected: \n\n%s"%input_text[i])
-                for pred in lang_prediction:
-                    print(str(pred[0]*100)+"%: "+str(index2lang[pred[1]]))
+
+                # print n_highest_probs for input
+                print('Language:')
+                for i in range(len(lang_prediction)):
+                    if (i == 0):
+                        print("{0:.2f}".format(lang_prediction[i][0]*100)+ "%: "+ str(index2lang[lang_prediction[i][1]]))
+                        print('')
+                    else:
+                        print("{0:.2f}".format(lang_prediction[i][0]*100)+ "%: "+ str(index2lang[lang_prediction[i][1]]))
+    
+        
+    ########################
+    # DATA FILES SPLITTING #
+    ########################
+    
+    if (not terminal):
+        # split into training, validation and test set from an original file
+        out_tr_data_rel_path = "../data/input_data/original_splitted/training.csv"
+        out_va_data_rel_path = "../data/input_data/original_splitted/validation.csv"
+        out_te_data_rel_path = "../data/input_data/original_splitted/test.csv"
+        files_exist = Path(out_tr_data_rel_path).is_file() and Path(out_va_data_rel_path).is_file() and Path(out_te_data_rel_path).is_file()
+        if (create_splitted_data_files or not files_exist):
+            out_filenames = [out_tr_data_rel_path, out_va_data_rel_path, out_te_data_rel_path] #same size as ratios
+            data_splitter = DataSplit.DataSplit()
+            splitted_data = data_splitter.split_percent_of_languages(input_tr_va_te_data_rel_path, tr_va_te_split_ratios, out_filenames, split_shuffle_seed)
+    
 
     ###################################
     # DATA RETRIEVAL & TRANSFORMATION #
@@ -271,10 +284,13 @@ def main():
 
     # train RNN model
     if (not terminal and train_rnn):
+        embed, num_classes = input_data.create_embed_from_weights_file(trained_embed_weights_rel_path)
         train_embed_char_text_inp_tensors, train_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=train_set_indexed,
-                                                                                                                   embed_weights_rel_path=embed_weights_rel_path)
+                                                                                                                   embed_weights_rel_path=embed_weights_rel_path,
+                                                                                                                   embed=embed)
         val_embed_char_text_inp_tensors, val_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=val_set_indexed,
-                                                                                                               embed_weights_rel_path=embed_weights_rel_path)
+                                                                                                               embed_weights_rel_path=embed_weights_rel_path,
+                                                                                                               embed=embed)
         # transfer tensors to GPU if available
         if (cuda_is_avail):
             train_embed_char_text_inp_tensors = [tensor.cuda() for tensor in train_embed_char_text_inp_tensors]
@@ -282,10 +298,10 @@ def main():
             val_embed_char_text_inp_tensors = [tensor.cuda() for tensor in val_embed_char_text_inp_tensors]
             val_target_tensors = [tensor.cuda() for tensor in val_target_tensors]
 
-        gru_model = GRUModel.GRUModel(input_size=list(train_embed_char_text_inp_tensors[0].size())[2],  # equals embedding dimension
+        gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],  # equals embedding dimension
                                       hidden_size=hidden_size_rnn,
                                       num_layers=num_layers_rnn,
-                                      num_classes=len(vocab_lang),
+                                      num_classes=num_classes,
                                       is_bidirectional=is_bidirectional,
                                       initial_lr=initial_lr_rnn,
                                       weight_decay=weight_decay_rnn)
@@ -346,15 +362,16 @@ def main():
     
     # evaluate test set
     if (not terminal and eval_test_set):
+        input_data = InputData.InputData()
+        embed, num_classes = input_data.create_embed_from_weights_file(embed_weights_rel_path)
         test_embed_char_text_inp_tensors, test_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=test_set_indexed,
-                                                                                                                 embed_weights_rel_path=embed_weights_rel_path)
+                                                                                                                 embed_weights_rel_path=embed_weights_rel_path,
+                                                                                                                 embed=embed)
         # transfer tensors to GPU if available
         if (cuda_is_avail):
             test_embed_char_text_inp_tensors = test_embed_char_text_inp_tensors.cuda()
             test_target_tensors = test_target_tensors.cuda()
             
-        input_data = InputData.InputData()
-        embed, num_classes = input_data.create_embed_from_weights_file(embed_weights_rel_path)
         gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],    # equals embedding dimension
                                       hidden_size=hidden_size_rnn,
                                       num_layers=num_layers_rnn,
@@ -366,12 +383,11 @@ def main():
         # run on GPU if available
         if (cuda_is_avail):
             gru_model.cuda()
-#        print('Model:\n', gru_model)
         evaluator = Evaluator.Evaluator(gru_model)
         
         test_accuracy, test_conf_matrix = evaluator.evaluate_data_set(test_embed_char_text_inp_tensors,
-                                                                 test_target_tensors,
-                                                                 vocab_lang)
+                                                                      test_target_tensors,
+                                                                      vocab_lang)
         print('========================================')
         print('Epochs trained:', start_epoch)
         print('========================================')
@@ -409,8 +425,9 @@ def main():
                                       is_bidirectional=is_bidirectional,
                                       initial_lr=initial_lr_rnn,
                                       weight_decay=weight_decay_rnn)
-#        print('Model:\n', gru_model)
         start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(print_model_checkpoint)
+        print('========================================')
+        print('Model:\n', gru_model)
         print('========================================')
         print('Epochs trained:', start_epoch)
         print('========================================')
