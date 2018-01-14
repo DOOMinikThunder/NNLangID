@@ -131,6 +131,9 @@ class EmbeddingCalculation(object):
                                                       initial_lr=initial_lr,
                                                       sampling_table_min_char_count=sampling_table_min_char_count,
                                                       sampling_table_specified_size_cap=sampling_table_specified_size_cap)
+        # run on GPU if available
+        if (torch.cuda.is_available()):
+            skip_gram_model.cuda()
         
         # train skip-gram with negative sampling
 #        skip_gram_model.scheduler.step()
