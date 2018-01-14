@@ -244,8 +244,10 @@ class InputData(object):
         return embed, num_classes
     
     
-    def create_embed_input_and_target_tensors(self, indexed_texts_and_lang, embed_weights_rel_path):
-        embed, num_classes = self.create_embed_from_weights_file(embed_weights_rel_path)
+    def create_embed_input_and_target_tensors(self, indexed_texts_and_lang, embed_weights_rel_path, embed=None):
+        # if no embed is passed: get it first
+        if (embed == None):
+            embed, num_classes = self.create_embed_from_weights_file(embed_weights_rel_path)
 
         embed_char_text_inp_tensors = []
         target_tensors = []

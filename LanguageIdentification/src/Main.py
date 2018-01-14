@@ -137,7 +137,6 @@ def main():
     if (terminal):
         input_data = InputData.InputData()
         embed, num_classes = input_data.create_embed_from_weights_file(trained_embed_weights_rel_path)
-#        print(embed.weight.size()[1])
         gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],    # equals embedding dimension
                                       hidden_size=hidden_size_rnn,
                                       num_layers=num_layers_rnn,
@@ -149,7 +148,6 @@ def main():
         # run on GPU if available
         if (cuda_is_avail):
             gru_model.cuda()
-#        print('Model:\n', gru_model)
         evaluator = Evaluator.Evaluator(gru_model)
         lang2index, index2lang = input_data.get_string2index_and_index2string(vocab_lang)
         
@@ -166,7 +164,8 @@ def main():
             input_text_indexed = input_data.get_indexed_texts_and_lang(input_text_only_vocab_chars, vocab_chars, vocab_lang)
 #            print(input_text_indexed)
             input_text_embed_char_text_inp_tensors, input_text_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=input_text_indexed,
-                                                                                                                                 embed_weights_rel_path=trained_embed_weights_rel_path)
+                                                                                                                                 embed_weights_rel_path=trained_embed_weights_rel_path,
+                                                                                                                                 embed=embed)
             # transfer tensors to GPU if available
             if (cuda_is_avail):
                 input_text_embed_char_text_inp_tensors = input_text_embed_char_text_inp_tensors.cuda()
@@ -261,10 +260,13 @@ def main():
 
     # train RNN model
     if (not terminal and train_rnn):
+        embed, num_classes = input_data.create_embed_from_weights_file(trained_embed_weights_rel_path)
         train_embed_char_text_inp_tensors, train_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=train_set_indexed,
-                                                                                                                   embed_weights_rel_path=embed_weights_rel_path)
+                                                                                                                   embed_weights_rel_path=embed_weights_rel_path,
+                                                                                                                   embed=embed)
         val_embed_char_text_inp_tensors, val_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=val_set_indexed,
-                                                                                                               embed_weights_rel_path=embed_weights_rel_path)
+                                                                                                               embed_weights_rel_path=embed_weights_rel_path,
+                                                                                                               embed=embed)
         # transfer tensors to GPU if available
         if (cuda_is_avail):
             train_embed_char_text_inp_tensors = [tensor.cuda() for tensor in train_embed_char_text_inp_tensors]
@@ -272,10 +274,10 @@ def main():
             val_embed_char_text_inp_tensors = [tensor.cuda() for tensor in val_embed_char_text_inp_tensors]
             val_target_tensors = [tensor.cuda() for tensor in val_target_tensors]
 
-        gru_model = GRUModel.GRUModel(input_size=list(train_embed_char_text_inp_tensors[0].size())[2],  # equals embedding dimension
+        gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],  # equals embedding dimension
                                       hidden_size=hidden_size_rnn,
                                       num_layers=num_layers_rnn,
-                                      num_classes=len(vocab_lang),
+                                      num_classes=num_classes,
                                       is_bidirectional=is_bidirectional,
                                       initial_lr=initial_lr_rnn,
                                       weight_decay=weight_decay_rnn)
@@ -336,15 +338,16 @@ def main():
     
     # evaluate test set
     if (not terminal and eval_test_set):
+        input_data = InputData.InputData()
+        embed, num_classes = input_data.create_embed_from_weights_file(embed_weights_rel_path)
         test_embed_char_text_inp_tensors, test_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=test_set_indexed,
-                                                                                                                 embed_weights_rel_path=embed_weights_rel_path)
+                                                                                                                 embed_weights_rel_path=embed_weights_rel_path,
+                                                                                                                 embed=embed)
         # transfer tensors to GPU if available
         if (cuda_is_avail):
             test_embed_char_text_inp_tensors = test_embed_char_text_inp_tensors.cuda()
             test_target_tensors = test_target_tensors.cuda()
             
-        input_data = InputData.InputData()
-        embed, num_classes = input_data.create_embed_from_weights_file(embed_weights_rel_path)
         gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],    # equals embedding dimension
                                       hidden_size=hidden_size_rnn,
                                       num_layers=num_layers_rnn,
@@ -356,12 +359,11 @@ def main():
         # run on GPU if available
         if (cuda_is_avail):
             gru_model.cuda()
-#        print('Model:\n', gru_model)
         evaluator = Evaluator.Evaluator(gru_model)
         
         test_accuracy, test_conf_matrix = evaluator.evaluate_data_set(test_embed_char_text_inp_tensors,
-                                                                 test_target_tensors,
-                                                                 vocab_lang)
+                                                                      test_target_tensors,
+                                                                      vocab_lang)
         print('========================================')
         print('Epochs trained:', start_epoch)
         print('========================================')
@@ -399,8 +401,9 @@ def main():
                                       is_bidirectional=is_bidirectional,
                                       initial_lr=initial_lr_rnn,
                                       weight_decay=weight_decay_rnn)
-#        print('Model:\n', gru_model)
         start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(print_model_checkpoint)
+        print('========================================')
+        print('Model:\n', gru_model)
         print('========================================')
         print('Epochs trained:', start_epoch)
         print('========================================')
