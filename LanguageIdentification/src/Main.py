@@ -8,27 +8,40 @@ from input import DataSplit, InputData
 from embedding import EmbeddingCalculation
 from net import GRUModel
 
+import sys, os
+tweet_path = os.path.abspath(os.path.join(__file__,'..','..','TweetRetriever'))
+sys.path.insert(0, tweet_path)
+from TweetRetriever import TweetRetriever
 
+
+def str_to_int(string):
+    try:
+        number = int(string)
+        return number
+    except:
+        print("Not a number")
+        return 0
 
 def main():
 
-    
+
     ##############
     # PARAMETERS #
     ##############
 
 
     # SYSTEM
-    create_splitted_data_files = True                     # split into training, validation and test set from an original file
-    calc_embed = True
-    train_rnn = True
+    create_splitted_data_files = False                     # split into training, validation and test set from an original file
+    calc_embed = False
+    train_rnn = False
     eval_test_set = True
     
     print_embed_testing = False
     print_model_checkpoint_embed_weights = None#"../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"#None
     print_model_checkpoint = None#"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
     
-    terminal = False                                      # if True: disables all other calculations
+    terminal = True                                      # if True: disables all other calculations
+    terminal_live_tweets = True
     
     
     # DATA
@@ -166,30 +179,37 @@ def main():
         lang2index, index2lang = input_data.get_string2index_and_index2string(vocab_lang)
         
         input_text = ''
+
+        tweet_retriever = TweetRetriever.TweetRetriever()
+
         while input_text != 'exit':
-            input_text = input('Enter text: ')
-#            print(input_text)
-            input_text_lang_tuple = [(input_text, index2lang[0])]    # language must be in vocab_lang
+            if terminal_live_tweets:
+                amount = str_to_int(input("Specify an amount and press Enter to sample live tweets: "))
+                sample_tweets = tweet_retriever.retrieve_sample_tweets(amount)
+                input_text =  list(sample_tweets.values())
+                input_text_lang_tuple = [(text, index2lang[0]) for text in input_text]
+            else:
+                input_text = input('Enter text: ')
+                input_text_lang_tuple = [(input_text, index2lang[0])]  # language must be in vocab_lang
             
             filtered_texts_and_lang = input_data.filter_out_irrelevant_tweet_parts(input_text_lang_tuple)
-#            print(filtered_texts_and_lang)
+            #print('filtered_texts_and_lang',filtered_texts_and_lang)
             input_text_only_vocab_chars = input_data.get_texts_with_only_vocab_chars(filtered_texts_and_lang, vocab_chars)
-#            print(input_text_only_vocab_chars)
+            #print('input_text_only_vocab_chars', input_text_only_vocab_chars)
             input_text_indexed = input_data.get_indexed_texts_and_lang(input_text_only_vocab_chars, vocab_chars, vocab_lang)
-#            print(input_text_indexed)
+            #print('input_text_indexed',input_text_indexed)
             input_text_embed_char_text_inp_tensors, input_text_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=input_text_indexed,
                                                                                                                                  embed_weights_rel_path=trained_embed_weights_rel_path)
             # transfer tensors to GPU if available
             if (cuda_is_avail):
                 input_text_embed_char_text_inp_tensors = input_text_embed_char_text_inp_tensors.cuda()
                 input_text_target_tensors = input_text_target_tensors.cuda()
-            
-            lang_prediction = evaluator.evaluate_single_date(input_text_embed_char_text_inp_tensors[0],
-                                                             5)
-            print('Prediction:')
-            for pred in lang_prediction:
-                print(pred[0], ':', index2lang[pred[1]])
-    
+
+            for i,input_tensor in enumerate(input_text_embed_char_text_inp_tensors):
+                lang_prediction = evaluator.evaluate_single_date(input_tensor, 5)
+                print("====================\ntweet detected: \n\n%s"%input_text[i])
+                for pred in lang_prediction:
+                    print(str(pred[0]*100)+"%: "+str(index2lang[pred[1]]))
 
     ###################################
     # DATA RETRIEVAL & TRANSFORMATION #

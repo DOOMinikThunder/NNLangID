@@ -156,7 +156,8 @@ class InputData(object):
             for j in range(len(texts_and_lang[i][0])):
                 if (texts_and_lang[i][0][j] in vocab_chars):
                     temp_text.append(texts_and_lang[i][0][j])
-            texts_and_lang_only_vocab_chars.append((temp_text, texts_and_lang[i][1]))
+            if(temp_text != []):
+                texts_and_lang_only_vocab_chars.append((temp_text, texts_and_lang[i][1]))
         return texts_and_lang_only_vocab_chars
     
     
