@@ -183,8 +183,8 @@ def main():
                 input_text =  list(sample_tweets.values())
                 input_text_lang_tuple = [(text, index2lang[0]) for text in input_text]
             else:
-                input_text = input('Enter text: ')
-                input_text_lang_tuple = [(input_text, index2lang[0])]  # language must be in vocab_lang
+                input_text = [input('Enter text: ')]
+                input_text_lang_tuple = [(input_text[0], index2lang[0])]  # language must be in vocab_lang
             
             filtered_texts_and_lang = input_data.filter_out_irrelevant_tweet_parts(input_text_lang_tuple)
             #print('filtered_texts_and_lang',filtered_texts_and_lang)
