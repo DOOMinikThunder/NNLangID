@@ -18,13 +18,11 @@ class Evaluator(object):
         target_list = []
         for input, target in zip(input_data, target_data):
             lang_prediction = self.evaluate_single_date(input, n_highest_probs)
-            print(lang_prediction)
             target_list.append(stats.mode(target.data.numpy()).mode[0])
             predictions.append(lang_prediction[0][1])
             pred_true += int(lang_prediction[0][1] == target_list[-1])
         accuracy = pred_true/len(input_data)
         conf_matrix = self.confusion_matrix(predictions, target_list, vocab_lang)
-#        print('accuracy', accuracy)
         return accuracy, conf_matrix
 
     def evaluate_single_date(self, input, n_highest_probs):
@@ -47,7 +45,13 @@ class Evaluator(object):
         return highest_probs
 
     def confusion_matrix(self, predictions, targets, vocab_lang):
-        #todo: more elaborate
+        """
+        row = target language, column = predicted language
+        :param predictions: single language predictions
+        :param targets: single language targets
+        :param vocab_lang: dict containing all languages
+        :return: confusion matrix
+        """
         if(len(predictions) != len(targets)):
             print("predictions and target size different for 'confusion_matrix()'")
             return []
@@ -55,3 +59,22 @@ class Evaluator(object):
         for pred, targ in zip(predictions, targets):
             conf_matrix[targ][pred] += 1
         return conf_matrix
+
+    def to_string_confusion_matrix(self, confusion_matrix, vocab_lang, pad):
+        idx_lang = []
+        for language, (language_idx, _)  in vocab_lang.items():
+            idx_lang.append((language_idx, language))
+        idx_lang.sort()
+        horizontal_lang = ""
+        for _, lang in idx_lang:
+            horizontal_lang += '{0: >{pad}}'.format(lang, pad=pad)+"\t"
+        print_matrix = "t\p\t" + horizontal_lang +"\n"
+        for i,row in enumerate(confusion_matrix):
+            print_matrix += idx_lang[i][1] + "\t" + self.row_as_string(row, pad) + "\n"
+        return print_matrix
+
+    def row_as_string(self, row, pad):
+        str_row = ""
+        for item in row:
+            str_row += '{0: >{pad}}'.format(str(int(item)), pad=pad) + "\t"
+        return str_row

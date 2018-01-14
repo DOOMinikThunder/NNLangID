@@ -20,7 +20,7 @@ def main():
 
     # SYSTEM
     create_splitted_data_files = False                     # split into training, validation and test set from an original file
-    calc_embed = True
+    calc_embed = False
     train_rnn = True
     eval_test_set = True
     
@@ -33,7 +33,7 @@ def main():
     
     # DATA
     #input_tr_va_te_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #training, validation and test will be generated from this file
-    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_embed.csv" #training, validation and test will be generated from this file
+    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_recall_de_en_es.csv" #training, validation and test will be generated from this file
     input_rt_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #to change later, rt = real test
     
     embed_weights_rel_path = "../data/save/embed_weights.txt"
@@ -123,6 +123,7 @@ def main():
     
     
     cuda_is_avail = torch.cuda.is_available()
+    cuda_is_avail = False #cuda not working on some builds
     print('cuda on') if cuda_is_avail else print('cuda off')
     
     ########################
@@ -293,6 +294,9 @@ def main():
             cur_val_accuracy, val_conf_matrix = evaluator.evaluate_data_set(val_embed_char_text_inp_tensors,
                                                            val_target_tensors,
                                                            vocab_lang)
+            print('========================================')
+            print('confusion matrix:\n')
+            print(evaluator.to_string_confusion_matrix(confusion_matrix=val_conf_matrix, vocab_lang=vocab_lang, pad=5))
             print('========================================')
             print('Epoch', epoch, 'validation set accuracy:', cur_val_accuracy)
             print('========================================')
