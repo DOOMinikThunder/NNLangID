@@ -179,7 +179,16 @@ def main():
         while input_text != 'exit':
             if terminal_live_tweets:
                 amount = str_to_int(input("Specify an amount and press Enter to sample live tweets: "))
-                sample_tweets = tweet_retriever.retrieve_sample_tweets(amount)
+                track = input("(Optional) Specify a keyword to search in tweets: ")
+                if track != "":
+                    language = input("(Optional) Specify a language identifier to search in tweets: ")
+                    if language in vocab_lang:
+                        sample_tweets = tweet_retriever.retrieve_specified_track_and_language(amount, track, language)
+                    else:
+                        print("ERROR: not a language identifier")
+                        continue
+                else:
+                    sample_tweets = tweet_retriever.retrieve_sample_tweets(amount)
                 input_text =  list(sample_tweets.values())
                 input_text_lang_tuple = [(text, index2lang[0]) for text in input_text]
             else:
