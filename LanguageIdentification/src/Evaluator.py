@@ -9,25 +9,23 @@ class Evaluator(object):
     def __init__(self, model):
         self.model = model
 
-    def evalute_data_set(self, input_data, target_data, vocab_lang, n_highest_probs=1):
+    def evaluate_data_set(self, input_data, target_data, vocab_lang, n_highest_probs=1):
         if(len(input_data) != len(target_data)):
             print("input and target size different for 'evaluate_data_set()'")
             return -1
         pred_true = 0
         predictions = []
         target_list = []
-        val_loss = 0
         for input, target in zip(input_data, target_data):
             lang_prediction = self.evaluate_single_date(input, n_highest_probs)
             print(lang_prediction)
             target_list.append(stats.mode(target.data.numpy()).mode[0])
             predictions.append(lang_prediction[0][1])
             pred_true += int(lang_prediction[0][1] == target_list[-1])
-#        print('val_loss', val_loss)
         accuracy = pred_true/len(input_data)
-#        self.confusion_matrix(predictions, target_list, vocab_lang)
+        conf_matrix = self.confusion_matrix(predictions, target_list, vocab_lang)
 #        print('accuracy', accuracy)
-        return accuracy
+        return accuracy, conf_matrix
 
     def evaluate_single_date(self, input, n_highest_probs):
         hidden = self.model.initHidden()
@@ -56,4 +54,4 @@ class Evaluator(object):
         conf_matrix = np.zeros((len(vocab_lang), len(vocab_lang)))
         for pred, targ in zip(predictions, targets):
             conf_matrix[targ][pred] += 1
-        print('conf_matrix\n', conf_matrix)
+        return conf_matrix

@@ -290,9 +290,9 @@ def main():
                             batch_size=batch_size_rnn)
             
             # evaluate validation set
-            cur_val_accuracy = evaluator.evalute_data_set(val_embed_char_text_inp_tensors,
-                                                          val_target_tensors,
-                                                          vocab_lang)
+            cur_val_accuracy, val_conf_matrix = evaluator.evaluate_data_set(val_embed_char_text_inp_tensors,
+                                                           val_target_tensors,
+                                                           vocab_lang)
             print('========================================')
             print('Epoch', epoch, 'validation set accuracy:', cur_val_accuracy)
             print('========================================')
@@ -345,9 +345,9 @@ def main():
 #        print('Model:\n', gru_model)
         evaluator = Evaluator.Evaluator(gru_model)
         
-        test_accuracy = evaluator.evalute_data_set(test_embed_char_text_inp_tensors,
-                                                   test_target_tensors,
-                                                   vocab_lang)
+        test_accuracy, test_conf_matrix = evaluator.evaluate_data_set(test_embed_char_text_inp_tensors,
+                                                                 test_target_tensors,
+                                                                 vocab_lang)
         print('========================================')
         print('Epochs trained:', start_epoch)
         print('========================================')
