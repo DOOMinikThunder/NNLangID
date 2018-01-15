@@ -10,6 +10,7 @@ from embedding import EmbeddingCalculation
 from input import DataSplit, InputData
 from evaluation import Evaluator
 from net import GRUModel
+import Terminal
 try:
     from tweet_retriever import TweetRetriever
     can_use_tweets = True
@@ -43,7 +44,7 @@ def main():
     print_model_checkpoint_embed_weights = None#"../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"#None
     print_model_checkpoint = None#"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
     
-    terminal = False                                      # if True: disables all other calculations
+    use_terminal = True                                     # if True: disables all other calculations
     if can_use_tweets:
         terminal_live_tweets = True #change this if you want to sample live tweets
     else:
@@ -109,7 +110,7 @@ def main():
         'print_embed_testing': print_embed_testing,
         'print_model_checkpoint_embed_weights' : print_model_checkpoint_embed_weights,
         'print_model_checkpoint' : print_model_checkpoint,
-        'terminal' : terminal,
+        'terminal' : use_terminal,
         # DATA
         'input_tr_va_te_data_rel_path' : input_tr_va_te_data_rel_path,
         'input_rt_data_rel_path' : input_rt_data_rel_path,
@@ -141,6 +142,7 @@ def main():
         'scheduler_gamma_rnn' : scheduler_gamma_rnn,
         'weight_decay_rnn' : weight_decay_rnn,
         'num_epochs_rnn' : num_epochs_rnn,
+        'cuda_is_avail' : False#torch.cuda.is_available()
         }
     
     
@@ -154,80 +156,15 @@ def main():
     ############    
     
     # simple terminal for testing
-    if (terminal):
-        input_data = InputData.InputData()
-        embed, num_classes = input_data.create_embed_from_weights_file(trained_embed_weights_rel_path)
-        gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],    # equals embedding dimension
-                                      hidden_size=hidden_size_rnn,
-                                      num_layers=num_layers_rnn,
-                                      num_classes=num_classes,
-                                      is_bidirectional=is_bidirectional,
-                                      initial_lr=initial_lr_rnn,
-                                      weight_decay=weight_decay_rnn)
-        start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(trained_model_checkpoint_rel_path)
-        # run on GPU if available
-        if (cuda_is_avail):
-            gru_model.cuda()
-        evaluator = Evaluator.Evaluator(gru_model)
-        lang2index, index2lang = input_data.get_string2index_and_index2string(vocab_lang)
-        
-        input_text = ''
+    if (use_terminal):
+        terminal = Terminal.Terminal(system_param_dict)
+        terminal.use_terminal(terminal_live_tweets)
 
-        if terminal_live_tweets:
-            tweet_retriever = TweetRetriever.TweetRetriever()
-
-        while input_text != 'exit':
-            if terminal_live_tweets:
-                amount = str_to_int(input("Specify an amount and press Enter to sample live tweets: "))
-                track = input("(Optional) Specify a keyword to search in tweets: ")
-                if track != "":
-                    language = input("(Optional) Specify a language identifier to search in tweets: ")
-                    if language in vocab_lang:
-                        sample_tweets = tweet_retriever.retrieve_specified_track_and_language(amount, track, language)
-                    else:
-                        print("ERROR: not a language identifier")
-                        continue
-                else:
-                    sample_tweets = tweet_retriever.retrieve_sample_tweets(amount)
-                input_text =  list(sample_tweets.values())
-                input_text_lang_tuple = [(text, index2lang[0]) for text in input_text]
-            else:
-                input_text = [input('Enter text: ')]
-                input_text_lang_tuple = [(input_text[0], index2lang[0])]  # language must be in vocab_lang
-            
-            filtered_texts_and_lang = input_data.filter_out_irrelevant_tweet_parts(input_text_lang_tuple)
-            #print('filtered_texts_and_lang',filtered_texts_and_lang)
-            input_text_only_vocab_chars = input_data.get_texts_with_only_vocab_chars(filtered_texts_and_lang, vocab_chars)
-            #print('input_text_only_vocab_chars', input_text_only_vocab_chars)
-            input_text_indexed = input_data.get_indexed_texts_and_lang(input_text_only_vocab_chars, vocab_chars, vocab_lang)
-            #print('input_text_indexed',input_text_indexed)
-            input_text_embed_char_text_inp_tensors, input_text_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=input_text_indexed,
-                                                                                                                                 embed_weights_rel_path=trained_embed_weights_rel_path,
-                                                                                                                                 embed=embed)
-            # transfer tensors to GPU if available
-            if (cuda_is_avail):
-                input_text_embed_char_text_inp_tensors = input_text_embed_char_text_inp_tensors.cuda()
-                input_text_target_tensors = input_text_target_tensors.cuda()
-
-            n_highest_probs = 5
-            for i, input_tensor in enumerate(input_text_embed_char_text_inp_tensors):
-                lang_prediction,_ = evaluator.evaluate_single_date(input_tensor, n_highest_probs)
-                print("====================\ntweet detected: \n\n%s\n"%input_text[i])
-
-                # print n_highest_probs for input
-                print('Language:')
-                for i in range(len(lang_prediction)):
-                    if (i == 0):
-                        print("{0:.2f}".format(lang_prediction[i][0]*100)+ "%: "+ str(index2lang[lang_prediction[i][1]])+"\n")
-                    else:
-                        print("{0:.2f}".format(lang_prediction[i][0]*100)+ "%: "+ str(index2lang[lang_prediction[i][1]]))
-    
-        
     ########################
     # DATA FILES SPLITTING #
     ########################
     
-    if (not terminal):
+    if (not use_terminal):
         # split into training, validation and test set from an original file
         out_tr_data_rel_path = "../data/input_data/original_splitted/training.csv"
         out_va_data_rel_path = "../data/input_data/original_splitted/validation.csv"
@@ -243,7 +180,7 @@ def main():
     # DATA RETRIEVAL & TRANSFORMATION #
     ###################################
 
-    if (not terminal):
+    if (not use_terminal):
         input_data = InputData.InputData()
         """
         train_set_indexed: list of every date where each character and target gets unique id, e.g. 
@@ -274,7 +211,7 @@ def main():
     # EMBEDDING CALCULATION #
     #########################
     
-    if (not terminal and calc_embed):
+    if (not use_terminal and calc_embed):
         indexed_texts = input_data.get_only_indexed_texts(train_set_indexed)
 #        print(indexed_texts)
         embedding_calculation = EmbeddingCalculation.EmbeddingCalculation()
@@ -298,7 +235,7 @@ def main():
     ################
 
     # train RNN model
-    if (not terminal and train_rnn):
+    if (not use_terminal and train_rnn):
         embed, num_classes = input_data.create_embed_from_weights_file(trained_embed_weights_rel_path)
         train_embed_char_text_inp_tensors, train_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=train_set_indexed,
                                                                                                                    embed_weights_rel_path=embed_weights_rel_path,
@@ -380,7 +317,7 @@ def main():
     ##############
     
     # evaluate test set
-    if (not terminal and eval_test_set):
+    if (not use_terminal and eval_test_set):
         input_data = InputData.InputData()
         embed, num_classes = input_data.create_embed_from_weights_file(embed_weights_rel_path)
         test_embed_char_text_inp_tensors, test_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=test_set_indexed,
@@ -446,7 +383,7 @@ def main():
 
 
     # print saved model checkpoint from file
-    if (not terminal and print_model_checkpoint != None and print_model_checkpoint_embed_weights != None):
+    if (not use_terminal and print_model_checkpoint != None and print_model_checkpoint_embed_weights != None):
         input_data = InputData.InputData()
         embed, num_classes = input_data.create_embed_from_weights_file(print_model_checkpoint_embed_weights)
         gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],    # equals embedding dimension

@@ -29,6 +29,10 @@ class TweetRetriever(object):
 		#print(json.dumps(tweet))
 		self.tweets = []
 
+	def tweet_not_deleted(self, tweet):
+		if 'full_text' in tweet:
+			return True
+		return False
 
 	def retrieve_single_tweet(self, id):
 		print("looking up: %s"%id)
@@ -37,11 +41,12 @@ class TweetRetriever(object):
 
 	def retrieve_list_of_tweets(self, ids):
 		tweets = self.twitter.statuses.lookup(tweet_mode='extended',_id=ids)
-		tweet_texts = [tweet["text"] for tweet in tweets]
-		tweet_ids = [tweet["id"] for tweet in tweets]
+		tweet_gen = [tweet for tweet in tweets if self.tweet_not_deleted(tweet)]
+		tweet_texts = [tweet["full_text"] for tweet in tweet_gen]
+		tweet_ids = [tweet["id"] for tweet in tweet_gen]
 		short_tweets = {}
-		for tweet in tweets:
-			short_tweets[str(tweet["id"])] = tweet["text"]
+		for tweet_text, tweet_id in zip(tweet_texts, tweet_ids):
+			short_tweets[str(tweet_id)] = tweet_text
 		return short_tweets
 
 	def retrieve_sample_tweets(self, amount):
@@ -56,8 +61,8 @@ class TweetRetriever(object):
 		short_tweets = {}
 		i = 0
 		for tweet in iterator:
-			if 'text' in tweet:
-				short_tweets[str(tweet['id'])] = tweet['text']
+			if 'full_text' in tweet:
+				short_tweets[str(tweet['id'])] = tweet['full_text']
 				i += 1
 			if i == amount:
 				break
@@ -120,8 +125,8 @@ class TweetRetriever(object):
 
 def main():
 	cur_dir = os.path.dirname(os.path.abspath(__file__))
-	tweet_file = cur_dir+"/tweet_retriever_data/uniformly_sampled4.csv"
-	output_file = cur_dir + "/tweet_retriever_data/uniformly_sampled_dl.csv"
+	tweet_file = cur_dir+"\\..\\..\\data\\tweet_retriever_data\\recall_tweets.csv"
+	output_file = cur_dir + "\\..\\..\\data\\tweet_retriever_data\\downloaded\\recall_oriented_dl2.csv"
 	tr = TweetRetriever()
 
 	tweets = tr.read_tweets_from_file(tweet_file)
