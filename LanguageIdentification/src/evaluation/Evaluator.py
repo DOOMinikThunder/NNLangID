@@ -8,32 +8,30 @@ class Evaluator(object):
 
     def __init__(self, model):
         self.model = model
+        self.criterion = torch.nn.NLLLoss()
 
     def evaluate_data_set(self, input_data, target_data, vocab_lang, n_highest_probs=1):
-        """
-        evaluates a whole tweet_retriever_data set
-        :param input_data: input tweet_retriever_data set
-        :param target_data: target set of same size as input tweet_retriever_data
-        :param vocab_lang: dictionary containing 'language':(index, frequency)
-        :param n_highest_probs: the n languages with the highest probabilites to be calculated
-        :return: accuracy, confusion matrix
-        """
-        if(len(input_data) != len(target_data)):
+        if (len(input_data) != len(target_data)):
             print("input and target size different for 'evaluate_data_set()'")
             return -1
-        pred_true = 0
         predictions = []
         target_list = []
+        acc_loss = []
         for input, target in zip(input_data, target_data):
-            lang_prediction = self.evaluate_single_date(input, n_highest_probs)
+            lang_prediction, loss = self.evaluate_single_date(input, n_highest_probs, target)
+            acc_loss.append(loss)
             target_list.append(stats.mode(target.data.numpy()).mode[0])
             predictions.append(lang_prediction[0][1])
-            pred_true += int(lang_prediction[0][1] == target_list[-1])
-        accuracy = pred_true/len(input_data)
-        conf_matrix = self.confusion_matrix(predictions, target_list, vocab_lang)
-        return accuracy, conf_matrix
+        mean_loss = sum(acc_loss)/float(len(acc_loss))
+        return mean_loss, predictions, target_list
 
-    def evaluate_single_date(self, input, n_highest_probs):
+    def accuracy(self, predictions, targets):
+        pred_true = 0
+        for pred, target in zip(predictions, targets):
+            pred_true += int(pred == target)
+        return pred_true/len(targets)
+
+    def evaluate_single_date(self, input, n_highest_probs, target=None):
         """
         evaluates a single date
         :param input: the input date/tweet
@@ -42,8 +40,12 @@ class Evaluator(object):
         """
         hidden = self.model.initHidden()
         output,hidden = self.model(input, hidden)
+        if target is not None:
+            loss = self.criterion(output, target)
+        else:
+            loss = 0
         lang_prediction = self.evaluate_prediction(output, n_highest_probs)
-        return lang_prediction
+        return lang_prediction, loss
 
     #prediction: tensor of languages-dimensional entries containing log softmax probabilities
     def evaluate_prediction(self, prediction, n_highest_probs):
@@ -98,7 +100,7 @@ class Evaluator(object):
         print_matrix = "t\p\t" + horizontal_lang +"\taccuracy\n"
         for i,row in enumerate(confusion_matrix):
             row_accuracy = (row[i]/sum(row))*100
-            print_matrix += idx_lang[i][1] + "\t" + self.row_as_string(row, pad) + '{0: >9}'.format(str(row_accuracy)) + "%\n"
+            print_matrix += idx_lang[i][1] + "\t" + self.row_as_string(row, pad) + '{0: >9.3}'.format(str(row_accuracy)) + "%\n"
         return print_matrix
 
     def row_as_string(self, row, pad):

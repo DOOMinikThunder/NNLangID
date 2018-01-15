@@ -36,14 +36,14 @@ def main():
     # SYSTEM
     create_splitted_data_files = False                     # split into training, validation and test set from an original file
     calc_embed = False
-    train_rnn = False
+    train_rnn = True
     eval_test_set = True
     
     print_embed_testing = False
     print_model_checkpoint_embed_weights = None#"../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"#None
     print_model_checkpoint = None#"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
     
-    terminal = True                                      # if True: disables all other calculations
+    terminal = False                                      # if True: disables all other calculations
     if can_use_tweets:
         terminal_live_tweets = True #change this if you want to sample live tweets
     else:
@@ -52,10 +52,10 @@ def main():
     
     
     # DATA
-    input_tr_va_te_data_rel_path = "../data/input_data/original/recall_oriented_dl.csv" #training, validation and test will be generated from this file
+    #input_tr_va_te_data_rel_path = "../data/input_data/original/recall_oriented_dl.csv" #training, validation and test will be generated from this file
 #    input_tr_va_te_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #training, validation and test will be generated from this file
 #    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_embed.csv" #training, validation and test will be generated from this file
-#    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_recall_de_en_es.csv" #training, validation and test will be generated from this file
+    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_recall_de_en_es.csv" #training, validation and test will be generated from this file
     input_rt_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #to change later, rt = real test
     
     embed_weights_rel_path = "../data/save/embed_weights.txt"
@@ -175,7 +175,6 @@ def main():
 
         if terminal_live_tweets:
             tweet_retriever = TweetRetriever.TweetRetriever()
-            print(tweet_retriever.retrieve_single_tweet('952332335999062016'))
 
         while input_text != 'exit':
             if terminal_live_tweets:
@@ -212,15 +211,14 @@ def main():
 
             n_highest_probs = 5
             for i, input_tensor in enumerate(input_text_embed_char_text_inp_tensors):
-                lang_prediction = evaluator.evaluate_single_date(input_tensor, n_highest_probs)
+                lang_prediction,_ = evaluator.evaluate_single_date(input_tensor, n_highest_probs)
                 print("====================\ntweet detected: \n\n%s\n"%input_text[i])
 
                 # print n_highest_probs for input
                 print('Language:')
                 for i in range(len(lang_prediction)):
                     if (i == 0):
-                        print("{0:.2f}".format(lang_prediction[i][0]*100)+ "%: "+ str(index2lang[lang_prediction[i][1]]))
-                        print('')
+                        print("{0:.2f}".format(lang_prediction[i][0]*100)+ "%: "+ str(index2lang[lang_prediction[i][1]])+"\n")
                     else:
                         print("{0:.2f}".format(lang_prediction[i][0]*100)+ "%: "+ str(index2lang[lang_prediction[i][1]]))
     
@@ -344,14 +342,18 @@ def main():
                             batch_size=batch_size_rnn)
             
             # evaluate validation set
-            cur_val_accuracy, val_conf_matrix = evaluator.evaluate_data_set(val_embed_char_text_inp_tensors,
+            val_mean_loss, predictions, targets = evaluator.evaluate_data_set(val_embed_char_text_inp_tensors,
                                                            val_target_tensors,
                                                            vocab_lang)
+            cur_val_accuracy = evaluator.accuracy(predictions, targets)
+            val_conf_matrix = evaluator.confusion_matrix(predictions, targets, vocab_lang)
             print('========================================')
             print('confusion matrix:\n')
             print(evaluator.to_string_confusion_matrix(confusion_matrix=val_conf_matrix, vocab_lang=vocab_lang, pad=5))
             print('========================================')
             print('Epoch', epoch, 'validation set accuracy:', cur_val_accuracy)
+            print('========================================')
+            print('Epoch', epoch, 'validation mean loss:', val_mean_loss)
             print('========================================')
             
             # check if accuracy improved and if so, save model checkpoint to file
@@ -402,9 +404,10 @@ def main():
             gru_model.cuda()
         evaluator = Evaluator.Evaluator(gru_model)
         
-        test_accuracy, test_conf_matrix = evaluator.evaluate_data_set(test_embed_char_text_inp_tensors,
+        test_mean_loss, predictions, targets = evaluator.evaluate_data_set(test_embed_char_text_inp_tensors,
                                                                       test_target_tensors,
                                                                       vocab_lang)
+        test_accuracy = evaluator.accuracy(predictions, targets)
         print('========================================')
         print('Epochs trained:', start_epoch)
         print('========================================')
