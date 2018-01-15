@@ -35,9 +35,9 @@ def main():
     create_splitted_data_files = False                     # split into training, validation and test set from an original file
     calc_embed = False
     train_rnn = False
-    eval_test_set = True
+    eval_test_set = False
     
-    print_embed_testing = True
+    print_embed_testing = False
     print_model_checkpoint_embed_weights = None#"../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"#None
     print_model_checkpoint = None#"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
     
