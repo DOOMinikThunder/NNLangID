@@ -174,37 +174,29 @@ class InputData(object):
     
     
     def get_indexed_data(self, train_data_rel_path, validation_data_rel_path, test_data_rel_path, real_test_data_rel_path, min_char_frequency, fetch_only_langs=None, fetch_only_first_x_tweets=math.inf):
-        tr_texts_and_lang = self.fetch_tweet_texts_and_lang_from_file(train_data_rel_path, fetch_only_langs, fetch_only_first_x_tweets)
-        va_texts_and_lang = self.fetch_tweet_texts_and_lang_from_file(validation_data_rel_path, fetch_only_langs, fetch_only_first_x_tweets)
-        te_texts_and_lang = self.fetch_tweet_texts_and_lang_from_file(test_data_rel_path, fetch_only_langs, fetch_only_first_x_tweets)
-        rt_texts_and_lang = self.fetch_tweet_texts_and_lang_from_file(real_test_data_rel_path, fetch_only_langs, fetch_only_first_x_tweets)
-        
-        # (true) randomly shuffle each tweet_retriever_data set
-        random.shuffle(tr_texts_and_lang)
-        random.shuffle(va_texts_and_lang)
-        random.shuffle(te_texts_and_lang)
-        random.shuffle(rt_texts_and_lang)
-        
-        filtered_tr_texts_and_lang = self.filter_out_irrelevant_tweet_parts(tr_texts_and_lang)
-        filtered_va_texts_and_lang = self.filter_out_irrelevant_tweet_parts(va_texts_and_lang)
-        filtered_te_texts_and_lang = self.filter_out_irrelevant_tweet_parts(te_texts_and_lang)
-        filtered_rt_texts_and_lang = self.filter_out_irrelevant_tweet_parts(rt_texts_and_lang)
-        
-        vocab_chars, vocab_lang = self.get_vocab_chars_and_lang(filtered_tr_texts_and_lang, min_char_frequency)
+        tr_filtered = self.get_filtered_data(train_data_rel_path, min_char_frequency, fetch_only_langs, fetch_only_first_x_tweets, calc_vocab=True)
+        vocab_chars, vocab_lang = self.get_vocab_chars_and_lang(tr_filtered, min_char_frequency)
+        val_filtered =  self.get_filtered_data(validation_data_rel_path, min_char_frequency, fetch_only_langs, fetch_only_first_x_tweets)
+        te_filtered =  self.get_filtered_data(test_data_rel_path, min_char_frequency, fetch_only_langs, fetch_only_first_x_tweets)
+        rt_filtered =  self.get_filtered_data(real_test_data_rel_path, min_char_frequency, fetch_only_langs, fetch_only_first_x_tweets)
+        tr_indexed = self.get_single_indexed_data(tr_filtered, vocab_lang, vocab_chars)
+        val_indexed = self.get_single_indexed_data(val_filtered, vocab_lang, vocab_chars)
+        te_indexed = self.get_single_indexed_data(te_filtered, vocab_lang, vocab_chars)
+        rt_indexed = self.get_single_indexed_data(rt_filtered, vocab_lang, vocab_chars)
+        return tr_indexed, val_indexed, te_indexed, rt_indexed, vocab_chars, vocab_lang
 
-        train_set_only_vocab_chars = self.get_texts_with_only_vocab_chars(filtered_tr_texts_and_lang, vocab_chars)
-        val_set_only_vocab_chars = self.get_texts_with_only_vocab_chars(filtered_va_texts_and_lang, vocab_chars)
-        test_set_only_vocab_chars = self.get_texts_with_only_vocab_chars(filtered_te_texts_and_lang, vocab_chars)
-        real_test_set_only_vocab_chars = self.get_texts_with_only_vocab_chars(filtered_rt_texts_and_lang, vocab_chars)
+    def get_filtered_data(self, data_path, min_char_frequency, fetch_only_langs=None, fetch_only_first_x_tweets=math.inf, calc_vocab=False):
+        texts_and_lang = self.fetch_tweet_texts_and_lang_from_file(data_path, fetch_only_langs, fetch_only_first_x_tweets)
+        random.shuffle(texts_and_lang)
+        filtered_texts_and_lang = self.filter_out_irrelevant_tweet_parts(texts_and_lang)
+        return filtered_texts_and_lang
 
-        train_set_indexed = self.get_indexed_texts_and_lang(train_set_only_vocab_chars, vocab_chars, vocab_lang)
-        val_set_indexed = self.get_indexed_texts_and_lang(val_set_only_vocab_chars, vocab_chars, vocab_lang)
-        test_set_indexed = self.get_indexed_texts_and_lang(test_set_only_vocab_chars, vocab_chars, vocab_lang)
-        real_test_set_indexed = self.get_indexed_texts_and_lang(real_test_set_only_vocab_chars, vocab_chars, vocab_lang)
+    def get_single_indexed_data(self, filtered_texts_and_lang, vocab_lang, vocab_chars):
+        set_only_vocab_chars = self.get_texts_with_only_vocab_chars(filtered_texts_and_lang, vocab_chars)
+        set_indexed = self.get_indexed_texts_and_lang(set_only_vocab_chars, vocab_chars, vocab_lang)
+        return set_indexed
 
-        return train_set_indexed, val_set_indexed, test_set_indexed, real_test_set_indexed, vocab_chars, vocab_lang
-    
-    
+
     def get_string2index_and_index2string(self, vocab_dict):
         string2index = {}
         index2string = {}

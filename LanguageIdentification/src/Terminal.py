@@ -11,6 +11,9 @@ class Terminal(object):
 	def __init__(self, system_parameters):
 		self.system_parameters = system_parameters
 
+	"""
+	to use the terminal, only this function needs to be called
+	"""
 	def use_terminal(self, terminal_live_tweets=False):
 		input_data = InputData.InputData()
 		embed, num_classes = input_data.create_embed_from_weights_file(self.system_parameters['trained_embed_weights_rel_path'])

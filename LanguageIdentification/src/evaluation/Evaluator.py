@@ -10,6 +10,17 @@ class Evaluator(object):
         self.model = model
         self.criterion = torch.nn.NLLLoss()
 
+    def all_metrics(self, input_data, target_data, vocab_lang):
+        mean_loss, predictions, targets = self.evaluate_data_set(input_data,
+                                                               target_data,
+                                                               vocab_lang)
+        accuracy = self.accuracy(predictions, targets)
+        confusion_matrix = self.confusion_matrix(predictions, targets, vocab_lang)
+        precision = self.precision(confusion_matrix)
+        recall = self.recall(confusion_matrix)
+        f1_score = self.f1_score(precision, recall)
+        return mean_loss, accuracy, confusion_matrix, precision, recall, f1_score
+
     def evaluate_data_set(self, input_data, target_data, vocab_lang, n_highest_probs=1):
         if (len(input_data) != len(target_data)):
             print("input and target size different for 'evaluate_data_set()'")
@@ -39,17 +50,26 @@ class Evaluator(object):
     """
 
     def f1_score(self, precision, recall):
-        return [2*(p*r)/(p+r) for p,r in zip(precision, recall)]
+        try:
+            return [2*(p*r)/(p+r) for p,r in zip(precision, recall)]
+        except ZeroDivisionError:
+            return [0]
 
     def recall(self, confusion_matrix):
         true_positives = self.true_positives(confusion_matrix)
         false_negatives = self.false_negatives(confusion_matrix)
-        return [tp/(tp+sum(fn)) for tp,fn in  zip(true_positives, false_negatives)]
+        try:
+            return [tp/(tp+sum(fn)) for tp,fn in  zip(true_positives, false_negatives)]
+        except ZeroDivisionError:
+            return [0]
 
     def precision(self, confusion_matrix):
         true_positives = self.true_positives(confusion_matrix)
         false_positives = self.false_positive(confusion_matrix)
-        return [tp/(tp+sum(fp)) for tp,fp in  zip(true_positives, false_positives)]
+        try:
+            return [tp/(tp+sum(fp)) for tp,fp in  zip(true_positives, false_positives)]
+        except ZeroDivisionError:
+            return [0]
 
     def true_positives(self, confusion_matrix):
         return [confusion_matrix[i][i] for i in range(len(confusion_matrix))]
@@ -60,10 +80,6 @@ class Evaluator(object):
     def false_negatives(self, confusion_matrix):
         matrix_in_columns = list(zip(*confusion_matrix))
         return [matrix_in_columns[i][:i]+matrix_in_columns[i][i+1:] for i in range(len(matrix_in_columns))]
-
-
-
-
 
     def evaluate_single_date(self, input, n_highest_probs, target=None):
         """

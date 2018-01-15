@@ -1,0 +1,61 @@
+# System parameters
+create_splitted_data_files: False                     # split into training, validation and test set from an original file
+calc_embed: False
+train_rnn: False
+eval_test_set: True
+use_terminal: False                                     # if True: disables all other calculations
+terminal_live_tweets: True        #change this if you want to sample live tweets
+
+# Print parameters
+print_embed_testing: False
+print_model_checkpoint_embed_weights: None #"../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"#None
+print_model_checkpoint: None #"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
+
+
+# Data path
+input_tr_va_te_data_rel_path: "../data/input_data/testing/test_recall_de_en_es.csv" #training, validation and test will be generated from this file
+input_rt_data_rel_path: "../data/input_data/original/uniformly_sampled_dl.csv" #to change later, rt = real test
+
+out_tr_data_rel_path: "../data/input_data/original_splitted/training.csv"
+out_va_data_rel_path: "../data/input_data/original_splitted/validation.csv"
+out_te_data_rel_path: "../data/input_data/original_splitted/test.csv"
+
+# Embedding weights path
+embed_weights_rel_path: "../data/save/embed_weights.txt"
+trained_embed_weights_rel_path: "../data/save/trained/embed_weights_de_en_es_fr_it.txt"
+
+# Model path
+model_checkpoint_rel_path: "../data/save/model_checkpoint.pth"
+trained_model_checkpoint_rel_path: "../data/save/trained/model_checkpoint_de_en_es_fr_it.pth"
+
+# Data manipulation parameters
+tr_va_te_split_ratios: [0.8, 0.1, 0.1]  # [train_ratio, val_ratio, test_ratio]
+split_shuffle_seed: 42  # ensures that splitted sets (training, validation, test) are always created identically (given a specified ratio)
+fetch_only_langs: ['de', 'en', 'es', 'fr', 'it']  # ['de', 'en', 'es']#['el', 'fa', 'hi', 'ca']#None
+fetch_only_first_x_tweets: 42  # 5
+min_char_frequency: 2  # chars appearing less than min_char_frequency in the training set will not be used to create the vocabulary vocab_chars
+
+# HYPERPARAMETERS EMBEDDING
+sampling_table_min_char_count: 10  # determines the precision of the sampling (should be 10 or higher)
+sampling_table_specified_size_cap: 10000  # math.inf        # caps specified sampling table size to this value (no matter how big it would be according to sampling_table_min_char_count)
+                                                            # note: this is only the specified size, the actual table size may slightly deviate due to roundings in the calculation
+#    embed_dim: 2                                           # will be set automatically later to: roundup(log2(vocabulary-size))
+max_context_window_size: 2
+num_neg_samples: 5
+batch_size_embed: 10
+initial_lr_embed: 0.025
+lr_decay_num_batches_embed: 100
+num_epochs_embed: 1
+
+# HYPERPARAMETERS RNN
+#    input_size: list(train_embed_char_text_inp_tensors[0].size())[2]
+#    num_classes: len(vocab_lang)
+hidden_size_rnn: 100
+num_layers_rnn: 1
+is_bidirectional: True
+batch_size_rnn: 10
+initial_lr_rnn: 0.01
+scheduler_step_size_rnn: 1  # currently not functioning
+scheduler_gamma_rnn: 0.1  # currently not functioning
+weight_decay_rnn: 0.00001
+num_epochs_rnn: 10  # math.inf#2
