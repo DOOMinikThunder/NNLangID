@@ -36,7 +36,7 @@ def main():
     # SYSTEM
     create_splitted_data_files = False                     # split into training, validation and test set from an original file
     calc_embed = False
-    train_rnn = True
+    train_rnn = False
     eval_test_set = True
     
     print_embed_testing = False
@@ -408,6 +408,17 @@ def main():
                                                                       test_target_tensors,
                                                                       vocab_lang)
         test_accuracy = evaluator.accuracy(predictions, targets)
+        confusion_matrix = evaluator.confusion_matrix(predictions, targets, vocab_lang)
+        precision = evaluator.precision(confusion_matrix)
+        recall = evaluator.recall(confusion_matrix)
+        f1_score = evaluator.f1_score(precision, recall)
+
+        print('========================================')
+        print('confusion matrix\n', evaluator.to_string_confusion_matrix(confusion_matrix, vocab_lang, 5))
+        print('========================================')
+        print('precision', precision)
+        print('recall', recall)
+        print('f1_score', f1_score)
         print('========================================')
         print('Epochs trained:', start_epoch)
         print('========================================')

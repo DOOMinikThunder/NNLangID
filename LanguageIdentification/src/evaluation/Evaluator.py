@@ -31,6 +31,40 @@ class Evaluator(object):
             pred_true += int(pred == target)
         return pred_true/len(targets)
 
+    """
+    1   2   3   4 #true positive:1      false positive:2,3,4         false negative: 7,2,3 
+    7   8   9   5
+    2   3   9   2
+    3   1   4   8
+    """
+
+    def f1_score(self, precision, recall):
+        return [2*(p*r)/(p+r) for p,r in zip(precision, recall)]
+
+    def recall(self, confusion_matrix):
+        true_positives = self.true_positives(confusion_matrix)
+        false_negatives = self.false_negatives(confusion_matrix)
+        return [tp/(tp+sum(fn)) for tp,fn in  zip(true_positives, false_negatives)]
+
+    def precision(self, confusion_matrix):
+        true_positives = self.true_positives(confusion_matrix)
+        false_positives = self.false_positive(confusion_matrix)
+        return [tp/(tp+sum(fp)) for tp,fp in  zip(true_positives, false_positives)]
+
+    def true_positives(self, confusion_matrix):
+        return [confusion_matrix[i][i] for i in range(len(confusion_matrix))]
+
+    def false_positive(self, confusion_matrix):
+        return [confusion_matrix[i][:i]+confusion_matrix[i][i+1:] for i in range(len(confusion_matrix))]
+
+    def false_negatives(self, confusion_matrix):
+        matrix_in_columns = list(zip(*confusion_matrix))
+        return [matrix_in_columns[i][:i]+matrix_in_columns[i][i+1:] for i in range(len(matrix_in_columns))]
+
+
+
+
+
     def evaluate_single_date(self, input, n_highest_probs, target=None):
         """
         evaluates a single date
@@ -80,7 +114,7 @@ class Evaluator(object):
         conf_matrix = np.zeros((len(vocab_lang), len(vocab_lang)))
         for pred, targ in zip(predictions, targets):
             conf_matrix[targ][pred] += 1
-        return conf_matrix
+        return conf_matrix.tolist()
 
     def to_string_confusion_matrix(self, confusion_matrix, vocab_lang, pad):
         """
