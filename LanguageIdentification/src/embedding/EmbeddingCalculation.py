@@ -5,7 +5,6 @@ import random
 import torch
 import torch.autograd as autograd
 from torch.autograd import Variable
-#from . import SkipGramModel
 from embedding import SkipGramModel
 from input import InputData
 #from tqdm import tqdm
@@ -114,17 +113,21 @@ class EmbeddingCalculation(object):
         return pairs
     
     
-    def calc_embed(self, indexed_tweet_texts, batch_size, vocab_chars, vocab_lang, max_context_window_size, num_neg_samples, num_epochs, initial_lr, lr_decay_num_batches, embed_weights_rel_path, print_testing, sampling_table_min_char_count=1, sampling_table_specified_size_cap=100000000):
+    def calc_embed(self, train_set_indexed, val_set_indexed, batch_size, vocab_chars, vocab_lang, max_context_window_size, num_neg_samples, max_eval_checks_not_improved, max_num_epochs, eval_every_num_batches, lr_decay_every_num_batches, lr_decay_factor, initial_lr, embed_weights_rel_path, embed_model_checkpoint_rel_path, system_param_dict, print_testing, sampling_table_min_char_count=1, sampling_table_specified_size_cap=100000000):
         # set embedding dimension to: roundup(log2(vocabulary-size))
         embed_dim = math.ceil(math.log2(len(vocab_chars)))
-    #    print(embed_dim)
         
         ##########################################
         # SKIP-GRAM-MODEL WITH NEGATIVE SAMPLING #
         ##########################################
         
-        batched_pairs = self.get_batched_target_context_index_pairs(indexed_tweet_texts, batch_size, max_context_window_size)
-#        print(batched_pairs)
+        input_data = InputData.InputData()
+        train_indexed_texts = input_data.get_only_indexed_texts(train_set_indexed)
+        val_indexed_texts = input_data.get_only_indexed_texts(val_set_indexed)
+        
+        train_batched_pairs = self.get_batched_target_context_index_pairs(train_indexed_texts, batch_size, max_context_window_size)
+        val_batched_pairs = self.get_batched_target_context_index_pairs(val_indexed_texts, batch_size, max_context_window_size)
+        
         skip_gram_model = SkipGramModel.SkipGramModel(vocab_chars=vocab_chars,
                                                       vocab_lang=vocab_lang,
                                                       embed_dim=embed_dim,
@@ -136,16 +139,18 @@ class EmbeddingCalculation(object):
             skip_gram_model.cuda()
         
         # train skip-gram with negative sampling
-#        skip_gram_model.scheduler.step()
-        skip_gram_model.train(batched_pairs=batched_pairs,
+        skip_gram_model.train(train_batched_pairs=train_batched_pairs,
+                              val_batched_pairs=val_batched_pairs,
                               num_neg_samples=num_neg_samples,
-                              num_epochs=num_epochs,
-                              lr_decay_num_batches=lr_decay_num_batches)
-        
-        # write embedding weights to file
-        skip_gram_model.save_embed_to_file(embed_weights_rel_path)
-    #    print(skip_gram_model.embed_hidden.weight)
-        
+                              max_eval_checks_not_improved=max_eval_checks_not_improved,
+                              max_num_epochs=max_num_epochs,
+                              eval_every_num_batches=eval_every_num_batches,
+                              lr_decay_every_num_batches=lr_decay_every_num_batches,
+                              lr_decay_factor=lr_decay_factor,
+                              embed_weights_rel_path=embed_weights_rel_path,
+                              embed_model_checkpoint_rel_path=embed_model_checkpoint_rel_path,
+                              system_param_dict=system_param_dict)
+                             
         
         ###########
         # TESTING #
