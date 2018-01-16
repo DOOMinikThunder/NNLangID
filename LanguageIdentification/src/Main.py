@@ -44,7 +44,7 @@ def main():
     if not can_use_tweets:
         system_parameters['terminal_live_tweets'] = False                      # change this if you want to sample live tweets
     # do not work in YAML file:
-    system_parameters['cuda_is_avail'] = False #torch.cuda.is_available()
+    system_parameters['cuda_is_avail'] = torch.cuda.is_available()
     system_parameters['fetch_only_langs'] = None #['de', 'en', 'es', 'fr', 'it'] #['de', 'en', 'es']#['el', 'fa', 'hi', 'ca']#None
     system_parameters['fetch_only_first_x_tweets'] = float('inf')
 
