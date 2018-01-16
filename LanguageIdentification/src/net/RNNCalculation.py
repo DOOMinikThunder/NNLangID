@@ -137,7 +137,7 @@ class RNNCalculation(object):
 
 
 
-	def print(self, string_date_tuple):
+	def print_out(self, string_date_tuple):
 		for string, date in string_date_tuple:
 			print('========================================')
 			print(string, date, sep="")

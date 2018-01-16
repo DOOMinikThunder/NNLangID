@@ -163,7 +163,7 @@ def main():
                         ('Test set accuracy: ', test_accuracy),
                         ('Epochs trained: ', start_epoch),
                         ('System parameters used: ', system_parameters)]
-            rnn_calculation.print(to_print)
+            rnn_calculation.print_out(to_print)
 
 
 if __name__ == '__main__':
