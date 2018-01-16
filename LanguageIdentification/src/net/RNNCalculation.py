@@ -72,8 +72,6 @@ class RNNCalculation(object):
             inp, target = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=data_set,
                                                                            embed_weights_rel_path=self.system_parameters['embed_weights_rel_path'],
                                                                            embed=embed)
-            
-  
             input_and_target_tensors.append((inp, target))
         return input_and_target_tensors, embed, num_classes
 
@@ -108,12 +106,14 @@ class RNNCalculation(object):
         epoch = 0
         is_improving = True
         evaluator = RNNEvaluator.RNNEvaluator(gru_model)
-	
-	# run on GPU if available
+    
+        inputs = []
+        targets = []
+        # run on GPU if available
         if (self.system_parameters['cuda_is_avail']):
-	    inputs = [tensor.cuda() for tensor in input_and_target_tensors[0][0]]
-	    targets = [tensor.cuda() for tensor in input_and_target_tensors[0][1]]
-	
+            inputs = [tensor.cuda() for tensor in input_and_target_tensors[0][0]]
+            targets = [tensor.cuda() for tensor in input_and_target_tensors[0][1]]
+    
         # stop training when validation set error stops getting smaller ==> stop when overfitting occurs
         # or when maximum number of epochs reached
         while is_improving and not epoch == self.system_parameters['num_epochs_rnn']:
