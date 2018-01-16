@@ -2,14 +2,13 @@
 
 import math
 from pathlib import Path
-import torch
+import yaml
 from embedding import EmbeddingCalculation
 from input import DataSplit, InputData
 from evaluation import RNNEvaluator
 from net import GRUModel
 import Terminal
 import UseModel
-import yaml
 
 try:
     from tweet_retriever import TweetRetriever
@@ -17,30 +16,34 @@ try:
 except ImportError:
     can_use_tweets = False
 
+
 def main():
+    
     ##############
     # PARAMETERS #
     ##############
 
-    with open("parameters.yaml", 'r') as stream:
+    with open("SystemParameters.yaml", 'r') as stream:
         system_parameters = yaml.load(stream)
 
     # SYSTEM parameters for convenience, can be removed later
-    system_parameters['create_splitted_data_files'] = False                     # split into training, validation and test set from an original file
-    system_parameters['calc_embed'] = False
-    system_parameters['train_rnn'] = False
+    system_parameters['create_splitted_data_files'] = True                     # split into training, validation and test set from an original file
+    system_parameters['calc_embed'] = True
+    system_parameters['train_rnn'] = True
     system_parameters['eval_test_set'] = True
 
-    system_parameters['print_embed_testing'] = False
-    system_parameters['print_model_checkpoint_embed_weights'] = None #"../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"#None
-    system_parameters['print_model_checkpoint'] = None#"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
+    system_parameters['print_embed_testing'] = True
+    system_parameters['print_model_checkpoint_embed_weights'] = None #"../data/save/trained/embed_weights_de_en_es_fr_it.txt"#None
+    system_parameters['print_model_checkpoint'] = None #"../data/save/trained/rnn_model_checkpoint_de_en_es_fr_it.pth"#None
 
-    system_parameters['use_terminal'] = False                                     # if True: disables all other calculations
+    system_parameters['use_terminal'] = False                                  # if True: disables all other calculations
 
     # parameters that need to be checked or reset
     if not can_use_tweets:
-        system_parameters['terminal_live_tweets'] = False #change this if you want to sample live tweets
+        system_parameters['terminal_live_tweets'] = False                      # change this if you want to sample live tweets
+    # do not work in YAML file:
     system_parameters['cuda_is_avail'] = False #torch.cuda.is_available()
+    system_parameters['fetch_only_langs'] = None #['de', 'en', 'es', 'fr', 'it'] #['de', 'en', 'es']#['el', 'fa', 'hi', 'ca']#None
     system_parameters['fetch_only_first_x_tweets'] = math.inf
 
     print('cuda on') if system_parameters['cuda_is_avail'] else print('cuda off')
@@ -50,7 +53,6 @@ def main():
     ############    
     
     # simple terminal for testing
-
     if (system_parameters['use_terminal']):
         terminal = Terminal.Terminal(system_parameters)
         terminal.use_terminal(system_parameters['terminal_live_tweets'])
@@ -105,59 +107,56 @@ def main():
     # EMBEDDING CALCULATION #
     #########################
 
-
         if (system_parameters['calc_embed']):
-    #        print(indexed_texts)
             embedding_calculation = EmbeddingCalculation.EmbeddingCalculation()
             embedding_calculation.calc_embed(train_set_indexed=train_set_indexed,
-                                         val_set_indexed=val_set_indexed,
-                                         batch_size=system_parameters['batch_size_embed'],
-                                         vocab_chars=vocab_chars,
-                                         vocab_lang=vocab_lang,
-                                         max_context_window_size=system_parameters['max_context_window_size'],
-                                         num_neg_samples=system_parameters['num_neg_samples'],
-                                         max_eval_checks_not_improved=system_parameters['max_eval_checks_not_improved_embed'],
-                                         max_num_epochs=system_parameters['max_num_epochs_embed'],
-                                         eval_every_num_batches=system_parameters['eval_every_num_batches_embed'],
-                                         lr_decay_every_num_batches=system_parameters['lr_decay_every_num_batches_embed'],
-                                         lr_decay_factor=system_parameters['lr_decay_factor_embed'],
-                                         initial_lr=system_parameters['initial_lr_embed'],
-                                         embed_weights_rel_path=system_parameters['embed_weights_rel_path'],
-                                         embed_model_checkpoint_rel_path=system_parameters['embed_model_checkpoint_rel_path'],
-                                         system_param_dict=system_parameters,
-                                         print_testing=system_parameters['print_embed_testing'],
-                                         sampling_table_min_char_count=system_parameters['sampling_table_min_char_count'],
-                                         sampling_table_specified_size_cap=system_parameters['sampling_table_specified_size_cap'])
+                                             val_set_indexed=val_set_indexed,
+                                             batch_size=system_parameters['batch_size_embed'],
+                                             vocab_chars=vocab_chars,
+                                             vocab_lang=vocab_lang,
+                                             max_context_window_size=system_parameters['max_context_window_size'],
+                                             num_neg_samples=system_parameters['num_neg_samples'],
+                                             max_eval_checks_not_improved=system_parameters['max_eval_checks_not_improved_embed'],
+                                             max_num_epochs=system_parameters['max_num_epochs_embed'],
+                                             eval_every_num_batches=system_parameters['eval_every_num_batches_embed'],
+                                             lr_decay_every_num_batches=system_parameters['lr_decay_every_num_batches_embed'],
+                                             lr_decay_factor=system_parameters['lr_decay_factor_embed'],
+                                             initial_lr=system_parameters['initial_lr_embed'],
+                                             embed_weights_rel_path=system_parameters['embed_weights_rel_path'],
+                                             embed_model_checkpoint_rel_path=system_parameters['embed_model_checkpoint_rel_path'],
+                                             system_param_dict=system_parameters,
+                                             print_testing=system_parameters['print_embed_testing'],
+                                             sampling_table_min_char_count=system_parameters['sampling_table_min_char_count'],
+                                             sampling_table_specified_size_cap=system_parameters['sampling_table_specified_size_cap'])
 
     ################
     # RNN TRAINING #
     ################
 
-    # train RNN model
-
+        # train RNN model
         if (system_parameters['train_rnn']):
-            use_model.train([train_set_indexed, val_set_indexed], vocab_lang, vocab_chars, system_parameters['model_checkpoint_rel_path'])
+            use_model.train([train_set_indexed, val_set_indexed], vocab_lang, vocab_chars, system_parameters['rnn_model_checkpoint_rel_path'])
 
     ##############
     # EVALUATION #
     ##############
 
-    # evaluate test set
+        # evaluate test set
         if (system_parameters['eval_test_set']):
-            use_model.test([test_set_indexed], system_parameters['model_checkpoint_rel_path'])
+            use_model.test([test_set_indexed], system_parameters['rnn_model_checkpoint_rel_path'])
 
-    # print saved model checkpoint from file
+        # print saved model checkpoint from file
         if (system_parameters['print_model_checkpoint'] != None and system_parameters['print_model_checkpoint_embed_weights'] != None):
             gru_model, _ = use_model.load_model_and_data([],system_parameters['print_model_checkpoint_embed_weights'])
 
             start_epoch, best_val_accuracy, test_accuracy, system_parameters, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(system_parameters['print_model_checkpoint'])
 
             to_print = [('Model:\n', gru_model),
-                        ('Epochs trained:', start_epoch),
-                        ('Best validation set accuracy:', best_val_accuracy),
-                        ('Test set accuracy:', test_accuracy),
-                        ('Epochs trained', start_epoch),
-                        ('System parameters used:', system_parameters)]
+                        ('Epochs trained: ', start_epoch),
+                        ('Best validation set accuracy: ', best_val_accuracy),
+                        ('Test set accuracy: ', test_accuracy),
+                        ('Epochs trained: ', start_epoch),
+                        ('System parameters used: ', system_parameters)]
             use_model.print(to_print)
 
 

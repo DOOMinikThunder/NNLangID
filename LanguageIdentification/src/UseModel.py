@@ -34,14 +34,13 @@ class UseModel(object):
 	def test(self, data_sets, model_path):
 		gru_model, input_and_target_tensors = self.load_model_and_data(data_sets, self.system_parameters['embed_weights_rel_path'])
 
-		start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(
-			model_path)
+		start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(model_path)
 
 		evaluator = RNNEvaluator.RNNEvaluator(gru_model)
 
-		mean_loss, accuracy, confusion_matrix, precision, recall, f1_score = evaluator.all_metrics(input_and_target_tensors[0][0],
-																								   input_and_target_tensors[0][1],
-																								   vocab_lang)
+		mean_loss, test_accuracy, confusion_matrix, precision, recall, f1_score = evaluator.all_metrics(input_and_target_tensors[0][0],
+                            																								   input_and_target_tensors[0][1],
+																								                              vocab_lang)
 		to_print = [('confusion matrix: \n', evaluator.to_string_confusion_matrix(confusion_matrix, vocab_lang, 5)),
 					('precision: ', precision),
 					('recall: ', recall),
@@ -49,7 +48,7 @@ class UseModel(object):
 					('Epochs trained: ', start_epoch),
 					('Best validation set accuracy: ', best_val_accuracy),
 					('Test set accuracy: ', test_accuracy),
-					('System parameters used:: ', self.system_parameters)]
+					('System parameters used: ', self.system_parameters)]
 		self.print(to_print)
 
 		# save test_accuracy to file
@@ -63,7 +62,7 @@ class UseModel(object):
 			'vocab_chars': vocab_chars,
 			'vocab_lang': vocab_lang,
 		},
-			model_path)
+        model_path)
 
 	def prepare_data(self, data_sets, embed_weights_path):
 		input_data = InputData.InputData()
