@@ -27,13 +27,19 @@ class GRUModel(nn.Module):
             self.num_directions = 1
         self.output_layer = nn.Linear(hidden_size * self.num_directions, num_classes)
         self.batch_size = 1     # unused dimension
+        self.cuda_is_avail = torch.cuda.is_available()
         
         self.criterion = torch.nn.NLLLoss()
         self.optimizer = optim.Adam(params=self.parameters(), lr=initial_lr, weight_decay=weight_decay)
 
 
     def initHidden(self):
-        return Variable(torch.zeros(self.num_layers * self.num_directions, self.batch_size, self.hidden_size))
+        hidden = Variable(torch.zeros(self.num_layers * self.num_directions, self.batch_size, self.hidden_size))
+        # transfer tensor to GPU if available
+        if (self.cuda_is_avail):
+            return hidden.cuda()
+        else:
+            return hidden
     
 
     def forward(self, inp, hidden=None):
