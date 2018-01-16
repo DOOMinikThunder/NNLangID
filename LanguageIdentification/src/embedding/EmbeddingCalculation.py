@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import math
-import random
 import torch
-import torch.autograd as autograd
 from torch.autograd import Variable
 from embedding import SkipGramModel
 from input import InputData
@@ -13,106 +11,7 @@ from input import InputData
 
 class EmbeddingCalculation(object):
         
-    
-    # create onehot-vectors for every char and its surrounding context chars (of all tweets)
-    # (the last onehot-vector is always the target)
-    # (context_window_size = 2 means 2 chars before and after the target char are considered)
-    def create_context_target_onehot_vectors(self, context_window_size, tweet_texts_only_embed_chars, chars_for_embed):
-        data = []
-        total_num_chars_involved = (context_window_size * 2) + 1
-        tensor_onehot = torch.FloatTensor(total_num_chars_involved, len(chars_for_embed))
-        # for each tweet: create onehot-vector for every char and its context chars
-        for tweet in tweet_texts_only_embed_chars:
-            for i in range(context_window_size, len(tweet) - context_window_size):
-                indexes = []
-                # context chars before the target
-                for j in range(context_window_size, 0, -1):
-                    indexes.append(chars_for_embed[tweet[i - j]][0])
-                # context chars after the target
-                for j in range(1, context_window_size + 1):
-                    indexes.append(chars_for_embed[tweet[i + j]][0])
-                    
-#    indexes = [chars_for_embed[tweet[i - 2]], chars_for_embed[tweet[i - 1]],
-#               chars_for_embed[tweet[i + 1]], chars_for_embed[tweet[i + 2]],
-                    
-                # the target char
-                indexes.append(chars_for_embed[tweet[i]][0])
 
-                tensor = torch.LongTensor(indexes)
-                # add 2nd dimension for scatter operation
-                tensor.unsqueeze_(1)
-      
-                # create onehot-vector out of indexes
-                tensor_onehot.zero_()
-                tensor_onehot.scatter_(1, tensor, 1)
-        
-#                print(tensor)
-#                print(tensor_onehot)
-                
-                data.append(autograd.Variable(tensor_onehot))
-        return data
-    
-    
-    def get_batched_indexed_text(self, tweet_texts_only_embed_chars, chars_for_embed, batch_size):
-        batch_tweet_texts = [[]]
-        tweet_counter = -1
-        char_counter = 0
-        batch_counter = 0
-        for tweet in tweet_texts_only_embed_chars:
-            batch_tweet_texts[batch_counter].append([])
-            tweet_counter += 1
-            for char in tweet:
-                # if batch is full: create new batch list
-                if (char_counter == batch_size):
-                    batch_counter += 1
-                    tweet_counter = 0
-                    char_counter = 0
-                    batch_tweet_texts.append([])
-                    batch_tweet_texts[batch_counter].append([])
-                    
-                batch_tweet_texts[batch_counter][tweet_counter].append(chars_for_embed[char][0])
-                char_counter += 1
-        return batch_tweet_texts
-    
-    
-    def get_batched_target_context_index_pairs(self, indexed_tweet_texts, batch_size, max_window_size):
-        pairs = [[]]
-        pair_counter = 0
-        batch_counter = 0
-        for tweet_i in range(len(indexed_tweet_texts)):
-            for index_j in range(len(indexed_tweet_texts[tweet_i])):
-                
-                # get random window size (so context chars further away from the target will have lesser weight)
-                rnd_window_size = random.randint(1, max_window_size)
-                # get pairs in the form (target_index, context_index) for the current window
-                for window_k in range(1, rnd_window_size + 1):
-                    left_context_index = index_j - window_k
-                    right_context_index = index_j + window_k
-                    
-                    # if not out of bounds to the left
-                    if (index_j - window_k >= 0):
-                        # if batch is full: create new batch list
-                        if (pair_counter == batch_size):
-                            pairs.append([])
-                            batch_counter += 1
-                            pair_counter = 0
-                        pairs[batch_counter].append((indexed_tweet_texts[tweet_i][index_j],
-                                                     indexed_tweet_texts[tweet_i][left_context_index]))
-                        pair_counter += 1
-
-                    # if not out of bounds to the right
-                    if (index_j + window_k < len(indexed_tweet_texts[tweet_i])):
-                        # if batch is full: create new batch list
-                        if (pair_counter == batch_size):
-                            pairs.append([])
-                            batch_counter += 1
-                            pair_counter = 0
-                        pairs[batch_counter].append((indexed_tweet_texts[tweet_i][index_j],
-                                                     indexed_tweet_texts[tweet_i][right_context_index]))
-                        pair_counter += 1
-        return pairs
-    
-    
     def calc_embed(self, train_set_indexed, val_set_indexed, batch_size, vocab_chars, vocab_lang, max_context_window_size, num_neg_samples, max_eval_checks_not_improved, max_num_epochs, eval_every_num_batches, lr_decay_every_num_batches, lr_decay_factor, initial_lr, embed_weights_rel_path, embed_model_checkpoint_rel_path, system_param_dict, print_testing, sampling_table_min_char_count=1, sampling_table_specified_size_cap=100000000):
         # set embedding dimension to: roundup(log2(vocabulary-size))
         embed_dim = math.ceil(math.log2(len(vocab_chars)))
@@ -125,8 +24,8 @@ class EmbeddingCalculation(object):
         train_indexed_texts = input_data.get_only_indexed_texts(train_set_indexed)
         val_indexed_texts = input_data.get_only_indexed_texts(val_set_indexed)
         
-        train_batched_pairs = self.get_batched_target_context_index_pairs(train_indexed_texts, batch_size, max_context_window_size)
-        val_batched_pairs = self.get_batched_target_context_index_pairs(val_indexed_texts, batch_size, max_context_window_size)
+        train_batched_pairs = input_data.get_batched_target_context_index_pairs(train_indexed_texts, batch_size, max_context_window_size)
+        val_batched_pairs = input_data.get_batched_target_context_index_pairs(val_indexed_texts, batch_size, max_context_window_size)
         
         skip_gram_model = SkipGramModel.SkipGramModel(vocab_chars=vocab_chars,
                                                       vocab_lang=vocab_lang,
@@ -151,7 +50,6 @@ class EmbeddingCalculation(object):
                               embed_model_checkpoint_rel_path=embed_model_checkpoint_rel_path,
                               system_param_dict=system_param_dict)
                              
-        
         ###########
         # TESTING #
         ###########
