@@ -91,11 +91,11 @@ class RNNCalculation(object):
 
         gru_model = self.load_model(embed=embed, num_classes=num_classes)
         # run on GPU if available
-        if (self.system_parameters['cuda_is_avail']):
-#            for i in range(len(inputs)):
-#                inputs = [tensor.cuda() for tensor in inputs]
-#                targets = [tensor.cuda() for tensor in targets]
-            gru_model.cuda()
+#        if (self.system_parameters['cuda_is_avail']):
+##            for i in range(len(inputs)):
+##                inputs = [tensor.cuda() for tensor in inputs]
+##                targets = [tensor.cuda() for tensor in targets]
+#            gru_model.cuda()
         return gru_model, input_and_target_tensors
 
 
@@ -113,7 +113,7 @@ class RNNCalculation(object):
         if (self.system_parameters['cuda_is_avail']):
             inputs = [tensor.cuda() for tensor in input_and_target_tensors[0][0]]
             targets = [tensor.cuda() for tensor in input_and_target_tensors[0][1]]
-    
+            gru_model.cuda()
         # stop training when validation set error stops getting smaller ==> stop when overfitting occurs
         # or when maximum number of epochs reached
         while is_improving and not epoch == self.system_parameters['num_epochs_rnn']:
