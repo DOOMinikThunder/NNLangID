@@ -72,7 +72,11 @@ class RNNCalculation(object):
             inp, target = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=data_set,
                                                                            embed_weights_rel_path=self.system_parameters['embed_weights_rel_path'],
                                                                            embed=embed)
-            input_and_target_tensors.append((inp, target))
+            # run on GPU if available
+            if (self.system_parameters['cuda_is_avail']):
+                input_and_target_tensors.append(([tensor.cuda() for tensor in inp], [tensor.cuda() for tensor in target]))
+            else:
+                input_and_target_tensors.append((inp, target))
         return input_and_target_tensors, embed, num_classes
 
     def load_model(self, embed, num_classes):
@@ -91,11 +95,11 @@ class RNNCalculation(object):
 
         gru_model = self.load_model(embed=embed, num_classes=num_classes)
         # run on GPU if available
-#        if (self.system_parameters['cuda_is_avail']):
-##            for i in range(len(inputs)):
-##                inputs = [tensor.cuda() for tensor in inputs]
-##                targets = [tensor.cuda() for tensor in targets]
-#            gru_model.cuda()
+        if (self.system_parameters['cuda_is_avail']):
+#            for i in range(len(inputs)):
+#                inputs = [tensor.cuda() for tensor in inputs]
+#                targets = [tensor.cuda() for tensor in targets]
+            gru_model.cuda()
         return gru_model, input_and_target_tensors
 
 
@@ -107,28 +111,28 @@ class RNNCalculation(object):
         is_improving = True
         evaluator = RNNEvaluator.RNNEvaluator(gru_model)
     
-        inputs_train = []
-        targets_train = []
-        inputs_val = []
-        targets_val = []
-        # run on GPU if available
-        if (self.system_parameters['cuda_is_avail']):
-            inputs_train = [tensor.cuda() for tensor in input_and_target_tensors[0][0]]
-            targets_train = [tensor.cuda() for tensor in input_and_target_tensors[0][1]]
-            inputs_val = [tensor.cuda() for tensor in input_and_target_tensors[1][0]]
-            targets_val = [tensor.cuda() for tensor in input_and_target_tensors[1][1]]
-            gru_model.cuda()
+#        inputs_train = []
+#        targets_train = []
+#        inputs_val = []
+#        targets_val = []
+#        # run on GPU if available
+#        if (self.system_parameters['cuda_is_avail']):
+#            inputs_train = [tensor.cuda() for tensor in input_and_target_tensors[0][0]]
+#            targets_train = [tensor.cuda() for tensor in input_and_target_tensors[0][1]]
+#            inputs_val = [tensor.cuda() for tensor in input_and_target_tensors[1][0]]
+#            targets_val = [tensor.cuda() for tensor in input_and_target_tensors[1][1]]
+#            gru_model.cuda()
         # stop training when validation set error stops getting smaller ==> stop when overfitting occurs
         # or when maximum number of epochs reached
         while is_improving and not epoch == self.system_parameters['num_epochs_rnn']:
             print('RNN epoch:', epoch)
             # inputs: whole data set, every date contains the embedding of one char in one dimension
             # targets: whole target set, target is set for each character embedding
-            gru_model.train(inputs=inputs_train,
-                            targets=targets_train,
+            gru_model.train(inputs= input_and_target_tensors[0][0],
+                            targets=input_and_target_tensors[0][1],
                             batch_size=self.system_parameters['batch_size_rnn'])
             # evaluate validation set
-            val_mean_loss = self.evaluate_validation(epoch, evaluator, inputs_val, targets_val, vocab_lang)
+            val_mean_loss = self.evaluate_validation(epoch, evaluator, input_and_target_tensors[1][0], input_and_target_tensors[1][1], vocab_lang)
 
             # check if accuracy improved and if so, save model checkpoint to file
             if (best_val_accuracy < cur_val_accuracy):
