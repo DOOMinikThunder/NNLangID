@@ -3,6 +3,7 @@
 import math
 from pathlib import Path
 import yaml
+import torch
 from embedding import EmbeddingCalculation
 from input import DataSplit, InputData
 from evaluation import RNNEvaluator, Terminal
