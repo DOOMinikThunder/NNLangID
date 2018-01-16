@@ -52,7 +52,7 @@ def main():
     if (system_parameters['cuda_is_avail']):
         print('cuda on')
     else:
-    		print('cuda off')
+            print('cuda off')
 
     ############
     # TERMINAL #
