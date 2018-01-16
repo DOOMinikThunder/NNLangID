@@ -12,7 +12,7 @@ class GRUModel(nn.Module):
     
     
     def __init__(self, input_size, hidden_size, num_layers, num_classes, is_bidirectional, initial_lr, weight_decay):
-        super().__init__()
+        super(GRUModel, self).__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.num_classes = num_classes

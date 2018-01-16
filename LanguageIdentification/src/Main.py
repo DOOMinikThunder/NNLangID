@@ -20,9 +20,13 @@ def main():
     ##############
     # PARAMETERS #
     ##############
-
-    with open("SystemParameters.yaml", 'r') as stream:
-        system_parameters = yaml.load(stream)
+    use_cluster_params = False                                                 # set True only for use on cluster
+    if(not use_cluster_params):
+        with open("SystemParameters.yaml", 'r') as stream:
+            system_parameters = yaml.load(stream)
+    else:
+        with open("SystemParametersCluster.yaml", 'r') as stream:
+            system_parameters = yaml.load(stream)
 
     # SYSTEM parameters for convenience, can be removed later
     system_parameters['create_splitted_data_files'] = True                     # split into training, validation and test set from an original file
@@ -42,9 +46,12 @@ def main():
     # do not work in YAML file:
     system_parameters['cuda_is_avail'] = False #torch.cuda.is_available()
     system_parameters['fetch_only_langs'] = None #['de', 'en', 'es', 'fr', 'it'] #['de', 'en', 'es']#['el', 'fa', 'hi', 'ca']#None
-    system_parameters['fetch_only_first_x_tweets'] = math.inf
+    system_parameters['fetch_only_first_x_tweets'] = float('inf')
 
-    print('cuda on') if system_parameters['cuda_is_avail'] else print('cuda off')
+    if (system_parameters['cuda_is_avail']):
+        print('cuda on')
+    else:
+    		print('cuda off')
 
     ############
     # TERMINAL #

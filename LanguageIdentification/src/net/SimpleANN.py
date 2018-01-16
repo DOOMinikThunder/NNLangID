@@ -18,7 +18,7 @@ target = autograd.Variable((torch.rand(batch_size)*num_classes).long())
 
 class Net(nn.Module):
 	def __init__(self, input_size, hidden_size, num_classes):
-		super().__init__()
+		super(Net, self).__init__()
 		self.h1 = nn.Linear(input_size, hidden_size)
 		self.h2 = nn.Linear(hidden_size, num_classes)
 

@@ -8,7 +8,7 @@ class SimpleRNN(nn.Module):
     
     
     def __init__(self, input_size, hidden_size, num_layers, num_classes):
-        super().__init__()
+        super(SimpleRNN, self).__init__()
         self.rnn_layer = nn.RNN(input_size=input_size,
                                 hidden_size=hidden_size,
                                 num_layers=num_layers,

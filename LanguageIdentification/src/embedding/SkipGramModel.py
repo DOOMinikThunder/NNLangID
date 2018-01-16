@@ -22,15 +22,16 @@ class SkipGramModel(nn.Module):
 
     
     def __init__(self, vocab_chars, vocab_lang, embed_dim, initial_lr, sampling_table_min_char_count=1, sampling_table_specified_size_cap=100000000):
-        super().__init__()
+        super(SkipGramModel, self).__init__()
+
         self.vocab_chars = vocab_chars
         self.vocab_lang = vocab_lang
         self.vocab_chars_size = len(vocab_chars)
         self.vocab_lang_size = len(vocab_lang)
         self.embed_dim = embed_dim
         self.lr = initial_lr
-        self.embed_hidden = nn.Embedding(self.vocab_chars_size, embed_dim, sparse=True)
-        self.embed_output = nn.Embedding(self.vocab_chars_size, embed_dim, sparse=True)
+        self.embed_hidden = nn.Embedding(self.vocab_chars_size, int(embed_dim), sparse=True)
+        self.embed_output = nn.Embedding(self.vocab_chars_size, int(embed_dim), sparse=True)
         self.sampling_table = []
         self.init_embed()
         self.init_sampling_table(vocab_chars, sampling_table_min_char_count, sampling_table_specified_size_cap)

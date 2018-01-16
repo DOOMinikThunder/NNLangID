@@ -14,7 +14,7 @@ class EmbeddingCalculation(object):
 
     def calc_embed(self, train_set_indexed, val_set_indexed, batch_size, vocab_chars, vocab_lang, max_context_window_size, num_neg_samples, max_eval_checks_not_improved, max_num_epochs, eval_every_num_batches, lr_decay_every_num_batches, lr_decay_factor, initial_lr, embed_weights_rel_path, embed_model_checkpoint_rel_path, system_param_dict, print_testing, sampling_table_min_char_count=1, sampling_table_specified_size_cap=100000000):
         # set embedding dimension to: roundup(log2(vocabulary-size))
-        embed_dim = math.ceil(math.log2(len(vocab_chars)))
+        embed_dim = math.ceil(math.log(len(vocab_chars),2))
         
         ##########################################
         # SKIP-GRAM-MODEL WITH NEGATIVE SAMPLING #
