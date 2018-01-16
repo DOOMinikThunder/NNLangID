@@ -28,7 +28,7 @@ class RNNCalculation(object):
 					('Epoch: ', epoch),
 					('validation set accuracy: ', cur_val_accuracy),
 					('validation mean loss: ', val_mean_loss)]
-		self.print(to_print)
+		self.print_out(to_print)
 		return val_mean_loss
 
 	def test(self, data_sets, model_path):
@@ -49,7 +49,7 @@ class RNNCalculation(object):
 					('Best validation set accuracy: ', best_val_accuracy),
 					('Test set accuracy: ', test_accuracy),
 					('System parameters used: ', self.system_parameters)]
-		self.print(to_print)
+		self.print_out(to_print)
 
 		# save test_accuracy to file
 		gru_model.save_model_checkpoint_to_file({
@@ -140,5 +140,5 @@ class RNNCalculation(object):
 	def print_out(self, string_date_tuple):
 		for string, date in string_date_tuple:
 			print('========================================')
-			print(string, date, sep="")
+			print(string, date)
 		print('========================================')

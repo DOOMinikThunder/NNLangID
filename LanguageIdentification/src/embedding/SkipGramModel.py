@@ -50,7 +50,7 @@ class SkipGramModel(nn.Module):
     def init_sampling_table(self, vocab_chars, min_char_count=1, specified_size_cap=100000000):
         char_pow_frequencies = {}
         char_pow_frequencies_acc = 0
-        min_char_pow_frequency = math.inf
+        min_char_pow_frequency = float('inf')
         for char in vocab_chars:
             char_pow_frequency = math.pow(vocab_chars[char][1], 0.75)
             char_pow_frequencies_acc = char_pow_frequencies_acc + char_pow_frequency
@@ -114,8 +114,8 @@ class SkipGramModel(nn.Module):
     def train(self, train_batched_pairs, val_batched_pairs, num_neg_samples, max_eval_checks_not_improved, max_num_epochs, eval_every_num_batches, lr_decay_every_num_batches, lr_decay_factor, embed_weights_rel_path, embed_model_checkpoint_rel_path, system_param_dict):
         num_train_batched_pairs_minus_one = len(train_batched_pairs) - 1
         max_eval_checks_not_improved_minus_one = max_eval_checks_not_improved - 1
-        best_val_mean_loss = math.inf
-        cur_val_mean_loss = math.inf
+        best_val_mean_loss = float('inf')
+        cur_val_mean_loss = float('inf')
         epoch = 0
         total_trained_batches_counter = 0
         eval_checks_not_improved_counter = 0

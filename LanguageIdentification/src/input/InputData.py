@@ -11,7 +11,7 @@ import random
 class InputData(object):
         
         
-    def fetch_tweet_texts_and_lang_from_file(self, relative_path_to_file, fetch_only_langs=None, fetch_only_first_x_tweets=math.inf):
+    def fetch_tweet_texts_and_lang_from_file(self, relative_path_to_file, fetch_only_langs=None, fetch_only_first_x_tweets=float('inf')):
         texts_and_lang = []
         with open(relative_path_to_file, 'rb') as file:
             reader = csv.reader(file, delimiter=';', encoding='utf-8')
