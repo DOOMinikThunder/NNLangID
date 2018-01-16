@@ -7,249 +7,73 @@ from embedding import EmbeddingCalculation
 from input import DataSplit, InputData
 from evaluation import RNNEvaluator
 from net import GRUModel
+import Terminal
+import UseModel
+import yaml
+
 try:
     from tweet_retriever import TweetRetriever
     can_use_tweets = True
 except ImportError:
     can_use_tweets = False
 
-def str_to_int(string):
-    try:
-        number = int(string)
-        return number
-    except:
-        print("Not a number")
-        return 0
-
-
-
 def main():
-
-
     ##############
     # PARAMETERS #
     ##############
 
+    with open("parameters.yaml", 'r') as stream:
+        system_parameters = yaml.load(stream)
 
-    # SYSTEM
-    create_splitted_data_files = False                     # split into training, validation and test set from an original file
-    calc_embed = False
-    train_rnn = False
-    eval_test_set = False
-    
-    print_embed_testing = False
-    print_model_checkpoint_embed_weights = None#"../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"#None
-    print_model_checkpoint = None#"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
-    
-    terminal = False                                      # if True: disables all other calculations
-    if can_use_tweets:
-        terminal_live_tweets = True #change this if you want to sample live tweets
-    else:
-        terminal_live_tweets = False
+    # SYSTEM parameters for convenience, can be removed later
+    system_parameters['create_splitted_data_files'] = False                     # split into training, validation and test set from an original file
+    system_parameters['calc_embed'] = False
+    system_parameters['train_rnn'] = False
+    system_parameters['eval_test_set'] = True
 
-    
-    # DATA
-    #input_tr_va_te_data_rel_path = "../data/input_data/original/recall_oriented_dl.csv" #training, validation and test will be generated from this file
-#    input_tr_va_te_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #training, validation and test will be generated from this file
-    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_embed.csv" #training, validation and test will be generated from this file
-#    input_tr_va_te_data_rel_path = "../data/input_data/testing/test_recall_de_en_es.csv" #training, validation and test will be generated from this file
-    input_rt_data_rel_path = "../data/input_data/original/uniformly_sampled_dl.csv" #to change later, rt = real test
-    
-    embed_weights_rel_path = "../data/save/embed_weights.txt"
-    embed_model_checkpoint_rel_path = "../data/save/embed_model_checkpoint.pth"
-    rnn_model_checkpoint_rel_path = "../data/save/rnn_model_checkpoint.pth"
-    
-#    trained_embed_weights_rel_path = "../data/save/embed_weights.txt"
-    trained_embed_weights_rel_path = "../data/save/trained/embed_weights_de_en_es_fr_it.txt"
-#    trained_rnn_model_checkpoint_rel_path = "../data/save/rnn_model_checkpoint.pth"
-    trained_rnn_model_checkpoint_rel_path = "../data/save/trained/rnn_model_checkpoint_de_en_es_fr_it.pth"
-    
-    tr_va_te_split_ratios = [0.8, 0.1, 0.1]                  # [train_ratio, val_ratio, test_ratio]
-    split_shuffle_seed = 42                                  # ensures that splitted sets (training, validation, test) are always created identically (given a specified ratio)
-    fetch_only_langs = None#['pl', 'sv']#['de', 'en', 'es', 'fr', 'it']#['de', 'en', 'es']#['el', 'fa', 'hi', 'ca']#None
-    fetch_only_first_x_tweets = math.inf#5
-    min_char_frequency = 2                                   # chars appearing less than min_char_frequency in the training set will not be used to create the vocabulary vocab_chars
-    
-    
-    # HYPERPARAMETERS EMBEDDING
-    sampling_table_min_char_count = 1                        # determines the precision of the sampling (should be 10 or higher)
-    sampling_table_specified_size_cap = math.inf#1000        # caps specified sampling table size to this value (no matter how big it would be according to sampling_table_min_char_count)
-                                                             # note: this is only the specified size, the actual table size may slightly deviate due to roundings in the calculation
-#    embed_dim = 2                                           # will be set automatically later to: roundup(log2(vocabulary-size))
-    max_context_window_size = 3
-    num_neg_samples = 5
-    batch_size_embed = 1
-    max_eval_checks_not_improved_embed = 10
-    max_num_epochs_embed = math.inf#10#math.inf
-    eval_every_num_batches_embed = 1000
-    lr_decay_every_num_batches_embed = eval_every_num_batches_embed
-    lr_decay_factor_embed = 1.0                              # 1.0 means no decay
-    initial_lr_embed = 0.025
-    
-   
-    # HYPERPARAMETERS RNN
-#    input_size = list(train_embed_char_text_inp_tensors[0].size())[2]
-#    num_classes = len(vocab_lang)
-    hidden_size_rnn = 100
-    num_layers_rnn = 1
-    is_bidirectional = True
-    batch_size_rnn = 10
-    initial_lr_rnn = 0.01
-    scheduler_step_size_rnn = 1                              # currently not functioning
-    scheduler_gamma_rnn = 0.1                                # currently not functioning
-    weight_decay_rnn = 0.00001
-    num_epochs_rnn = 10#math.inf#2
+    system_parameters['print_embed_testing'] = False
+    system_parameters['print_model_checkpoint_embed_weights'] = None #"../data/embed_weights/trained/embed_weights_de_en_es_fr_it_und.txt"#None
+    system_parameters['print_model_checkpoint'] = None#"../data/model_checkpoints/trained/model_checkpoint_de_en_es_fr_it_und.pth"#None
 
-    
-    # set dict to later store parameters to file
-    system_param_dict = {
-        # SYSTEM
-        'create_splitted_data_files' : create_splitted_data_files,
-        'calc_embed' : calc_embed,
-        'train_rnn' : train_rnn,
-        'eval_test_set' : eval_test_set,
-        'print_embed_testing': print_embed_testing,
-        'print_model_checkpoint_embed_weights' : print_model_checkpoint_embed_weights,
-        'print_model_checkpoint' : print_model_checkpoint,
-        'terminal' : terminal,
-        # DATA
-        'input_tr_va_te_data_rel_path' : input_tr_va_te_data_rel_path,
-        'input_rt_data_rel_path' : input_rt_data_rel_path,
-        'embed_weights_rel_path' : embed_weights_rel_path,
-        'embed_model_checkpoint_rel_path' : embed_model_checkpoint_rel_path,
-        'rnn_model_checkpoint_rel_path' : rnn_model_checkpoint_rel_path,
-        'trained_embed_weights_rel_path' : trained_embed_weights_rel_path,
-        'trained_rnn_model_checkpoint_rel_path' : trained_rnn_model_checkpoint_rel_path,
-        'tr_va_te_split_ratios' : tr_va_te_split_ratios,
-        'split_shuffle_seed' : split_shuffle_seed,
-        'fetch_only_langs' : fetch_only_langs,
-        'fetch_only_first_x_tweets' : fetch_only_first_x_tweets,
-        'min_char_frequency' : min_char_frequency,
-        # HYPERPARAMETERS EMBEDDING
-        'sampling_table_min_char_count' : sampling_table_min_char_count,
-        'sampling_table_specified_size_cap' : sampling_table_specified_size_cap,
-        'max_context_window_size' : max_context_window_size,
-        'num_neg_samples' : num_neg_samples,
-        'batch_size_embed' : batch_size_embed,
-        'max_eval_checks_not_improved_embed' : max_eval_checks_not_improved_embed,
-        'max_num_epochs_embed' : max_num_epochs_embed,
-        'eval_every_num_batches_embed' : eval_every_num_batches_embed,
-        'lr_decay_every_num_batches_embed' : lr_decay_every_num_batches_embed,
-        'lr_decay_factor_embed' : lr_decay_factor_embed,
-        'initial_lr_embed' : initial_lr_embed,
-        # HYPERPARAMETERS RNN
-        'hidden_size_rnn' : hidden_size_rnn,
-        'num_layers_rnn' : num_layers_rnn,
-        'is_bidirectional' : is_bidirectional,
-        'batch_size_rnn' : batch_size_rnn,
-        'initial_lr_rnn' : initial_lr_rnn,
-        'scheduler_step_size_rnn' : scheduler_step_size_rnn,
-        'scheduler_gamma_rnn' : scheduler_gamma_rnn,
-        'weight_decay_rnn' : weight_decay_rnn,
-        'num_epochs_rnn' : num_epochs_rnn,
-        }
-    
-    
-    cuda_is_avail = torch.cuda.is_available()
-    cuda_is_avail = False #cuda not working on some builds
-    print('cuda on') if cuda_is_avail else print('cuda off')
-    
- 
+    system_parameters['use_terminal'] = False                                     # if True: disables all other calculations
+
+    # parameters that need to be checked or reset
+    if not can_use_tweets:
+        system_parameters['terminal_live_tweets'] = False #change this if you want to sample live tweets
+    system_parameters['cuda_is_avail'] = False #torch.cuda.is_available()
+    system_parameters['fetch_only_first_x_tweets'] = math.inf
+
+    print('cuda on') if system_parameters['cuda_is_avail'] else print('cuda off')
+
     ############
     # TERMINAL #
     ############    
     
     # simple terminal for testing
-    if (terminal):
-        input_data = InputData.InputData()
-        embed, num_classes = input_data.create_embed_from_weights_file(trained_embed_weights_rel_path)
-        gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],    # equals embedding dimension
-                                      hidden_size=hidden_size_rnn,
-                                      num_layers=num_layers_rnn,
-                                      num_classes=num_classes,
-                                      is_bidirectional=is_bidirectional,
-                                      initial_lr=initial_lr_rnn,
-                                      weight_decay=weight_decay_rnn)
-        start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(trained_rnn_model_checkpoint_rel_path)
-        # run on GPU if available
-        if (cuda_is_avail):
-            gru_model.cuda()
-        rnn_evaluator = RNNEvaluator.RNNEvaluator(gru_model)
-        lang2index, index2lang = input_data.get_string2index_and_index2string(vocab_lang)
-        
-        input_text = ''
 
-        if terminal_live_tweets:
-            tweet_retriever = TweetRetriever.TweetRetriever()
+    if (system_parameters['use_terminal']):
+        terminal = Terminal.Terminal(system_parameters)
+        terminal.use_terminal(system_parameters['terminal_live_tweets'])
+    else:
 
-        while input_text != 'exit':
-            if terminal_live_tweets:
-                amount = str_to_int(input("Specify an amount and press Enter to sample live tweets: "))
-                track = input("(Optional) Specify a keyword to search in tweets: ")
-                if track != "":
-                    language = input("(Optional) Specify a language identifier to search in tweets: ")
-                    if language in vocab_lang:
-                        sample_tweets = tweet_retriever.retrieve_specified_track_and_language(amount, track, language)
-                    else:
-                        print("ERROR: not a language identifier")
-                        continue
-                else:
-                    sample_tweets = tweet_retriever.retrieve_sample_tweets(amount)
-                input_text =  list(sample_tweets.values())
-                input_text_lang_tuple = [(text, index2lang[0]) for text in input_text]
-            else:
-                input_text = [input('Enter text: ')]
-                input_text_lang_tuple = [(input_text[0], index2lang[0])]  # language must be in vocab_lang
-            
-            filtered_texts_and_lang = input_data.filter_out_irrelevant_tweet_parts(input_text_lang_tuple)
-            #print('filtered_texts_and_lang',filtered_texts_and_lang)
-            input_text_only_vocab_chars = input_data.get_texts_with_only_vocab_chars(filtered_texts_and_lang, vocab_chars)
-            #print('input_text_only_vocab_chars', input_text_only_vocab_chars)
-            input_text_indexed = input_data.get_indexed_texts_and_lang(input_text_only_vocab_chars, vocab_chars, vocab_lang)
-            #print('input_text_indexed',input_text_indexed)
-            input_text_embed_char_text_inp_tensors, input_text_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=input_text_indexed,
-                                                                                                                                 embed_weights_rel_path=trained_embed_weights_rel_path,
-                                                                                                                                 embed=embed)
-            # transfer tensors to GPU if available
-            if (cuda_is_avail):
-                input_text_embed_char_text_inp_tensors = input_text_embed_char_text_inp_tensors.cuda()
-                input_text_target_tensors = input_text_target_tensors.cuda()
-
-            n_highest_probs = 5
-            for i, input_tensor in enumerate(input_text_embed_char_text_inp_tensors):
-                lang_prediction,_ = rnn_evaluator.evaluate_single_date(input_tensor, n_highest_probs)
-                print("====================\ntweet detected: \n\n%s\n"%input_text[i])
-
-                # print n_highest_probs for input
-                print('Language:')
-                for i in range(len(lang_prediction)):
-                    if (i == 0):
-                        print("{0:.2f}".format(lang_prediction[i][0]*100)+ "%: "+ str(index2lang[lang_prediction[i][1]])+"\n")
-                    else:
-                        print("{0:.2f}".format(lang_prediction[i][0]*100)+ "%: "+ str(index2lang[lang_prediction[i][1]]))
-    
-        
     ########################
     # DATA FILES SPLITTING #
     ########################
-    
-    if (not terminal):
+
         # split into training, validation and test set from an original file
-        out_tr_data_rel_path = "../data/input_data/original_splitted/training.csv"
-        out_va_data_rel_path = "../data/input_data/original_splitted/validation.csv"
-        out_te_data_rel_path = "../data/input_data/original_splitted/test.csv"
-        files_exist = Path(out_tr_data_rel_path).is_file() and Path(out_va_data_rel_path).is_file() and Path(out_te_data_rel_path).is_file()
-        if (create_splitted_data_files or not files_exist):
-            out_filenames = [out_tr_data_rel_path, out_va_data_rel_path, out_te_data_rel_path] #same size as ratios
+        files_exist = Path(system_parameters['out_tr_data_rel_path']).is_file() and Path(system_parameters['out_va_data_rel_path']).is_file() and Path(system_parameters['out_te_data_rel_path']).is_file()
+        if (system_parameters['create_splitted_data_files'] or not files_exist):
+            out_filenames = [system_parameters['out_tr_data_rel_path'], system_parameters['out_va_data_rel_path'], system_parameters['out_te_data_rel_path']] #same size as ratios
             data_splitter = DataSplit.DataSplit()
-            splitted_data = data_splitter.split_percent_of_languages(input_tr_va_te_data_rel_path, tr_va_te_split_ratios, out_filenames, split_shuffle_seed)
-    
+            splitted_data = data_splitter.split_percent_of_languages(system_parameters['input_tr_va_te_data_rel_path'],
+                                                                     system_parameters['tr_va_te_split_ratios'],
+                                                                     out_filenames,
+                                                                     system_parameters['split_shuffle_seed'])
 
     ###################################
     # DATA RETRIEVAL & TRANSFORMATION #
     ###################################
 
-    if (not terminal):
         input_data = InputData.InputData()
         """
         train_set_indexed: list of every date where each character and target gets unique id, e.g. 
@@ -262,226 +86,79 @@ def main():
             {'de': (0, 32)}
         """
         train_set_indexed, val_set_indexed, test_set_indexed, real_test_set_indexed, vocab_chars, vocab_lang = input_data.get_indexed_data(
-            train_data_rel_path=out_tr_data_rel_path,
-            validation_data_rel_path=out_va_data_rel_path,
-            test_data_rel_path=out_te_data_rel_path,
-            real_test_data_rel_path=input_rt_data_rel_path,
-            min_char_frequency=min_char_frequency,
-            fetch_only_langs=fetch_only_langs,
-            fetch_only_first_x_tweets=fetch_only_first_x_tweets)
+            train_data_rel_path=system_parameters['out_tr_data_rel_path'],
+            validation_data_rel_path=system_parameters['out_va_data_rel_path'],
+            test_data_rel_path=system_parameters['out_te_data_rel_path'],
+            real_test_data_rel_path=system_parameters['input_rt_data_rel_path'],
+            min_char_frequency=system_parameters['min_char_frequency'],
+            fetch_only_langs=system_parameters['fetch_only_langs'],
+            fetch_only_first_x_tweets=system_parameters['fetch_only_first_x_tweets'])
 #        print(train_set_indexed, val_set_indexed, test_set_indexed)
 #        print(vocab_chars)
 #        print(len(vocab_chars))
 #        print(vocab_lang)
 #        print(len(vocab_lang))
 
+        use_model = UseModel.UseModel(system_parameters)
 
     #########################
     # EMBEDDING CALCULATION #
     #########################
-    
-    if (not terminal and calc_embed):
-        embedding_calculation = EmbeddingCalculation.EmbeddingCalculation()
-        embedding_calculation.calc_embed(train_set_indexed=train_set_indexed,
+
+
+        if (system_parameters['calc_embed']):
+    #        print(indexed_texts)
+            embedding_calculation = EmbeddingCalculation.EmbeddingCalculation()
+            embedding_calculation.calc_embed(train_set_indexed=train_set_indexed,
                                          val_set_indexed=val_set_indexed,
-                                         batch_size=batch_size_embed,
+                                         batch_size=system_parameters['batch_size_embed'],
                                          vocab_chars=vocab_chars,
                                          vocab_lang=vocab_lang,
-                                         max_context_window_size=max_context_window_size,
-                                         num_neg_samples=num_neg_samples,
-                                         max_eval_checks_not_improved=max_eval_checks_not_improved_embed,
-                                         max_num_epochs=max_num_epochs_embed,
-                                         eval_every_num_batches=eval_every_num_batches_embed,
-                                         lr_decay_every_num_batches=lr_decay_every_num_batches_embed,
-                                         lr_decay_factor=lr_decay_factor_embed,
-                                         initial_lr=initial_lr_embed,
-                                         embed_weights_rel_path=embed_weights_rel_path,
-                                         embed_model_checkpoint_rel_path=embed_model_checkpoint_rel_path,
-                                         system_param_dict=system_param_dict,
-                                         print_testing=print_embed_testing,
-                                         sampling_table_min_char_count=sampling_table_min_char_count,
-                                         sampling_table_specified_size_cap=sampling_table_specified_size_cap)
-        
-    
+                                         max_context_window_size=system_parameters['max_context_window_size'],
+                                         num_neg_samples=system_parameters['num_neg_samples'],
+                                         max_eval_checks_not_improved=system_parameters['max_eval_checks_not_improved_embed'],
+                                         max_num_epochs=system_parameters['max_num_epochs_embed'],
+                                         eval_every_num_batches=system_parameters['eval_every_num_batches_embed'],
+                                         lr_decay_every_num_batches=system_parameters['lr_decay_every_num_batches_embed'],
+                                         lr_decay_factor=system_parameters['lr_decay_factor_embed'],
+                                         initial_lr=system_parameters['initial_lr_embed'],
+                                         embed_weights_rel_path=system_parameters['embed_weights_rel_path'],
+                                         embed_model_checkpoint_rel_path=system_parameters['embed_model_checkpoint_rel_path'],
+                                         system_param_dict=system_parameters,
+                                         print_testing=system_parameters['print_embed_testing'],
+                                         sampling_table_min_char_count=system_parameters['sampling_table_min_char_count'],
+                                         sampling_table_specified_size_cap=system_parameters['sampling_table_specified_size_cap'])
+
     ################
     # RNN TRAINING #
     ################
 
     # train RNN model
-    if (not terminal and train_rnn):
-        embed, num_classes = input_data.create_embed_from_weights_file(trained_embed_weights_rel_path)
-        train_embed_char_text_inp_tensors, train_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=train_set_indexed,
-                                                                                                                   embed_weights_rel_path=embed_weights_rel_path,
-                                                                                                                   embed=embed)
-        val_embed_char_text_inp_tensors, val_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=val_set_indexed,
-                                                                                                               embed_weights_rel_path=embed_weights_rel_path,
-                                                                                                               embed=embed)
-        # transfer tensors to GPU if available
-        if (cuda_is_avail):
-            train_embed_char_text_inp_tensors = [tensor.cuda() for tensor in train_embed_char_text_inp_tensors]
-            train_target_tensors = [tensor.cuda() for tensor in train_target_tensors]
-            val_embed_char_text_inp_tensors = [tensor.cuda() for tensor in val_embed_char_text_inp_tensors]
-            val_target_tensors = [tensor.cuda() for tensor in val_target_tensors]
 
-        gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],  # equals embedding dimension
-                                      hidden_size=hidden_size_rnn,
-                                      num_layers=num_layers_rnn,
-                                      num_classes=num_classes,
-                                      is_bidirectional=is_bidirectional,
-                                      initial_lr=initial_lr_rnn,
-                                      weight_decay=weight_decay_rnn)
-        # run on GPU if available
-        if (cuda_is_avail):
-            gru_model.cuda()
-        print('Model:\n', gru_model)
-        rnn_evaluator = RNNEvaluator.RNNEvaluator(gru_model)
-        
-        cur_val_accuracy = 0
-        best_val_accuracy = -1.0
+        if (system_parameters['train_rnn']):
+            use_model.train([train_set_indexed, val_set_indexed], vocab_lang, vocab_chars, system_parameters['model_checkpoint_rel_path'])
 
-        epoch = 0
-        is_improving = True
-        # stop training when validation set error stops getting smaller ==> stop when overfitting occurs
-        # or when maximum number of epochs reached
-        while is_improving and not epoch == num_epochs_rnn:
-            print('RNN epoch:', epoch)
-            # inputs: whole data set, every date contains the embedding of one char in one dimension
-            # targets: whole target set, target is set for each character embedding
-            gru_model.train(inputs=train_embed_char_text_inp_tensors,
-                            targets=train_target_tensors,
-                            batch_size=batch_size_rnn)
-            
-            # evaluate validation set
-            val_mean_loss, predictions, targets = rnn_evaluator.evaluate_data_set(val_embed_char_text_inp_tensors,
-                                                                                  val_target_tensors,
-                                                                                  vocab_lang)
-            cur_val_accuracy = rnn_evaluator.accuracy(predictions, targets)
-            val_conf_matrix = rnn_evaluator.confusion_matrix(predictions, targets, vocab_lang)
-            print('========================================')
-            print('confusion matrix:\n')
-            print(rnn_evaluator.to_string_confusion_matrix(confusion_matrix=val_conf_matrix, vocab_lang=vocab_lang, pad=5))
-            print('========================================')
-            print('Epoch', epoch, 'validation set accuracy:', cur_val_accuracy)
-            print('========================================')
-            print('Epoch', epoch, 'validation mean loss:', val_mean_loss)
-            print('========================================')
-            
-            # check if accuracy improved and if so, save model checkpoint to file
-            if (best_val_accuracy < cur_val_accuracy):
-                best_val_accuracy = cur_val_accuracy
-                gru_model.save_model_checkpoint_to_file({
-                                            'start_epoch': epoch + 1,
-                                            'best_val_accuracy': best_val_accuracy,
-                                            'test_accuracy' : -1.0,
-                                            'state_dict': gru_model.state_dict(),
-                                            'optimizer': gru_model.optimizer.state_dict(),
-                                            'system_param_dict' : system_param_dict,
-                                            'vocab_chars' : vocab_chars,
-                                            'vocab_lang' : vocab_lang,
-                                            },
-                                            rnn_model_checkpoint_rel_path)
-            else:
-                is_improving = False
-            epoch += 1
-           
-            
     ##############
     # EVALUATION #
     ##############
-    
+
     # evaluate test set
-    if (not terminal and eval_test_set):
-        input_data = InputData.InputData()
-        embed, num_classes = input_data.create_embed_from_weights_file(embed_weights_rel_path)
-        test_embed_char_text_inp_tensors, test_target_tensors = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=test_set_indexed,
-                                                                                                                 embed_weights_rel_path=embed_weights_rel_path,
-                                                                                                                 embed=embed)
-        # transfer tensors to GPU if available
-        if (cuda_is_avail):
-            test_embed_char_text_inp_tensors = test_embed_char_text_inp_tensors.cuda()
-            test_target_tensors = test_target_tensors.cuda()
-            
-        gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],    # equals embedding dimension
-                                      hidden_size=hidden_size_rnn,
-                                      num_layers=num_layers_rnn,
-                                      num_classes=num_classes,
-                                      is_bidirectional=is_bidirectional,
-                                      initial_lr=initial_lr_rnn,
-                                      weight_decay=weight_decay_rnn)
-        start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(rnn_model_checkpoint_rel_path)
-        # run on GPU if available
-        if (cuda_is_avail):
-            gru_model.cuda()
-        rnn_evaluator = RNNEvaluator.RNNEvaluator(gru_model)
-        
-        test_mean_loss, predictions, targets = rnn_evaluator.evaluate_data_set(test_embed_char_text_inp_tensors,
-                                                                      test_target_tensors,
-                                                                      vocab_lang)
-        test_accuracy = rnn_evaluator.accuracy(predictions, targets)
-        confusion_matrix = rnn_evaluator.confusion_matrix(predictions, targets, vocab_lang)
-        precision = rnn_evaluator.precision(confusion_matrix)
-        recall = rnn_evaluator.recall(confusion_matrix)
-        f1_score = rnn_evaluator.f1_score(precision, recall)
-
-        print('========================================')
-        print('confusion matrix\n', rnn_evaluator.to_string_confusion_matrix(confusion_matrix, vocab_lang, 5))
-        print('========================================')
-        print('precision', precision)
-        print('recall', recall)
-        print('f1_score', f1_score)
-        print('========================================')
-        print('Epochs trained:', start_epoch)
-        print('========================================')
-        print('Best validation set accuracy:', best_val_accuracy)
-        print('========================================')
-        print('Test set accuracy:', test_accuracy)
-        print('========================================')
-        print('System parameters used:')
-        for param in system_param_dict:
-            print(repr(param), ':', system_param_dict[param])
-        print('========================================')
-
-        # save test_accuracy to file
-        gru_model.save_model_checkpoint_to_file({
-                                            'start_epoch': start_epoch,
-                                            'best_val_accuracy': best_val_accuracy,
-                                            'test_accuracy' : test_accuracy,
-                                            'state_dict': gru_model.state_dict(),
-                                            'optimizer': gru_model.optimizer.state_dict(),
-                                            'system_param_dict' : system_param_dict,
-                                            'vocab_chars' : vocab_chars,
-                                            'vocab_lang' : vocab_lang,
-                                            },
-                                            rnn_model_checkpoint_rel_path)
-
+        if (system_parameters['eval_test_set']):
+            use_model.test([test_set_indexed], system_parameters['model_checkpoint_rel_path'])
 
     # print saved model checkpoint from file
-    if (not terminal and print_model_checkpoint != None and print_model_checkpoint_embed_weights != None):
-        input_data = InputData.InputData()
-        embed, num_classes = input_data.create_embed_from_weights_file(print_model_checkpoint_embed_weights)
-        gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],    # equals embedding dimension
-                                      hidden_size=hidden_size_rnn,
-                                      num_layers=num_layers_rnn,
-                                      num_classes=num_classes,
-                                      is_bidirectional=is_bidirectional,
-                                      initial_lr=initial_lr_rnn,
-                                      weight_decay=weight_decay_rnn)
-        start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(print_model_checkpoint)
-        print('========================================')
-        print('Model:\n', gru_model)
-        print('========================================')
-        print('Epochs trained:', start_epoch)
-        print('========================================')
-        print('Best validation set accuracy:', best_val_accuracy)
-        print('========================================')
-        print('Test set accuracy:', test_accuracy)
-        print('========================================')
-        print('System parameters used:')
-        for param in system_param_dict:
-            print(repr(param), ':', system_param_dict[param])
-        print('========================================')
-    
-    
+        if (system_parameters['print_model_checkpoint'] != None and system_parameters['print_model_checkpoint_embed_weights'] != None):
+            gru_model, _ = use_model.load_model_and_data([],system_parameters['print_model_checkpoint_embed_weights'])
+
+            start_epoch, best_val_accuracy, test_accuracy, system_parameters, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(system_parameters['print_model_checkpoint'])
+
+            to_print = [('Model:\n', gru_model),
+                        ('Epochs trained:', start_epoch),
+                        ('Best validation set accuracy:', best_val_accuracy),
+                        ('Test set accuracy:', test_accuracy),
+                        ('Epochs trained', start_epoch),
+                        ('System parameters used:', system_parameters)]
+            use_model.print(to_print)
 
 
 if __name__ == '__main__':
