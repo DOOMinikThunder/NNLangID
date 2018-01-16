@@ -54,7 +54,6 @@ def main():
     else:
             print('cuda off')
 
-    print(torch.cuda.is_available())
 
     ############
     # TERMINAL #

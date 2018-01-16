@@ -42,7 +42,7 @@ sampling_table_specified_size_cap: 100000000 #math.inf      # caps specified sam
 max_context_window_size: 3
 num_neg_samples: 5
 batch_size_embed: 1
-max_eval_checks_not_improved_embed: 10
+max_eval_checks_not_improved_embed: 1
 max_num_epochs_embed: 100000000 #math.inf
 eval_every_num_batches_embed: 1000
 lr_decay_every_num_batches_embed: 1000
