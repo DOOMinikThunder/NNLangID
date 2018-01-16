@@ -5,10 +5,8 @@ from pathlib import Path
 import yaml
 from embedding import EmbeddingCalculation
 from input import DataSplit, InputData
-from evaluation import RNNEvaluator
-from net import GRUModel
-import Terminal
-import UseModel
+from evaluation import RNNEvaluator, Terminal
+from net import GRUModel, RNNCalculation
 
 try:
     from tweet_retriever import TweetRetriever
@@ -101,8 +99,6 @@ def main():
 #        print(vocab_lang)
 #        print(len(vocab_lang))
 
-        use_model = UseModel.UseModel(system_parameters)
-
     #########################
     # EMBEDDING CALCULATION #
     #########################
@@ -133,9 +129,11 @@ def main():
     # RNN TRAINING #
     ################
 
+        rnn_calculation = RNNCalculation.RNNCalculation(system_parameters)
+        
         # train RNN model
         if (system_parameters['train_rnn']):
-            use_model.train([train_set_indexed, val_set_indexed], vocab_lang, vocab_chars, system_parameters['rnn_model_checkpoint_rel_path'])
+            rnn_calculation.train([train_set_indexed, val_set_indexed], vocab_lang, vocab_chars, system_parameters['rnn_model_checkpoint_rel_path'])
 
     ##############
     # EVALUATION #
@@ -143,11 +141,11 @@ def main():
 
         # evaluate test set
         if (system_parameters['eval_test_set']):
-            use_model.test([test_set_indexed], system_parameters['rnn_model_checkpoint_rel_path'])
+            rnn_calculation.test([test_set_indexed], system_parameters['rnn_model_checkpoint_rel_path'])
 
         # print saved model checkpoint from file
         if (system_parameters['print_model_checkpoint'] != None and system_parameters['print_model_checkpoint_embed_weights'] != None):
-            gru_model, _ = use_model.load_model_and_data([],system_parameters['print_model_checkpoint_embed_weights'])
+            gru_model, _ = rnn_calculation.load_model_and_data([],system_parameters['print_model_checkpoint_embed_weights'])
 
             start_epoch, best_val_accuracy, test_accuracy, system_parameters, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file(system_parameters['print_model_checkpoint'])
 
@@ -157,7 +155,7 @@ def main():
                         ('Test set accuracy: ', test_accuracy),
                         ('Epochs trained: ', start_epoch),
                         ('System parameters used: ', system_parameters)]
-            use_model.print(to_print)
+            rnn_calculation.print(to_print)
 
 
 if __name__ == '__main__':

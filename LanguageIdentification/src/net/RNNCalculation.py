@@ -2,7 +2,7 @@ from input import InputData
 from net import GRUModel
 from evaluation import RNNEvaluator
 
-class UseModel(object):
+class RNNCalculation(object):
 	def __init__(self, system_parameters):
 		self.system_parameters = system_parameters
 
