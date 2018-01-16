@@ -74,7 +74,7 @@ class RNNCalculation(object):
                                                                            embed=embed)
             # run on GPU if available
             if (self.system_parameters['cuda_is_avail']):
-                input_and_target_tensors.append((inp.cuda(), target.cuda()))
+                input_and_target_tensors.append(([tensor.cuda() for tensor in inp], [tensor.cuda() for tensor in target]))
             else:
                 input_and_target_tensors.append((inp, target))
         return input_and_target_tensors, embed, num_classes
