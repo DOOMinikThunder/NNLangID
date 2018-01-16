@@ -85,16 +85,17 @@ class RNNCalculation(object):
 									  weight_decay=self.system_parameters['weight_decay_rnn'])
 
 	def load_model_and_data(self, data_sets, embed_weights_path):
-		input_and_target_tensors, embed, num_classes = self.prepare_data(data_sets=data_sets, embed_weights_path=embed_weights_path)
-
+		data, embed, num_classes = self.prepare_data(data_sets=data_sets, embed_weights_path=embed_weights_path)
+		input = [date[0] for date in data]
+		target = [date[1] for date in data]
 		gru_model = self.load_model(embed=embed, num_classes=num_classes)
 		# run on GPU if available
 		if (self.system_parameters['cuda_is_avail']):
-			for i in range(len(input_and_target_tensors)):
-				input_and_target_tensors[i][0] = [tensor.cuda() for tensor in input_and_target_tensors[i][0]]
-				input_and_target_tensors[i][1] = [tensor.cuda() for tensor in input_and_target_tensors[i][1]]
+			for i in range(len(input)):
+				input = [tensor.cuda() for tensor in input]
+				target = [tensor.cuda() for tensor in target]
 			gru_model.cuda()
-		return gru_model, input_and_target_tensors
+		return gru_model, (input, target)
 
 
 
