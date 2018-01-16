@@ -37,6 +37,8 @@ class RNNEvaluator(object):
             # transfer back from GPU to CPU if GPU available
             if (self.cuda_is_avail):
                 target_list.append(stats.mode(target.cpu().data.numpy()).mode[0])
+                # transfer back to GPU
+                target.cuda()
             else:
                 target_list.append(stats.mode(target.data.numpy()).mode[0])
             predictions.append(lang_prediction[0][1])

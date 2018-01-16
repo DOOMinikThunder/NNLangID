@@ -107,12 +107,16 @@ class RNNCalculation(object):
         is_improving = True
         evaluator = RNNEvaluator.RNNEvaluator(gru_model)
     
-        inputs = []
-        targets = []
+        inputs_train = []
+        targets_train = []
+        inputs_val = []
+        targets_val = []
         # run on GPU if available
         if (self.system_parameters['cuda_is_avail']):
-            inputs = [tensor.cuda() for tensor in input_and_target_tensors[0][0]]
-            targets = [tensor.cuda() for tensor in input_and_target_tensors[0][1]]
+            inputs_train = [tensor.cuda() for tensor in input_and_target_tensors[0][0]]
+            targets_train = [tensor.cuda() for tensor in input_and_target_tensors[0][1]]
+            inputs_val = [tensor.cuda() for tensor in input_and_target_tensors[1][0]]
+            targets_val = [tensor.cuda() for tensor in input_and_target_tensors[1][1]]
             gru_model.cuda()
         # stop training when validation set error stops getting smaller ==> stop when overfitting occurs
         # or when maximum number of epochs reached
@@ -120,11 +124,11 @@ class RNNCalculation(object):
             print('RNN epoch:', epoch)
             # inputs: whole data set, every date contains the embedding of one char in one dimension
             # targets: whole target set, target is set for each character embedding
-            gru_model.train(inputs=inputs,
-                            targets=targets,
+            gru_model.train(inputs=inputs_train,
+                            targets=targets_train,
                             batch_size=self.system_parameters['batch_size_rnn'])
             # evaluate validation set
-            val_mean_loss = self.evaluate_validation(epoch, evaluator, input_and_target_tensors[1][0], input_and_target_tensors[1][1], vocab_lang)
+            val_mean_loss = self.evaluate_validation(epoch, evaluator, inputs_val, targets_val, vocab_lang)
 
             # check if accuracy improved and if so, save model checkpoint to file
             if (best_val_accuracy < cur_val_accuracy):
