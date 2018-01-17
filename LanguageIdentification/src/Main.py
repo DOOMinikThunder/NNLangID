@@ -31,7 +31,7 @@ def main():
 
     # SYSTEM parameters for convenience, can be removed later
     system_parameters['create_splitted_data_files'] = True                     # split into training, validation and test set from an original file
-    system_parameters['calc_embed'] = False
+    system_parameters['calc_embed'] = True
     system_parameters['train_rnn'] = True
     system_parameters['eval_test_set'] = True
 
