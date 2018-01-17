@@ -134,7 +134,7 @@ def main():
         
         # train RNN model
         if (system_parameters['train_rnn']):
-            rnn_calculation.train([train_set_indexed, val_set_indexed], vocab_lang, vocab_chars, system_parameters['rnn_model_checkpoint_rel_path'])
+            rnn_calculation.train_rnn([train_set_indexed, val_set_indexed], vocab_chars, vocab_lang, system_parameters['rnn_model_checkpoint_rel_path'])
 
     ##############
     # EVALUATION #
@@ -142,7 +142,7 @@ def main():
 
         # evaluate test set
         if (system_parameters['eval_test_set']):
-            rnn_calculation.test([test_set_indexed], system_parameters['rnn_model_checkpoint_rel_path'])
+            rnn_calculation.test_rnn([test_set_indexed], system_parameters['rnn_model_checkpoint_rel_path'])
 
         # print saved model checkpoint from file
         if (system_parameters['print_model_checkpoint'] != None and system_parameters['print_model_checkpoint_embed_weights'] != None):

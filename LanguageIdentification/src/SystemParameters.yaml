@@ -1,6 +1,6 @@
 # System parameters
 create_splitted_data_files: True                             # split into training, validation and test set from an original file
-calc_embed: True
+calc_embed: False
 train_rnn: True
 eval_test_set: True
 run_terminal: False                                          # if True: disables all other calculations
@@ -53,8 +53,10 @@ hidden_size_rnn: 100
 num_layers_rnn: 1
 is_bidirectional: True
 batch_size_rnn: 10
+max_eval_checks_not_improved_rnn: 1
+max_num_epochs_rnn: 1 #.inf
+eval_every_num_batches_rnn: 3
+lr_decay_every_num_batches_rnn: 3
+lr_decay_factor_rnn: 1.0                                    # 1.0 means no decay
 initial_lr_rnn: 0.01
-scheduler_step_size_rnn: 1                                  # currently not functioning
-scheduler_gamma_rnn: 0.1                                    # currently not functioning
 weight_decay_rnn: 0.00001
-num_epochs_rnn: 10 #.inf

@@ -3,8 +3,8 @@
 import math
 import torch
 from torch.autograd import Variable
-from embedding import SkipGramModel
 from input import InputData
+from embedding import SkipGramModel
 #from tqdm import tqdm
 
 
