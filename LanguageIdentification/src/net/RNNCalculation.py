@@ -134,8 +134,11 @@ class RNNCalculation(object):
                             targets=input_and_target_tensors[0][1],
                             batch_size=self.system_parameters['batch_size_rnn'])
             # evaluate validation set
-            cur_val_mean_loss = self.evaluate_validation(epoch, evaluator, input_and_target_tensors[1][0], input_and_target_tensors[1][1], vocab_lang)
+#            cur_val_mean_loss = self.evaluate_validation(epoch, evaluator, input_and_target_tensors[1][0], input_and_target_tensors[1][1], vocab_lang)
 
+            cur_val_mean_loss, best_val_accuracy, confusion_matrix, precision, recall, f1_score = evaluator.all_metrics(input_and_target_tensors[1][0],
+                                                                                                                input_and_target_tensors[1][1],
+                                                                                                                vocab_lang)
             # check if accuracy improved and if so, save model checkpoint to file
             if (best_val_mean_loss > cur_val_mean_loss):
                 best_val_mean_loss = cur_val_mean_loss
