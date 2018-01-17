@@ -12,7 +12,7 @@ print_model_checkpoint_embed_weights: None #"../data/save/trained/embed_weights_
 print_model_checkpoint: None #"../data/save/trained/rnn_model_checkpoint_de_en_es_fr_it.pth"#None
 
 # Data paths
-input_tr_va_te_data_rel_path: "../data/input_data/testing/test_recall_de_en_es.csv"   # training, validation and test will be generated from this file
+input_tr_va_te_data_rel_path: "../data/input_data/testing/test_embed.csv"   # training, validation and test will be generated from this file
 input_rt_data_rel_path: "../data/input_data/original/uniformly_sampled_dl.csv"  # to change later, rt = real test
 
 out_tr_data_rel_path: "../data/input_data/original_splitted/training.csv"
@@ -36,7 +36,7 @@ min_char_frequency: 2                                       # chars appearing le
 
 # HYPERPARAMETERS EMBEDDING
 sampling_table_min_char_count: 1                            # determines the precision of the sampling (should be 1 or higher)
-sampling_table_specified_size_cap: 10000#100000000 #math.inf      # caps specified sampling table size to this value (no matter how big it would be according to sampling_table_min_char_count)
+sampling_table_specified_size_cap: 10000 #100000000 #math.inf      # caps specified sampling table size to this value (no matter how big it would be according to sampling_table_min_char_count)
                                                             # note: this is only the specified size, the actual table size may slightly deviate due to roundings in the calculation
 #    embed_dim: 2                                           # will be set automatically later to: roundup(log2(vocabulary-size))
 max_context_window_size: 3
