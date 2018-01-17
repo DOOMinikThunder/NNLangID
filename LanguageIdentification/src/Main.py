@@ -36,8 +36,8 @@ def main():
     with open(yaml_file, 'r') as stream:
         system_parameters = yaml.load(stream)
         
-    system_parameters['terminal_live_tweets'] = can_use_live_tweets            # (change this if you want to sample live tweets)
-    if (system_parameters['terminal_live_tweets']):
+    system_parameters['can_use_live_tweets'] = can_use_live_tweets            # (change this if you want to sample live tweets)
+    if (system_parameters['can_use_live_tweets']):
         print('!!! TERMINAL LIVE TWEETS ON !!!')
     else:
         print('!!! TERMINAL LIVE TWEETS OFF !!!')
@@ -52,9 +52,9 @@ def main():
     ############    
     
     # simple terminal for testing
-    if (system_parameters['use_terminal']):
+    if (system_parameters['run_terminal']):
         terminal = Terminal.Terminal(system_parameters)
-        terminal.use_terminal(system_parameters['terminal_live_tweets'])
+        terminal.run_terminal(system_parameters['can_use_live_tweets'])
     else:
 
     ########################

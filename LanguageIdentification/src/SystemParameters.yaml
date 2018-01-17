@@ -3,7 +3,7 @@ create_splitted_data_files: True                             # split into traini
 calc_embed: True
 train_rnn: True
 eval_test_set: True
-use_terminal: False                                          # if True: disables all other calculations
+run_terminal: False                                          # if True: disables all other calculations
 
 # Print parameters
 print_embed_testing: True
@@ -23,8 +23,8 @@ embed_weights_rel_path: "../data/save/embed_weights.txt"
 embed_model_checkpoint_rel_path: "../data/save/embed_model_checkpoint.pth"
 rnn_model_checkpoint_rel_path: "../data/save/rnn_model_checkpoint.pth"
 
-trained_embed_weights_rel_path: "../data/save/trained/embed_weights_de_en_es_fr_it.txt"
-trained_model_checkpoint_rel_path: "../data/save/trained/rnn_model_checkpoint_de_en_es_fr_it.pth"
+trained_embed_weights_rel_path: "../data/save/trained/embed_weights_recall_de_en_es_fr_it.txt"
+trained_model_checkpoint_rel_path: "../data/save/trained/rnn_model_checkpoint_recall_de_en_es_fr_it.pth"
 
 # Data manipulation parameters
 tr_va_te_split_ratios: [0.8, 0.1, 0.1]                      # [train_ratio, val_ratio, test_ratio]
