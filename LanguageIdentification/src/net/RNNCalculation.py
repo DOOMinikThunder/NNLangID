@@ -1,6 +1,6 @@
 from input import InputData
 from net import GRUModel
-#from evaluation import RNNEvaluator
+from evaluation import RNNEvaluator
 
 
 

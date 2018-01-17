@@ -24,7 +24,7 @@ class RNNEvaluator(object):
         f1_score = self.f1_score(precision, recall)
         return mean_loss, accuracy, confusion_matrix, precision, recall, f1_score
 
-    def evaluate_data_set(self, input_data, target_data, vocab_lang, n_highest_probs=1):
+    def evaluate_data_set(self, input_data, target_data, n_highest_probs=1):
         if (len(input_data) != len(target_data)):
             print("input and target size different for 'evaluate_data_set()'")
             return -1
