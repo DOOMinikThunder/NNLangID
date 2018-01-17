@@ -24,13 +24,13 @@ class Terminal(object):
                                       is_bidirectional=self.system_parameters['is_bidirectional'],
                                       initial_lr=self.system_parameters['initial_lr_rnn'],
                                       weight_decay=self.system_parameters['weight_decay_rnn'])
-        start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang = gru_model.load_model_checkpoint_from_file \
-            (self.system_parameters['trained_model_checkpoint_rel_path'])
+        state = gru_model.load_model_checkpoint_from_file(self.system_parameters['trained_model_checkpoint_rel_path'])
+        results_dict = state['results_dict']
         # run on GPU if available
         if (self.system_parameters['cuda_is_avail']):
             gru_model.cuda()
 
-        self.loop_input(gru_model=gru_model, input_data=input_data, can_use_live_tweets=can_use_live_tweets, embed=embed, vocab_lang=vocab_lang, vocab_chars=vocab_chars)
+        self.loop_input(gru_model=gru_model, input_data=input_data, can_use_live_tweets=can_use_live_tweets, embed=embed, vocab_lang=results_dict['vocab_lang'], vocab_chars=results_dict['vocab_chars'])
 
 
     def loop_input(self, gru_model, input_data, can_use_live_tweets, embed, vocab_lang, vocab_chars):

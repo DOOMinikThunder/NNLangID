@@ -12,8 +12,10 @@ from evaluation import RNNEvaluator
 class GRUModel(nn.Module):
     
     
-    def __init__(self, input_size, hidden_size, num_layers, num_classes, is_bidirectional, initial_lr, weight_decay):
+    def __init__(self, vocab_chars, vocab_lang, input_size, hidden_size, num_layers, num_classes, is_bidirectional, initial_lr, weight_decay):
         super(GRUModel, self).__init__()
+        self.vocab_chars = vocab_chars
+        self.vocab_lang = vocab_lang
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.num_classes = num_classes
@@ -110,19 +112,21 @@ class GRUModel(nn.Module):
                             best_val_mean_loss = cur_val_mean_loss
                             eval_checks_not_improved_counter = 0
                             self.save_model_checkpoint_to_file({
-                                                        'start_epoch' : epoch + 1,
-                                                        'start_total_trained_batches_counter' : total_trained_batches_counter + 1,
-                                                        'best_val_mean_loss' : best_val_mean_loss,
-                                                        'test_mean_loss' : -1.0,
-                                                        'best_val_accuracy' : -1.0,
-                                                        'test_accuracy' : -1.0,
-                                                        'state_dict': self.state_dict(),
-                                                        'optimizer': self.optimizer.state_dict(),
-                                                        'system_param_dict' : system_param_dict,
-                                                        'vocab_chars' : {}, #self.vocab_chars,
-                                                        'vocab_lang' : {}, #self.vocab_lang,
-                                                        },
-                                                        rnn_model_checkpoint_rel_path)
+                                                                'system_param_dict': system_param_dict,
+                                                                'results_dict': {
+                                                                                'start_epoch': epoch + 1,
+                                                                                'start_total_trained_batches_counter': total_trained_batches_counter + 1,
+                                                                                'best_val_mean_loss': best_val_mean_loss,
+                                                                                'test_mean_loss': -1.0,
+                                                                                'best_val_accuracy': -1.0,
+                                                                                'test_accuracy': -1.0,
+                                                                                'state_dict': self.state_dict(),
+                                                                                'optimizer': self.optimizer.state_dict(),
+                                                                                'vocab_chars': self.vocab_chars,
+                                                                                'vocab_lang': self.vocab_lang,
+                                                                                },
+                                                                },
+                                                                rnn_model_checkpoint_rel_path)
                         # as model is not improving: increment counter to stop,
                         # if counter equals max_eval_checks_not_improved then stop training
                         else:
@@ -140,15 +144,10 @@ class GRUModel(nn.Module):
         
         
     def load_model_checkpoint_from_file(self, relative_path_to_file):
-        checkpoint = torch.load(relative_path_to_file)
-        start_epoch = checkpoint['start_epoch']
-        best_val_accuracy = checkpoint['best_val_accuracy']
-        test_accuracy = checkpoint['test_accuracy']
-        self.load_state_dict(checkpoint['state_dict'])
-        self.optimizer.load_state_dict(checkpoint['optimizer'])
-        system_param_dict = checkpoint['system_param_dict']
-        vocab_chars = checkpoint['vocab_chars']
-        vocab_lang = checkpoint['vocab_lang']
+        state = torch.load(relative_path_to_file)
+        self.load_state_dict(state['results_dict']['state_dict'])
+        self.optimizer.load_state_dict(state['results_dict']['optimizer'])
 #        self.eval()
         print('Model checkpoint loaded from file:', relative_path_to_file)
-        return start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang
+#        return start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang
+        return state
