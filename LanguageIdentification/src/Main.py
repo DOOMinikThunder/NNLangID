@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import math
 from pathlib import Path
 import yaml
 import torch
-from embedding import EmbeddingCalculation
 from input import DataSplit, InputData
-from evaluation import RNNEvaluator, Terminal
-from net import GRUModel, RNNCalculation
+from embedding import EmbeddingCalculation
+from net import RNNCalculation
+from evaluation import Terminal
 
+# check if twitter module is available
 try:
     from tweet_retriever import TweetRetriever
-    can_use_tweets = True
+    can_use_live_tweets = True
 except ImportError:
-    can_use_tweets = False
+    can_use_live_tweets = False
+
 
 
 def main():
@@ -21,39 +22,30 @@ def main():
     ##############
     # PARAMETERS #
     ##############
-    use_cluster_params = False                                                 # set True only for use on cluster
-    if(not use_cluster_params):
-        with open("SystemParameters.yaml", 'r') as stream:
-            system_parameters = yaml.load(stream)
+    
+    # ONLY SET THIS AND THE PARAMETERS IN CORRESPONDING YAML FILE
+    use_cluster_params = False                                                 # set True for use of cluster parameters
+    
+    
+    
+    # automatically determined parameters
+    if(use_cluster_params):
+        yaml_file = 'SystemParametersCluster.yaml'
     else:
-        with open("SystemParametersCluster.yaml", 'r') as stream:
-            system_parameters = yaml.load(stream)
-
-    # SYSTEM parameters for convenience, can be removed later
-    system_parameters['create_splitted_data_files'] = True                     # split into training, validation and test set from an original file
-    system_parameters['calc_embed'] = True
-    system_parameters['train_rnn'] = True
-    system_parameters['eval_test_set'] = True
-
-    system_parameters['print_embed_testing'] = True
-    system_parameters['print_model_checkpoint_embed_weights'] = None #"../data/save/trained/embed_weights_de_en_es_fr_it.txt"#None
-    system_parameters['print_model_checkpoint'] = None #"../data/save/trained/rnn_model_checkpoint_de_en_es_fr_it.pth"#None
-
-    system_parameters['use_terminal'] = False                                  # if True: disables all other calculations
-
-    # parameters that need to be checked or reset
-    if not can_use_tweets:
-        system_parameters['terminal_live_tweets'] = False                      # change this if you want to sample live tweets
-    # do not work in YAML file:
+        yaml_file = 'SystemParameters.yaml'
+    with open(yaml_file, 'r') as stream:
+        system_parameters = yaml.load(stream)
+        
+    system_parameters['terminal_live_tweets'] = can_use_live_tweets            # (change this if you want to sample live tweets)
+    if (system_parameters['terminal_live_tweets']):
+        print('!!! TERMINAL LIVE TWEETS ON !!!')
+    else:
+        print('!!! TERMINAL LIVE TWEETS OFF !!!')
     system_parameters['cuda_is_avail'] = torch.cuda.is_available()
-    system_parameters['fetch_only_langs'] = None #['de', 'en', 'es', 'fr', 'it'] #['de', 'en', 'es']#['el', 'fa', 'hi', 'ca']#None
-    system_parameters['fetch_only_first_x_tweets'] = float('inf')
-
     if (system_parameters['cuda_is_avail']):
-        print('cuda on')
+        print('!!! CUDA ON !!!')
     else:
-            print('cuda off')
-
+        print('!!! CUDA OFF !!!')
 
     ############
     # TERMINAL #
