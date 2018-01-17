@@ -35,12 +35,7 @@ class RNNEvaluator(object):
             lang_prediction, loss = self.evaluate_single_date(input, n_highest_probs, target)
             acc_loss.append(loss)
             # transfer back from GPU to CPU if GPU available
-            if (self.cuda_is_avail):
-                target_list.append(stats.mode(target.cpu().data.numpy()).mode[0])
-                # transfer back to GPU
-                target.cuda()
-            else:
-                target_list.append(stats.mode(target.data.numpy()).mode[0])
+            target_list.append(target.data[0])
             predictions.append(lang_prediction[0][1])
         mean_loss = sum(acc_loss) / float(len(acc_loss))
         return mean_loss.data[0], predictions, target_list
