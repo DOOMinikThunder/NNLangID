@@ -107,6 +107,8 @@ class RNNCalculation(object):
     def loop_training(self, gru_model, input_and_target_tensors, vocab_lang, vocab_chars, model_save_path):
         cur_val_accuracy = 0
         best_val_accuracy = -1.0
+        best_val_mean_loss = float('inf')
+        cur_val_mean_loss = float('inf')
         epoch = 0
         is_improving = True
         evaluator = RNNEvaluator.RNNEvaluator(gru_model)
@@ -132,11 +134,12 @@ class RNNCalculation(object):
                             targets=input_and_target_tensors[0][1],
                             batch_size=self.system_parameters['batch_size_rnn'])
             # evaluate validation set
-            val_mean_loss = self.evaluate_validation(epoch, evaluator, input_and_target_tensors[1][0], input_and_target_tensors[1][1], vocab_lang)
+            cur_val_mean_loss = self.evaluate_validation(epoch, evaluator, input_and_target_tensors[1][0], input_and_target_tensors[1][1], vocab_lang)
 
             # check if accuracy improved and if so, save model checkpoint to file
-            if (best_val_accuracy < cur_val_accuracy):
-                best_val_accuracy = cur_val_accuracy
+            if (best_val_mean_loss > cur_val_mean_loss):
+                best_val_mean_loss = cur_val_mean_loss
+                print('best_val_mean_loss', best_val_mean_loss)
                 gru_model.save_model_checkpoint_to_file({
                     'start_epoch': epoch + 1,
                     'best_val_accuracy': best_val_accuracy,
