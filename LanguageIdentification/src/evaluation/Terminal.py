@@ -58,12 +58,11 @@ class Terminal(object):
 		try:
 			number = int(string)
 			return number
-		except:
+		except ValueError:
 			print("Not a number")
 			return 0
 
-	def sample_tweets(self, tweet_retriever, vocab_lang):
-		amount = self.str_to_int(input("Specify an amount and press Enter to sample live tweets: "))
+	def sample_tweets(self, tweet_retriever, vocab_lang, amount):
 		track = input("(Optional) Specify a keyword to search in tweets: ")
 		if track != "":
 			language = input("(Optional) Specify a language identifier to search in tweets: ")
@@ -76,15 +75,17 @@ class Terminal(object):
 			return tweet_retriever.retrieve_sample_tweets(amount)
 
 	def retrieve_text(self, terminal_live_tweets, index2lang, tweet_retriever, vocab_lang):
-		if terminal_live_tweets:
-			sample_tweets = self.sample_tweets(tweet_retriever, vocab_lang)
+		input_terminal = input('Enter text: ')
+		amount_live_tweets = self.str_to_int(input_terminal)
+		if amount_live_tweets>0:
+			sample_tweets = self.sample_tweets(tweet_retriever, vocab_lang, amount_live_tweets)
 			print('sample_tweets',sample_tweets)
 			if sample_tweets is None:
 				return None, None
 			input_text =  list(sample_tweets.values())
 			input_text_lang_tuple = [(text, index2lang[0]) for text in input_text]
 		else:
-			input_text = [input('Enter text: ')]
+			input_text = [input_terminal]
 			input_text_lang_tuple = [(input_text[0], index2lang[0])]  # language must be in vocab_lang
 		return input_text, input_text_lang_tuple
 
