@@ -73,6 +73,8 @@ class GRUModel(nn.Module):
         max_eval_checks_not_improved_minus_one = max_eval_checks_not_improved - 1
         best_val_mean_loss = float('inf')
         cur_val_mean_loss = float('inf')
+        best_val_accuracy = -1.0
+        cur_val_accuracy = -1.0
         epoch = 0
         total_trained_batches_counter = 0
         eval_checks_not_improved_counter = 0
@@ -110,13 +112,19 @@ class GRUModel(nn.Module):
                     
                     # evaluate validation set every eval_every_num_batches
                     if (total_trained_batches_counter % eval_every_num_batches == 0):
-                        cur_val_mean_loss, predictions, target_list = rnn_evaluator.evaluate_data_set(val_inputs,
-                                                                                                      val_targets,
-                                                                                                      n_highest_probs=1)
+                        cur_val_mean_loss, cur_val_accuracy = rnn_evaluator.evaluate_data_set(val_inputs,
+                                                                                              val_targets,
+                                                                                              n_highest_probs=1)
                         print('========================================')
                         print('[RNN] Epoch', epoch, '| Batch', batch_i, '/', num_train_batches_minus_one, '| Validation mean loss: ', cur_val_mean_loss)
                         print('========================================')
-            
+                        print('[RNN] Epoch', epoch, '| Batch', batch_i, '/', num_train_batches_minus_one, '| Validation accuracy: ', cur_val_accuracy)
+                        print('========================================')
+                        
+                        # check if accuracy is better than the best accuracy observed so far
+                        if (best_val_accuracy < cur_val_accuracy):
+                            best_val_accuracy = cur_val_accuracy
+                            
                         # check if loss improved, and if so, save model checkpoint to file
                         # and reset eval_checks_not_improved_counter as model is improving (again)
                         if (best_val_mean_loss > cur_val_mean_loss):
@@ -128,7 +136,7 @@ class GRUModel(nn.Module):
                                                                                 'start_epoch': epoch + 1,
                                                                                 'start_total_trained_batches_counter': total_trained_batches_counter + 1,
                                                                                 'best_val_mean_loss': best_val_mean_loss,
-                                                                                'best_val_accuracy': -1.0,
+                                                                                'best_val_accuracy': best_val_accuracy,
                                                                                 'state_dict': self.state_dict(),
                                                                                 'optimizer': self.optimizer.state_dict(),
                                                                                 'vocab_chars': self.vocab_chars,
@@ -157,6 +165,8 @@ class GRUModel(nn.Module):
         results_dict = state['results_dict']
         self.load_state_dict(results_dict['state_dict'])
         self.optimizer.load_state_dict(results_dict['optimizer'])
+        self.vocab_chars = results_dict['vocab_chars']
+        self.vocab_lang = results_dict['vocab_lang']
 #        self.eval()
         print('Model checkpoint loaded from file:', relative_path_to_file)
         return state
