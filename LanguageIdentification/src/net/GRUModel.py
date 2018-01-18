@@ -165,6 +165,8 @@ class GRUModel(nn.Module):
         results_dict = state['results_dict']
         self.load_state_dict(results_dict['state_dict'])
         self.optimizer.load_state_dict(results_dict['optimizer'])
+        self.vocab_chars = results_dict['vocab_chars']
+        self.vocab_lang = results_dict['vocab_lang']
 #        self.eval()
         print('Model checkpoint loaded from file:', relative_path_to_file)
         return state
