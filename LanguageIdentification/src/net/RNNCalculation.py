@@ -1,3 +1,4 @@
+import pprint
 from input import InputData
 from net import GRUModel
 from evaluation import RNNEvaluator
@@ -7,14 +8,14 @@ from evaluation import RNNEvaluator
 class RNNCalculation(object):
     
     
-    def __init__(self, system_parameters):
-        self.system_parameters = system_parameters
+    def __init__(self, system_param_dict):
+        self.system_param_dict = system_param_dict
 
 
-    def train_rnn(self, data_sets, vocab_chars, vocab_lang, model_save_path):
-        input_and_target_tensors, gru_model = self.get_model_and_data(data_sets, vocab_chars, vocab_lang)
+    def train_rnn(self, data_sets, vocab_chars, vocab_lang):
+        input_and_target_tensors, gru_model = self.get_model_and_data(data_sets, vocab_chars, vocab_lang, self.system_param_dict['embed_weights_rel_path'])
         if (len(data_sets) < 2):
-            print("ERROR: Two data sets (traninig, validation) are needed!")
+            print("ERROR: Two data sets (training, validation) are needed!")
             return
         print('Model:\n', gru_model)
         
@@ -23,77 +24,82 @@ class RNNCalculation(object):
         gru_model.train(train_inputs=input_and_target_tensors[0][0],
                         train_targets=input_and_target_tensors[0][1],
                         val_inputs=input_and_target_tensors[1][0],
-                        val_targets=input_and_target_tensors[1][1],
-                        batch_size=self.system_parameters['batch_size_rnn'],
-                        max_eval_checks_not_improved=self.system_parameters['max_eval_checks_not_improved_rnn'],
-                        max_num_epochs=self.system_parameters['max_num_epochs_rnn'],
-                        eval_every_num_batches=self.system_parameters['eval_every_num_batches_rnn'],
-                        lr_decay_every_num_batches=self.system_parameters['lr_decay_every_num_batches_rnn'],
-                        lr_decay_factor=self.system_parameters['lr_decay_factor_rnn'],
-                        rnn_model_checkpoint_rel_path=self.system_parameters['rnn_model_checkpoint_rel_path'],
-                        system_param_dict=self.system_parameters)
+                        val_targets=input_and_target_tensors[1][1])
+
+
+    def test_rnn(self, data_sets, vocab_chars, vocab_lang):
+        input_and_target_tensors, gru_model = self.get_model_and_data(data_sets, vocab_chars, vocab_lang, self.system_param_dict['embed_weights_rel_path'])
+        state = gru_model.load_model_checkpoint_from_file(self.system_param_dict['rnn_model_checkpoint_rel_path'])
+        results_dict = state['results_dict']
+        rnn_evaluator = RNNEvaluator.RNNEvaluator(gru_model)
+
+        test_mean_loss, test_accuracy, confusion_matrix, precision, recall, f1_score = rnn_evaluator.all_metrics(input_and_target_tensors[0][0],
+                                                                                                                 input_and_target_tensors[0][1],
+                                                                                                                 vocab_lang)
+        confusion_matrix = rnn_evaluator.to_string_confusion_matrix(confusion_matrix, vocab_lang, 5)
+        
+        print('Test results:')
+        to_print = [('Confusion matrix:\n', confusion_matrix),
+                    ('Best validation set mean loss:', results_dict['best_val_mean_loss']),
+                    ('Test set mean loss:', test_mean_loss),
+                    ('Best validation set accuracy:', results_dict['best_val_accuracy']),
+                    ('Test set accuracy:', test_accuracy),
+                    ('Precision:', precision),
+                    ('Recall:', recall),
+                    ('F1 score:', f1_score),
+                    ('Epochs trained:', results_dict['start_epoch']),
+                    ('Total batches trained:', results_dict['start_total_trained_batches_counter']),
+                    ('System parameters used:', self.system_param_dict)]
+        self.print_out(to_print)
+
+        # save with new results to file
+        results_dict['test_mean_loss'] = test_mean_loss
+        results_dict['test_accuracy'] = test_accuracy
+        results_dict['confusion_matrix'] = confusion_matrix
+        results_dict['precision'] = precision
+        results_dict['recall'] = recall
+        results_dict['f1_score'] = f1_score
+        state['results_dict'] = results_dict
+        gru_model.save_model_checkpoint_to_file(state, self.system_param_dict['rnn_model_checkpoint_rel_path'])
+
+
+    def print_model_checkpoint(self, vocab_chars, vocab_lang):
+        _, gru_model = self.get_model_and_data([], vocab_chars, vocab_lang, self.system_param_dict['print_model_checkpoint_embed_weights'])
+        state = gru_model.load_model_checkpoint_from_file(self.system_param_dict['print_model_checkpoint'])
+        system_param_dict = state['system_param_dict']
+        results_dict = state['results_dict']
+        rnn_evaluator = RNNEvaluator.RNNEvaluator(gru_model)
+        
+        # get nice formatting for confusion matrix
+        confusion_matrix = rnn_evaluator.to_string_confusion_matrix(results_dict['confusion_matrix'], vocab_lang, 5)
+        results_print_dict = {}
+        for result in results_dict:
+            # only print relevant and not too verbose data
+            if (result != 'state_dict'
+                and result != 'optimizer'
+                and result != 'vocab_chars'
+                and result != 'vocab_lang'
+                and result != 'confusion_matrix'):
+                results_print_dict[result] = results_dict[result]
+        
+        print('Model checkpoint data:')
+        to_print = [('Model:\n', gru_model),
+                    ('System parameters:', system_param_dict),
+                    ('Results:', results_print_dict),
+                    ('Confusion matrix:\n', confusion_matrix)]
+        self.print_out(to_print)
         
 
-    def evaluate_validation(self, epoch, evaluator, val_input, val_target, vocab_lang):
-        val_mean_loss, predictions, targets = evaluator.evaluate_data_set(val_input,
-                                                                          val_target,
-                                                                          vocab_lang)
-        cur_val_accuracy = evaluator.accuracy(predictions, targets)
-        val_conf_matrix = evaluator.confusion_matrix(predictions, targets, vocab_lang)
-
-        to_print = [('confusion_matrix: \n',
-                     evaluator.to_string_confusion_matrix(confusion_matrix=val_conf_matrix, vocab_lang=vocab_lang,
-                                                          pad=5)),
-                    ('Epoch: ', epoch),
-                    ('validation set accuracy: ', cur_val_accuracy),
-                    ('validation mean loss: ', val_mean_loss)]
-        self.print_out(to_print)
-        return val_mean_loss
-
-
-    def test_rnn(self, data_sets, vocab_chars, vocab_lang, model_path):
-        input_and_target_tensors, gru_model = self.get_model_and_data(data_sets, vocab_chars, vocab_lang)
-        state = gru_model.load_model_checkpoint_from_file(model_path)
-        results_dict = state['results_dict']
-        evaluator = RNNEvaluator.RNNEvaluator(gru_model)
-
-        mean_loss, test_accuracy, confusion_matrix, precision, recall, f1_score = evaluator.all_metrics(input_and_target_tensors[0][0],
-                                                                                                        input_and_target_tensors[0][1],
-                                                                                                        vocab_lang)
-        to_print = [('confusion matrix: \n', evaluator.to_string_confusion_matrix(confusion_matrix, vocab_lang, 5)),
-                    ('precision: ', precision),
-                    ('recall: ', recall),
-                    ('f1 score: ', f1_score),
-                    ('Epochs trained: ', results_dict['start_epoch']),
-                    ('Best validation set accuracy: ', results_dict['best_val_accuracy']),
-                    ('Test set accuracy: ', results_dict['test_accuracy']),
-                    ('System parameters used: ', self.system_parameters)]
-        self.print_out(to_print)
-
-        # save test_accuracy to file
-        gru_model.save_model_checkpoint_to_file({
-            'start_epoch': results_dict['start_epoch'],
-            'best_val_accuracy': results_dict['best_val_accuracy'],
-            'test_accuracy': results_dict['test_accuracy'],
-            'state_dict': gru_model.state_dict(),
-            'optimizer': gru_model.optimizer.state_dict(),
-            'system_param_dict': state['system_param_dict'],
-            'vocab_chars': results_dict['vocab_chars'],
-            'vocab_lang': results_dict['vocab_lang'],
-        },
-        model_path)
-
-
-    def get_model_and_data(self, data_sets, vocab_chars, vocab_lang):
+    def get_model_and_data(self, data_sets, vocab_chars, vocab_lang, embed_weights_rel_path):
         input_data = InputData.InputData()
-        embed, num_classes = input_data.create_embed_from_weights_file(self.system_parameters['embed_weights_rel_path'])
+        embed, num_classes = input_data.create_embed_from_weights_file(embed_weights_rel_path)
         input_and_target_tensors = []
         for data_set in data_sets:
             inputs, targets = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=data_set,
-                                                                               embed_weights_rel_path=self.system_parameters['embed_weights_rel_path'],
+                                                                               embed_weights_rel_path=embed_weights_rel_path,
                                                                                embed=embed)
             # transfer tensors to GPU if available
-            if (self.system_parameters['cuda_is_avail']):
+            if (self.system_param_dict['cuda_is_avail']):
                 input_and_target_tensors.append(([tensor.cuda() for tensor in inputs], [tensor.cuda() for tensor in targets]))
             else:
                 input_and_target_tensors.append((inputs, targets))
@@ -101,14 +107,10 @@ class RNNCalculation(object):
         gru_model = GRUModel.GRUModel(vocab_chars=vocab_chars,
                                       vocab_lang=vocab_lang,
                                       input_size=embed.weight.size()[1],  # equals embedding dimension
-                                      hidden_size=self.system_parameters['hidden_size_rnn'],
-                                      num_layers=self.system_parameters['num_layers_rnn'],
                                       num_classes=num_classes,
-                                      is_bidirectional=self.system_parameters['is_bidirectional'],
-                                      initial_lr=self.system_parameters['initial_lr_rnn'],
-                                      weight_decay=self.system_parameters['weight_decay_rnn'])
+                                      system_param_dict=self.system_param_dict)
         # run on GPU if available
-        if (self.system_parameters['cuda_is_avail']):
+        if (self.system_param_dict['cuda_is_avail']):
             gru_model.cuda()
         return input_and_target_tensors, gru_model
 
@@ -116,5 +118,10 @@ class RNNCalculation(object):
     def print_out(self, string_date_tuple):
         for string, date in string_date_tuple:
             print('========================================')
-            print(string, date)
+            # print dicts with new line for every key
+            if isinstance(date, dict):
+                print(string)
+                pprint.pprint(date)
+            else:
+                print(string, date)
         print('========================================')

@@ -21,24 +21,26 @@ https://adoni.github.io/2017/11/08/word2vec-pytorch/ (Access: 11.01.2018)
 class SkipGramModel(nn.Module):
 
     
-    def __init__(self, vocab_chars, vocab_lang, embed_dim, initial_lr, sampling_table_min_char_count=1, sampling_table_specified_size_cap=100000000):
+    def __init__(self, vocab_chars, vocab_lang, embed_dim, system_param_dict):
         super(SkipGramModel, self).__init__()
-
         self.vocab_chars = vocab_chars
         self.vocab_lang = vocab_lang
         self.vocab_chars_size = len(vocab_chars)
         self.vocab_lang_size = len(vocab_lang)
         self.embed_dim = embed_dim
-        self.lr = initial_lr
+        self.system_param_dict = system_param_dict
+        self.sampling_table_min_char_count = system_param_dict['sampling_table_min_char_count']
+        self.sampling_table_specified_size_cap = system_param_dict['sampling_table_specified_size_cap']
+        self.lr = system_param_dict['initial_lr_embed']
         self.embed_hidden = nn.Embedding(self.vocab_chars_size, int(embed_dim), sparse=True)
         self.embed_output = nn.Embedding(self.vocab_chars_size, int(embed_dim), sparse=True)
         self.sampling_table = []
         self.init_embed()
-        self.init_sampling_table(vocab_chars, sampling_table_min_char_count, sampling_table_specified_size_cap)
-        self.cuda_is_avail = torch.cuda.is_available()
+        self.init_sampling_table(vocab_chars, self.sampling_table_min_char_count, self.sampling_table_specified_size_cap)
+        self.cuda_is_avail = system_param_dict['cuda_is_avail']
         # no weight_decay and momentum set because they
         # "require the global calculation on embedding matrix, which is extremely time-consuming"
-        self.optimizer = optim.SGD(self.parameters(), lr=initial_lr)
+        self.optimizer = optim.SGD(params=self.parameters(), lr=self.lr)
         
         
     def init_embed(self):
@@ -58,13 +60,11 @@ class SkipGramModel(nn.Module):
             # get smallest char_pow_frequency
             if (char_pow_frequency < min_char_pow_frequency):
                 min_char_pow_frequency = char_pow_frequency
-#        print(char_pow_frequencies)
         # calculate the necessary table_size to have at least min_char_count of each char in the table
         table_specified_size = math.ceil((char_pow_frequencies_acc / min_char_pow_frequency) * min_char_count)
         # cap table size to table_size_cap
         if (table_specified_size > specified_size_cap):
             table_specified_size = specified_size_cap
-#        print(table_size)
         # get the number of occurrences of each char in the table (depending on the probability function)
         # and fill the table accordingly
         for char_index in char_pow_frequencies:
@@ -72,7 +72,6 @@ class SkipGramModel(nn.Module):
 
             for i in range(int(num_of_char)):
                 self.sampling_table.append(char_index)
-#        print(self.sampling_table)
                 
     
     def get_neg_samples(self, num_pairs, num_samples):
@@ -111,7 +110,15 @@ class SkipGramModel(nn.Module):
         return (-1 * sum(losses)) / len(targets_1_pos)
     
     
-    def train(self, train_batched_pairs, val_batched_pairs, num_neg_samples, max_eval_checks_not_improved, max_num_epochs, eval_every_num_batches, lr_decay_every_num_batches, lr_decay_factor, embed_weights_rel_path, embed_model_checkpoint_rel_path, system_param_dict):
+    def train(self, train_batched_pairs, val_batched_pairs):
+        num_neg_samples = self.system_param_dict['num_neg_samples']
+        max_eval_checks_not_improved = self.system_param_dict['max_eval_checks_not_improved_embed']
+        max_num_epochs = self.system_param_dict['max_num_epochs_embed']
+        eval_every_num_batches = self.system_param_dict['eval_every_num_batches_embed']
+        lr_decay_every_num_batches = self.system_param_dict['lr_decay_every_num_batches_embed']
+        lr_decay_factor = self.system_param_dict['lr_decay_factor_embed']
+        embed_weights_rel_path = self.system_param_dict['embed_weights_rel_path']
+        embed_model_checkpoint_rel_path = self.system_param_dict['embed_model_checkpoint_rel_path']
         num_train_batched_pairs_minus_one = len(train_batched_pairs) - 1
         max_eval_checks_not_improved_minus_one = max_eval_checks_not_improved - 1
         best_val_mean_loss = float('inf')
@@ -170,17 +177,18 @@ class SkipGramModel(nn.Module):
                             eval_checks_not_improved_counter = 0
                             self.save_embed_weights_to_file(embed_weights_rel_path)
                             self.save_model_checkpoint_to_file({
-                                                        'start_epoch' : epoch + 1,
-                                                        'start_total_trained_batches_counter' : total_trained_batches_counter + 1,
-                                                        'best_val_mean_loss' : best_val_mean_loss,
-                                                        'test_mean_loss' : -1.0,
-                                                        'state_dict': self.state_dict(),
-                                                        'optimizer': self.optimizer.state_dict(),
-                                                        'system_param_dict' : system_param_dict,
-                                                        'vocab_chars' : self.vocab_chars,
-                                                        'vocab_lang' : self.vocab_lang,
-                                                        },
-                                                        embed_model_checkpoint_rel_path)
+                                                                'system_param_dict': self.system_param_dict,
+                                                                'results_dict': {
+                                                                                'start_epoch': epoch + 1,
+                                                                                'start_total_trained_batches_counter': total_trained_batches_counter + 1,
+                                                                                'best_val_mean_loss': best_val_mean_loss,
+                                                                                'state_dict': self.state_dict(),
+                                                                                'optimizer': self.optimizer.state_dict(),
+                                                                                'vocab_chars': self.vocab_chars,
+                                                                                'vocab_lang': self.vocab_lang,
+                                                                                },
+                                                                },
+                                                                embed_model_checkpoint_rel_path)
                         # as model is not improving: increment counter to stop,
                         # if counter equals max_eval_checks_not_improved then stop training
                         else:
@@ -206,7 +214,7 @@ class SkipGramModel(nn.Module):
             line = ' '.join([str(x) for x in weights_array[i]])
             writer.write('\n%s' % line)
         print('Embedding weights saved to file:', relative_path_to_file)
-        
+       
         
     def save_model_checkpoint_to_file(self, state, relative_path_to_file):
         torch.save(state, relative_path_to_file)
@@ -214,16 +222,10 @@ class SkipGramModel(nn.Module):
         
         
     def load_model_checkpoint_from_file(self, relative_path_to_file):
-        checkpoint = torch.load(relative_path_to_file)
-        start_epoch = checkpoint['start_epoch']
-        start_total_trained_batches_counter = checkpoint['start_total_trained_batches_counter']
-        best_val_mean_loss = checkpoint['best_val_mean_loss']
-        test_mean_loss = checkpoint['test_mean_loss']
-        self.load_state_dict(checkpoint['state_dict'])
-        self.optimizer.load_state_dict(checkpoint['optimizer'])
-        system_param_dict = checkpoint['system_param_dict']
-        vocab_chars = checkpoint['vocab_chars']
-        vocab_lang = checkpoint['vocab_lang']
+        state = torch.load(relative_path_to_file)
+        results_dict = state['results_dict']
+        self.load_state_dict(results_dict['state_dict'])
+        self.optimizer.load_state_dict(results_dict['optimizer'])
 #        self.eval()
         print('Model checkpoint loaded from file:', relative_path_to_file)
-        return start_epoch, start_total_trained_batches_counter, best_val_mean_loss, test_mean_loss, system_param_dict, vocab_chars, vocab_lang
+        return state

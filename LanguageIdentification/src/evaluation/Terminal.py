@@ -7,27 +7,27 @@ try:
 except ImportError:
     can_use_tweets = False
 
+
 class Terminal(object):
-    def __init__(self, system_parameters):
-        self.system_parameters = system_parameters
+    
+    def __init__(self, system_param_dict):
+        self.system_param_dict = system_param_dict
 
     """
     to run the terminal, only this function needs to be called
     """
     def run_terminal(self, can_use_live_tweets=False):
         input_data = InputData.InputData()
-        embed, num_classes = input_data.create_embed_from_weights_file(self.system_parameters['trained_embed_weights_rel_path'])
-        gru_model = GRUModel.GRUModel(input_size=embed.weight.size()[1],    # equals embedding dimension
-                                      hidden_size=self.system_parameters['hidden_size_rnn'],
-                                      num_layers=self.system_parameters['num_layers_rnn'],
+        embed, num_classes = input_data.create_embed_from_weights_file(self.system_param_dict['trained_embed_weights_rel_path'])
+        gru_model = GRUModel.GRUModel(vocab_chars={},
+                                      vocab_lang={},
+                                      input_size=embed.weight.size()[1],    # equals embedding dimension
                                       num_classes=num_classes,
-                                      is_bidirectional=self.system_parameters['is_bidirectional'],
-                                      initial_lr=self.system_parameters['initial_lr_rnn'],
-                                      weight_decay=self.system_parameters['weight_decay_rnn'])
-        state = gru_model.load_model_checkpoint_from_file(self.system_parameters['trained_model_checkpoint_rel_path'])
+                                      system_param_dict=self.system_param_dict)
+        state = gru_model.load_model_checkpoint_from_file(self.system_param_dict['trained_model_checkpoint_rel_path'])
         results_dict = state['results_dict']
         # run on GPU if available
-        if (self.system_parameters['cuda_is_avail']):
+        if (self.system_param_dict['cuda_is_avail']):
             gru_model.cuda()
 
         self.loop_input(gru_model=gru_model, input_data=input_data, can_use_live_tweets=can_use_live_tweets, embed=embed, vocab_lang=results_dict['vocab_lang'], vocab_chars=results_dict['vocab_chars'])
@@ -48,7 +48,7 @@ class Terminal(object):
                                                                           vocab_chars=vocab_chars,
                                                                           vocab_lang=vocab_lang)
             # transfer tensors to GPU if available
-            if (self.system_parameters['cuda_is_avail']):
+            if (self.system_param_dict['cuda_is_avail']):
                 input_text_embed_char_text_inp_tensors = input_text_embed_char_text_inp_tensors.cuda()
             n_highest_probs = 5
             self.evaluate_and_print(gru_model=gru_model, input_text_embed_char_text_inp_tensors=input_text_embed_char_text_inp_tensors,
@@ -100,7 +100,7 @@ class Terminal(object):
         # print('input_text_indexed',input_text_indexed)
         input_text_embed_char_text_inp_tensors, input_text_target_tensors = input_data.create_embed_input_and_target_tensors \
             (indexed_texts_and_lang=input_text_indexed,
-             embed_weights_rel_path=self.system_parameters['trained_embed_weights_rel_path'],
+             embed_weights_rel_path=self.system_param_dict['trained_embed_weights_rel_path'],
              embed=embed)
         return input_text_embed_char_text_inp_tensors, input_text_target_tensors
 

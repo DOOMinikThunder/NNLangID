@@ -1,14 +1,14 @@
 # System parameters
 create_splitted_data_files: True                             # split into training, validation and test set from an original file
-calc_embed: True
+train_embed: True
 train_rnn: True
 eval_test_set: True
 run_terminal: False                                          # if True: disables all other calculations
 
 # Print parameters
 print_embed_testing: True
-print_model_checkpoint_embed_weights: null #"../data/save/trained/embed_weights_de_en_es_fr_it.txt" #None
-print_model_checkpoint: null #"../data/save/trained/rnn_model_checkpoint_de_en_es_fr_it.pth" #None
+print_model_checkpoint_embed_weights: null #"../data/save/trained/embed_weights.txt" #None
+print_model_checkpoint: null #"../data/save/trained/rnn_model_checkpoint.pth" #None
 
 # Data paths
 input_tr_va_te_data_rel_path: "../data/input_data/testing/test_embed.csv"   # training, validation and test will be generated from this file
@@ -23,8 +23,8 @@ embed_weights_rel_path: "../data/save/embed_weights.txt"
 embed_model_checkpoint_rel_path: "../data/save/embed_model_checkpoint.pth"
 rnn_model_checkpoint_rel_path: "../data/save/rnn_model_checkpoint.pth"
 
-trained_embed_weights_rel_path: "../data/save/trained/embed_weights_recall_de_en_es_fr_it.txt"
-trained_model_checkpoint_rel_path: "../data/save/trained/rnn_model_checkpoint_recall_de_en_es_fr_it.pth"
+trained_embed_weights_rel_path: "../data/save/trained/embed_weights.txt"
+trained_model_checkpoint_rel_path: "../data/save/trained/rnn_model_checkpoint.pth"
 
 # Data manipulation parameters
 tr_va_te_split_ratios: [0.8, 0.1, 0.1]                      # [train_ratio, val_ratio, test_ratio]
@@ -37,7 +37,6 @@ min_char_frequency: 2                                       # chars appearing le
 sampling_table_min_char_count: 1                            # determines the precision of the sampling (should be 1 or higher)
 sampling_table_specified_size_cap: 10000 #.inf              # caps specified sampling table size to this value (no matter how big it would be according to sampling_table_min_char_count)
                                                             # note: this is only the specified size, the actual table size may slightly deviate due to roundings in the calculation
-#embed_dim: 2                                               # will be set automatically later to: roundup(log2(vocabulary-size))
 max_context_window_size: 3
 num_neg_samples: 5
 batch_size_embed: 1
@@ -53,8 +52,10 @@ hidden_size_rnn: 100
 num_layers_rnn: 1
 is_bidirectional: True
 batch_size_rnn: 10
+max_eval_checks_not_improved_rnn: 1
+max_num_epochs_rnn: 1 #.inf
+eval_every_num_batches_rnn: 3
+lr_decay_every_num_batches_rnn: 3
+lr_decay_factor_rnn: 1.0                                    # 1.0 means no decay
 initial_lr_rnn: 0.01
-scheduler_step_size_rnn: 1                                  # currently not functioning
-scheduler_gamma_rnn: 0.1                                    # currently not functioning
 weight_decay_rnn: 0.00001
-num_epochs_rnn: 10 #.inf

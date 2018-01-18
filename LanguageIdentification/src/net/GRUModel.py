@@ -12,29 +12,33 @@ from evaluation import RNNEvaluator
 class GRUModel(nn.Module):
     
     
-    def __init__(self, vocab_chars, vocab_lang, input_size, hidden_size, num_layers, num_classes, is_bidirectional, initial_lr, weight_decay):
+    def __init__(self, vocab_chars, vocab_lang, input_size, num_classes, system_param_dict):
         super(GRUModel, self).__init__()
         self.vocab_chars = vocab_chars
         self.vocab_lang = vocab_lang
-        self.hidden_size = hidden_size
-        self.num_layers = num_layers
+        self.input_size = input_size
         self.num_classes = num_classes
-        self.lr = initial_lr
+        self.system_param_dict = system_param_dict
+        self.hidden_size=system_param_dict['hidden_size_rnn']
+        self.num_layers=system_param_dict['num_layers_rnn']
+        self.is_bidirectional=system_param_dict['is_bidirectional']
+        self.lr = system_param_dict['initial_lr_rnn']
+        self.weight_decay=system_param_dict['weight_decay_rnn']
         self.gru_layer = nn.GRU(input_size=input_size,
-                                hidden_size=hidden_size,
-                                num_layers=num_layers,
-                                bidirectional=is_bidirectional)
-        if (is_bidirectional):
+                                hidden_size=self.hidden_size,
+                                num_layers=self.num_layers,
+                                bidirectional=self.is_bidirectional)
+        if (self.is_bidirectional):
             self.num_directions = 2
         else:
             self.num_directions = 1
-        self.output_layer = nn.Linear(hidden_size * self.num_directions, num_classes)
+        self.output_layer = nn.Linear(self.hidden_size * self.num_directions, num_classes)
         self.log_softmax = nn.LogSoftmax()
         self.batch_size = 1     # unused dimension
-        self.cuda_is_avail = torch.cuda.is_available()
+        self.cuda_is_avail = system_param_dict['cuda_is_avail']
         
         self.criterion = torch.nn.NLLLoss()
-        self.optimizer = optim.Adam(params=self.parameters(), lr=initial_lr, weight_decay=weight_decay)
+        self.optimizer = optim.Adam(params=self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
 
 
     def initHidden(self):
@@ -56,7 +60,14 @@ class GRUModel(nn.Module):
         return output, next_hidden
 
 
-    def train(self, train_inputs, train_targets, val_inputs, val_targets, batch_size, max_eval_checks_not_improved, max_num_epochs, eval_every_num_batches, lr_decay_every_num_batches, lr_decay_factor, rnn_model_checkpoint_rel_path, system_param_dict):
+    def train(self, train_inputs, train_targets, val_inputs, val_targets):
+        batch_size = self.system_param_dict['batch_size_rnn']
+        max_eval_checks_not_improved = self.system_param_dict['max_eval_checks_not_improved_rnn']
+        max_num_epochs = self.system_param_dict['max_num_epochs_rnn']
+        eval_every_num_batches = self.system_param_dict['eval_every_num_batches_rnn']
+        lr_decay_every_num_batches = self.system_param_dict['lr_decay_every_num_batches_rnn']
+        lr_decay_factor = self.system_param_dict['lr_decay_factor_rnn']
+        rnn_model_checkpoint_rel_path = self.system_param_dict['rnn_model_checkpoint_rel_path']
         batch_generator = BatchGenerator.Batches(train_inputs, train_targets, batch_size)
         num_train_batches_minus_one = batch_generator.num_batches - 1
         max_eval_checks_not_improved_minus_one = max_eval_checks_not_improved - 1
@@ -106,20 +117,18 @@ class GRUModel(nn.Module):
                         print('[RNN] Epoch', epoch, '| Batch', batch_i, '/', num_train_batches_minus_one, '| Validation mean loss: ', cur_val_mean_loss)
                         print('========================================')
             
-                        # check if loss improved, and if so, save embedding weights and model checkpoint to file
+                        # check if loss improved, and if so, save model checkpoint to file
                         # and reset eval_checks_not_improved_counter as model is improving (again)
                         if (best_val_mean_loss > cur_val_mean_loss):
                             best_val_mean_loss = cur_val_mean_loss
                             eval_checks_not_improved_counter = 0
                             self.save_model_checkpoint_to_file({
-                                                                'system_param_dict': system_param_dict,
+                                                                'system_param_dict': self.system_param_dict,
                                                                 'results_dict': {
                                                                                 'start_epoch': epoch + 1,
                                                                                 'start_total_trained_batches_counter': total_trained_batches_counter + 1,
                                                                                 'best_val_mean_loss': best_val_mean_loss,
-                                                                                'test_mean_loss': -1.0,
                                                                                 'best_val_accuracy': -1.0,
-                                                                                'test_accuracy': -1.0,
                                                                                 'state_dict': self.state_dict(),
                                                                                 'optimizer': self.optimizer.state_dict(),
                                                                                 'vocab_chars': self.vocab_chars,
@@ -145,9 +154,9 @@ class GRUModel(nn.Module):
         
     def load_model_checkpoint_from_file(self, relative_path_to_file):
         state = torch.load(relative_path_to_file)
-        self.load_state_dict(state['results_dict']['state_dict'])
-        self.optimizer.load_state_dict(state['results_dict']['optimizer'])
+        results_dict = state['results_dict']
+        self.load_state_dict(results_dict['state_dict'])
+        self.optimizer.load_state_dict(results_dict['optimizer'])
 #        self.eval()
         print('Model checkpoint loaded from file:', relative_path_to_file)
-#        return start_epoch, best_val_accuracy, test_accuracy, system_param_dict, vocab_chars, vocab_lang
         return state

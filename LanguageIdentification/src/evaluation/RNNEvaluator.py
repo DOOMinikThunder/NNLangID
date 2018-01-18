@@ -16,7 +16,7 @@ class RNNEvaluator(object):
     def all_metrics(self, input_data, target_data, vocab_lang):
         mean_loss, predictions, targets = self.evaluate_data_set(input_data,
                                                                  target_data,
-                                                                 vocab_lang)
+                                                                 n_highest_probs=1)
         accuracy = self.accuracy(predictions, targets)
         confusion_matrix = self.confusion_matrix(predictions, targets, vocab_lang)
         precision = self.precision(confusion_matrix)
@@ -110,8 +110,7 @@ class RNNEvaluator(object):
         lang_predictions = [lang_mean / pred_size for lang_mean in lang_predictions]
         languages_probs_and_idx = [(lang_predictions[i], i) for i in range(len(lang_predictions))]
         languages_probs_and_idx.sort(reverse=True)
-        highest_probs = [languages_probs_and_idx[i] for i in
-                         range(min(n_highest_probs, len(languages_probs_and_idx)))]
+        highest_probs = [languages_probs_and_idx[i] for i in range(min(n_highest_probs, len(languages_probs_and_idx)))]
         return highest_probs
 
     def confusion_matrix(self, predictions, targets, vocab_lang):
