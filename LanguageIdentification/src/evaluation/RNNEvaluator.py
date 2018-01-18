@@ -14,9 +14,9 @@ class RNNEvaluator(object):
 #        super(RNNEvaluator, self).__init__(model)
 
     def all_metrics(self, input_data, target_data, vocab_lang):
-        mean_loss, predictions, targets = self.evaluate_data_set(input_data,
-                                                                 target_data,
-                                                                 n_highest_probs=1)
+        mean_loss, predictions, targets = self.evaluate_data_set_basic(input_data,
+                                                                       target_data,
+                                                                       n_highest_probs=1)
         accuracy = self.accuracy(predictions, targets)
         confusion_matrix = self.confusion_matrix(predictions, targets, vocab_lang)
         precision = self.precision(confusion_matrix)
@@ -24,7 +24,7 @@ class RNNEvaluator(object):
         f1_score = self.f1_score(precision, recall)
         return mean_loss, accuracy, confusion_matrix, precision, recall, f1_score
 
-    def evaluate_data_set_efficient(self, input_data, target_data, n_highest_probs=1):
+    def evaluate_data_set(self, input_data, target_data, n_highest_probs=1):
         predictions = []
         target_list = []
         acc_loss = []
@@ -44,7 +44,6 @@ class RNNEvaluator(object):
                              range(min(n_highest_probs, len(languages_probs_and_idx)))]
 
             acc_loss.append(loss)
-            # transfer back from GPU to CPU if GPU available
             target_list.append(target.data[0])
             predictions.append(lang_prediction[0][1])
         mean_loss = sum(acc_loss) / float(len(acc_loss))
@@ -54,9 +53,9 @@ class RNNEvaluator(object):
         accuracy = pred_true / len(target_list)
         return mean_loss.data[0], accuracy
 
-    def evaluate_data_set(self, input_data, target_data, n_highest_probs=1):
+    def evaluate_data_set_basic(self, input_data, target_data, n_highest_probs=1):
         if (len(input_data) != len(target_data)):
-            print("input and target size different for 'evaluate_data_set()'")
+            print("input and target size different for 'evaluate_data_set_basic()'")
             return -1
         predictions = []
         target_list = []
