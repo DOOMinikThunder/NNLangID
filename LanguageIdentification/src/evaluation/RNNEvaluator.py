@@ -24,6 +24,36 @@ class RNNEvaluator(object):
         f1_score = self.f1_score(precision, recall)
         return mean_loss, accuracy, confusion_matrix, precision, recall, f1_score
 
+    def evaluate_data_set_efficient(self, input_data, target_data, n_highest_probs=1):
+        predictions = []
+        target_list = []
+        acc_loss = []
+        for input, target in zip(input_data, target_data):
+            hidden = self.model.initHidden()
+            output, hidden = self.model(input, hidden)
+            loss = self.model.criterion(output, target)
+            lang_predictions = np.zeros([output.size()[1]])
+            pred_size = output.size()[0]
+            for pred in output:
+                for i in range(len(lang_predictions)):
+                    lang_predictions[i] += np.exp(pred[i].data[0])
+            lang_predictions = [lang_mean / pred_size for lang_mean in lang_predictions]
+            languages_probs_and_idx = [(lang_predictions[i], i) for i in range(len(lang_predictions))]
+            languages_probs_and_idx.sort(reverse=True)
+            lang_prediction = [languages_probs_and_idx[i] for i in
+                             range(min(n_highest_probs, len(languages_probs_and_idx)))]
+
+            acc_loss.append(loss)
+            # transfer back from GPU to CPU if GPU available
+            target_list.append(target.data[0])
+            predictions.append(lang_prediction[0][1])
+        mean_loss = sum(acc_loss) / float(len(acc_loss))
+        pred_true = 0
+        for pred, target in zip(predictions, target_list):
+            pred_true += int(pred == target)
+        accuracy = pred_true / len(target_list)
+        return mean_loss.data[0], accuracy
+
     def evaluate_data_set(self, input_data, target_data, n_highest_probs=1):
         if (len(input_data) != len(target_data)):
             print("input and target size different for 'evaluate_data_set()'")
