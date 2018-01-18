@@ -71,22 +71,22 @@ class RNNCalculation(object):
         rnn_evaluator = RNNEvaluator.RNNEvaluator(gru_model)
         
         # get nice formatting for confusion matrix
-        confusion_matrix = rnn_evaluator.to_string_confusion_matrix(results_dict['confusion_matrix'], vocab_lang, 5)
+        #confusion_matrix = rnn_evaluator.to_string_confusion_matrix(results_dict['confusion_matrix'], vocab_lang, 5)
         results_print_dict = {}
         for result in results_dict:
             # only print relevant and not too verbose data
             if (result != 'state_dict'
                 and result != 'optimizer'
                 and result != 'vocab_chars'
-                and result != 'vocab_lang'
-                and result != 'confusion_matrix'):
+                and result != 'vocab_lang'):
+                #and result != 'confusion_matrix'):
                 results_print_dict[result] = results_dict[result]
         
         print('Model checkpoint data:')
         to_print = [('Model:\n', gru_model),
                     ('System parameters:', system_param_dict),
-                    ('Results:', results_print_dict),
-                    ('Confusion matrix:\n', confusion_matrix)]
+                    ('Results:', results_print_dict)]#,
+                    #('Confusion matrix:\n', confusion_matrix)]
         self.print_out(to_print)
         
 
