@@ -1,14 +1,14 @@
 # System parameters
-create_splitted_data_files: True                             # split into training, validation and test set from an original file
-train_embed: True
-train_rnn: True
-eval_test_set: True
+create_splitted_data_files: False                             # split into training, validation and test set from an original file
+train_embed: False
+train_rnn: False
+eval_test_set: False
 run_terminal: False                                          # if True: disables all other calculations
 
 # Print parameters
-print_embed_testing: True
-print_model_checkpoint_embed_weights: null #"../data/save/trained/embed_weights.txt" #None
-print_model_checkpoint: null #"../data/save/trained/rnn_model_checkpoint.pth" #None
+print_embed_testing: False
+print_model_checkpoint_embed_weights: "../data/save/trained/embed_weights_recall_all_18.01.2018.txt" #None
+print_model_checkpoint: "../data/save/trained/rnn_model_checkpoint_recall_all_18.01.2018.pth" #None
 
 # Data paths
 input_tr_va_te_data_rel_path: "../data/input_data/testing/test_embed.csv"   # training, validation and test will be generated from this file
