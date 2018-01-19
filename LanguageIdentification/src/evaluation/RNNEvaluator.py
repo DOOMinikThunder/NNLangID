@@ -109,7 +109,16 @@ class RNNEvaluator(object):
             loss = self.model.criterion(output, target)
 #            else:
 #                loss = 0
-            lang_prediction = self.__evaluate_prediction(output, n_highest_probs)
+            lang_predictions = np.zeros([output.size()[1]])
+            pred_size = output.size()[0]
+            for pred in output:
+                for i in range(len(lang_predictions)):
+                    lang_predictions[i] += np.exp(pred[i].data[0])
+            lang_predictions = [lang_mean / pred_size for lang_mean in lang_predictions]
+            languages_probs_and_idx = [(lang_predictions[i], i) for i in range(len(lang_predictions))]
+            languages_probs_and_idx.sort(reverse=True)
+            lang_prediction = [languages_probs_and_idx[i] for i in range(min(n_highest_probs, len(languages_probs_and_idx)))]
+            
             acc_loss.append(loss)
             target_list.append(target.data[0])
             predictions.append(lang_prediction[0][1])
@@ -225,29 +234,7 @@ class RNNEvaluator(object):
         """
         matrix_in_columns = list(zip(*confusion_matrix))
         return [matrix_in_columns[i][:i] + matrix_in_columns[i][i + 1:] for i in range(len(matrix_in_columns))]
-
-    def __evaluate_prediction(self, prediction, n_highest_probs):
-        """
-        Given a prediction, computes the most likely languages
-        Args:
-        	prediction: tensor of languages-dimensional entries containing log softmax probabilities
-        	n_highest_probs: n highest probabilities of languages to return
-
-        Returns:
-        	highest_probs: list of highest probability-language pairs for n languages
-
-        """
-        lang_predictions = np.zeros([prediction.size()[1]])
-        pred_size = prediction.size()[0]
-        for pred in prediction:
-            for i in range(len(lang_predictions)):
-                lang_predictions[i] += np.exp(pred[i].data[0])
-        lang_predictions = [lang_mean / pred_size for lang_mean in lang_predictions]
-        languages_probs_and_idx = [(lang_predictions[i], i) for i in range(len(lang_predictions))]
-        languages_probs_and_idx.sort(reverse=True)
-        highest_probs = [languages_probs_and_idx[i] for i in range(min(n_highest_probs, len(languages_probs_and_idx)))]
-        return highest_probs
-
+    
     def confusion_matrix(self, predictions, targets, vocab_lang):
         """
         Confusion matrix has language x language entries, corresponding to predictions(row) and targets(column)
