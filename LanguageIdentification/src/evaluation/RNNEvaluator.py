@@ -1,9 +1,9 @@
+from __future__ import division
 import math
 import numpy as np
 from scipy import stats
 import torch
-from torch.autograd import Variable
-from collections import Counter
+
 #import Evaluator
 
 class RNNEvaluator(object):

@@ -115,7 +115,6 @@ class SkipGramModel(nn.Module):
         max_eval_checks_not_improved = self.system_param_dict['max_eval_checks_not_improved_embed']
         max_num_epochs = self.system_param_dict['max_num_epochs_embed']
         eval_every_num_batches = self.system_param_dict['eval_every_num_batches_embed']
-        lr_decay_every_num_batches = self.system_param_dict['lr_decay_every_num_batches_embed']
         lr_decay_factor = self.system_param_dict['lr_decay_factor_embed']
         embed_weights_rel_path = self.system_param_dict['embed_weights_rel_path']
         embed_model_checkpoint_rel_path = self.system_param_dict['embed_model_checkpoint_rel_path']
@@ -126,6 +125,7 @@ class SkipGramModel(nn.Module):
         epoch = 0
         total_trained_batches_counter = 0
         eval_checks_not_improved_counter = 0
+        max_eval_checks_not_improved_half = max_eval_checks_not_improved / 2
         continue_training = True
         embedding_evaluator = EmbeddingEvaluator.EmbeddingEvaluator(self)
         # increase the learning rate variable as in the first iteration it will be immediately decreased
@@ -156,12 +156,6 @@ class SkipGramModel(nn.Module):
                     batch_mean_loss.backward()
                     self.optimizer.step()
                     
-                    # decrease learning rate every lr_decay_every_num_batches
-                    if (total_trained_batches_counter % lr_decay_every_num_batches == 0):
-                        self.lr = self.lr * lr_decay_factor
-                        for param_group in self.optimizer.param_groups:
-                            param_group['lr'] = self.lr
-                    
                     # evaluate validation set every eval_every_num_batches
                     if (total_trained_batches_counter % eval_every_num_batches == 0):
                         cur_val_mean_loss = embedding_evaluator.evaluate_data_set(val_batched_pairs,
@@ -189,11 +183,19 @@ class SkipGramModel(nn.Module):
                                                                                 },
                                                                 },
                                                                 embed_model_checkpoint_rel_path)
-                        # as model is not improving: increment counter to stop,
+                        # as model is not improving: increment counter to stop, and eventually start decreasing the learning rate;
                         # if counter equals max_eval_checks_not_improved then stop training
                         else:
                             print('Not improved evaluation checks:', eval_checks_not_improved_counter, '/', max_eval_checks_not_improved_minus_one)
                             eval_checks_not_improved_counter += 1
+                            # when half of maximal not improved eval checks is reached:
+                            # decrease learning rate every eval check as long as there is no improvement
+                            if (eval_checks_not_improved_counter >= max_eval_checks_not_improved_half):
+                                self.lr = self.lr * lr_decay_factor
+                                for param_group in self.optimizer.param_groups:
+                                    param_group['lr'] = self.lr
+                                print('Learning rate decreased to:', self.lr)
+                            # stop training when maximum of not improved eval checks is reached
                             if (eval_checks_not_improved_counter == max_eval_checks_not_improved):
                                 continue_training = False
                 total_trained_batches_counter += 1
