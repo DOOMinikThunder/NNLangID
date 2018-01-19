@@ -47,13 +47,13 @@ lr_decay_factor_embed: 0.1                                  # 1.0 means no decay
 initial_lr_embed: 0.025
 
 # HYPERPARAMETERS RNN
-hidden_size_rnn: 100
+hidden_size_rnn: 10
 num_layers_rnn: 1
 is_bidirectional: True
-batch_size_rnn: 10
+batch_size_rnn: 1
 max_eval_checks_not_improved_rnn: 10
 max_num_epochs_rnn: .inf #10 #.inf
-eval_every_num_batches_rnn: 10000                            # 107300 tweets in uniformly_recall_merged
+eval_every_num_batches_rnn: 107300                            # 107300 tweets in uniformly_recall_merged
 lr_decay_factor_rnn: 0.1                                    # 1.0 means no decay
 initial_lr_rnn: 0.01
 weight_decay_rnn: 0.00001
