@@ -9,10 +9,24 @@ from evaluation import Evaluator
 class EmbeddingEvaluator(object):
 
     def __init__(self, model):
+        """
+
+        Args:
+        	model:
+        """
         self.model = model
 #        super(EmbeddingEvaluator, self).__init__(model)
     
     def evaluate_data_set(self, val_batched_pairs, num_neg_samples):
+        """
+
+        Args:
+        	val_batched_pairs:
+        	num_neg_samples:
+
+        Returns:
+
+        """
         for batch_i, batch in enumerate(val_batched_pairs):
             batch_size = len(batch)
             

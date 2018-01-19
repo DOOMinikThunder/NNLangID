@@ -13,6 +13,18 @@ class EmbeddingCalculation(object):
         
 
     def train_embed(self, train_set_indexed, val_set_indexed, vocab_chars, vocab_lang, system_param_dict):
+        """
+
+        Args:
+        	train_set_indexed:
+        	val_set_indexed:
+        	vocab_chars:
+        	vocab_lang:
+        	system_param_dict:
+
+        Returns:
+
+        """
         # set embedding dimension to: roundup(log2(vocabulary-size))
         embed_dim = math.ceil(math.log(len(vocab_chars),2))
         
