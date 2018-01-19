@@ -4,6 +4,17 @@ import unicodecsv as csv
 class DataSplit(object):
 
 	def split_percent_of_languages(self, input_file, ratio, out_filenames, shuffle_seed):
+		"""
+
+		Args:
+			input_file:
+			ratio:
+			out_filenames:
+			shuffle_seed:
+
+		Returns:
+
+		"""
 		if(len(ratio) != len(out_filenames)):
 			print("ratio and output files must have same size!")
 			return []
@@ -14,6 +25,15 @@ class DataSplit(object):
 		return splitted_data
 
 	def write_to_file(self, splitted_data, out_filenames):
+		"""
+
+		Args:
+			splitted_data:
+			out_filenames:
+
+		Returns:
+
+		"""
 		for list, out_file in zip(splitted_data, out_filenames):
 			with open(out_file, 'wb') as file:
 				writer = csv.writer(file, delimiter=';')
@@ -23,6 +43,14 @@ class DataSplit(object):
 					writer.writerow(to_write)
 
 	def read_input(self, csv_file):
+		"""
+
+		Args:
+			csv_file:
+
+		Returns:
+
+		"""
 		with open(csv_file, 'rb') as file:
 			reader = csv.reader(file, delimiter=';', encoding='utf-8')
 			next(reader)
@@ -31,6 +59,16 @@ class DataSplit(object):
 
 
 	def merge_splitted_languages(self, languages_splitted, ratio, shuffle_seed):
+		"""
+
+		Args:
+			languages_splitted:
+			ratio:
+			shuffle_seed:
+
+		Returns:
+
+		"""
 		splitted_data = [[] for i in range(len(ratio))]
 		for language in languages_splitted:
 			language_in_ratios = self.split_language_with_ratio(languages_splitted[language], ratio, shuffle_seed)#
@@ -40,6 +78,14 @@ class DataSplit(object):
 		return splitted_data
 
 	def split_by_languages(self, input):
+		"""
+
+		Args:
+			input:
+
+		Returns:
+
+		"""
 		idx = 0
 		end_of_list = len(input)-1
 		languages_splitted = {}
@@ -53,6 +99,16 @@ class DataSplit(object):
 	#ratio is a list of ratios, e.g. [0.5,0.5] for two lists, [0.4,0.4,0.2] for three lists
 	#returns list of split lists with len(ratio)
 	def split_language_with_ratio(self, input, ratio, shuffle_seed):
+		"""
+
+		Args:
+			input:
+			ratio:
+			shuffle_seed:
+
+		Returns:
+
+		"""
 		in_size = len(input)
 		idx_list = [i for i in range(len(input))]
 		seed(shuffle_seed)
@@ -64,6 +120,16 @@ class DataSplit(object):
 		return split_languages
 
 	def take_from_list(self, list, start, end):
+		"""
+
+		Args:
+			list:
+			start:
+			end:
+
+		Returns:
+
+		"""
 		new_list = list[start:end]
 		del list[start:end]
 		return new_list

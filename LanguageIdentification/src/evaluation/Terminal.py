@@ -11,12 +11,25 @@ except ImportError:
 class Terminal(object):
     
     def __init__(self, system_param_dict):
+        """
+
+        Args:
+        	system_param_dict:
+        """
         self.system_param_dict = system_param_dict
 
     """
     to run the terminal, only this function needs to be called
     """
     def run_terminal(self, can_use_live_tweets=False):
+        """
+
+        Args:
+        	can_use_live_tweets:
+
+        Returns:
+
+        """
         input_data = InputData.InputData()
         embed, num_classes = input_data.create_embed_from_weights_file(self.system_param_dict['trained_embed_weights_rel_path'])
         gru_model = GRUModel.GRUModel(vocab_chars={},
@@ -33,7 +46,20 @@ class Terminal(object):
         self.loop_input(gru_model=gru_model, input_data=input_data, can_use_live_tweets=can_use_live_tweets, embed=embed, vocab_lang=results_dict['vocab_lang'], vocab_chars=results_dict['vocab_chars'])
 
 
-    def loop_input(self, gru_model, input_data, can_use_live_tweets, embed, vocab_lang, vocab_chars):
+    def __loop_input(self, gru_model, input_data, can_use_live_tweets, embed, vocab_lang, vocab_chars):
+        """
+
+        Args:
+        	gru_model:
+        	input_data:
+        	can_use_live_tweets:
+        	embed:
+        	vocab_lang:
+        	vocab_chars:
+
+        Returns:
+
+        """
         tweet_retriever = TweetRetriever.TweetRetriever()
         lang2index, index2lang = input_data.get_string2index_and_index2string(vocab_lang)
 
@@ -54,7 +80,15 @@ class Terminal(object):
             self.evaluate_and_print(gru_model=gru_model, input_text_embed_char_text_inp_tensors=input_text_embed_char_text_inp_tensors,
                                     n_highest_probs=n_highest_probs, input_text=input_text, index2lang=index2lang, is_live_tweets=is_live_tweets)
 
-    def str_to_int(self, string):
+    def __str_to_int(self, string):
+        """
+
+        Args:
+        	string:
+
+        Returns:
+
+        """
         try:
             number = int(string)
             return number
@@ -63,6 +97,16 @@ class Terminal(object):
             return 0
 
     def sample_tweets(self, tweet_retriever, vocab_lang, amount):
+        """
+
+        Args:
+        	tweet_retriever:
+        	vocab_lang:
+        	amount:
+
+        Returns:
+
+        """
         track = input("(Optional) Specify a keyword to search in tweets: ")
         if track != "":
             language = input("(Optional) Specify a language identifier to search in tweets: ")
@@ -75,6 +119,17 @@ class Terminal(object):
             return tweet_retriever.retrieve_sample_tweets(amount)
 
     def retrieve_text(self, can_use_live_tweets, index2lang, tweet_retriever, vocab_lang):
+        """
+
+        Args:
+        	can_use_live_tweets:
+        	index2lang:
+        	tweet_retriever:
+        	vocab_lang:
+
+        Returns:
+
+        """
         input_terminal = input('Enter text or number: ')
         amount_live_tweets = self.str_to_int(input_terminal)
         is_live_tweets = False
@@ -92,6 +147,18 @@ class Terminal(object):
         return input_text, input_text_lang_tuple, is_live_tweets
 
     def prepare_data(self, input_data, embed, input_text_lang_tuple, vocab_chars, vocab_lang):
+        """
+
+        Args:
+        	input_data:
+        	embed:
+        	input_text_lang_tuple:
+        	vocab_chars:
+        	vocab_lang:
+
+        Returns:
+
+        """
         filtered_texts_and_lang = input_data.filter_out_irrelevant_tweet_parts(input_text_lang_tuple)
         # print('filtered_texts_and_lang',filtered_texts_and_lang)
         input_text_only_vocab_chars = input_data.get_texts_with_only_vocab_chars(filtered_texts_and_lang, vocab_chars)
@@ -105,6 +172,19 @@ class Terminal(object):
         return input_text_embed_char_text_inp_tensors, input_text_target_tensors
 
     def evaluate_and_print(self, gru_model, input_text_embed_char_text_inp_tensors, n_highest_probs, input_text, index2lang, is_live_tweets):
+        """
+
+        Args:
+        	gru_model:
+        	input_text_embed_char_text_inp_tensors:
+        	n_highest_probs:
+        	input_text:
+        	index2lang:
+        	is_live_tweets:
+
+        Returns:
+
+        """
         rnn_evaluator = RNNEvaluator.RNNEvaluator(gru_model)
         for i, input_tensor in enumerate(input_text_embed_char_text_inp_tensors):
             lang_prediction, _ = rnn_evaluator.evaluate_single_date(input_tensor, n_highest_probs)

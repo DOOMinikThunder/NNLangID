@@ -20,8 +20,15 @@ https://adoni.github.io/2017/11/08/word2vec-pytorch/ (Access: 11.01.2018)
 """
 class SkipGramModel(nn.Module):
 
-    
     def __init__(self, vocab_chars, vocab_lang, embed_dim, system_param_dict):
+        """
+
+        Args:
+        	vocab_chars:
+        	vocab_lang:
+        	embed_dim:
+        	system_param_dict:
+        """
         super(SkipGramModel, self).__init__()
         self.vocab_chars = vocab_chars
         self.vocab_lang = vocab_lang
@@ -44,12 +51,27 @@ class SkipGramModel(nn.Module):
         
         
     def init_embed(self):
+        """
+
+        Returns:
+
+        """
         init_range = 0.5 / self.embed_dim
         self.embed_hidden.weight.data.uniform_(-init_range, init_range)
         self.embed_output.weight.data.uniform_(-0, 0)
 
 
     def init_sampling_table(self, vocab_chars, min_char_count=1, specified_size_cap=100000000):
+        """
+
+        Args:
+        	vocab_chars:
+        	min_char_count:
+        	specified_size_cap:
+
+        Returns:
+
+        """
         char_pow_frequencies = {}
         char_pow_frequencies_acc = 0
         min_char_pow_frequency = float('inf')
@@ -75,10 +97,29 @@ class SkipGramModel(nn.Module):
                 
     
     def get_neg_samples(self, num_pairs, num_samples):
+        """
+
+        Args:
+        	num_pairs:
+        	num_samples:
+
+        Returns:
+
+        """
         return np.random.choice(self.sampling_table, size=(num_pairs, num_samples)).tolist()
                 
 
     def forward(self, targets_1_pos, contexts_1_pos, contexts_0_pos_samples):
+        """
+
+        Args:
+        	targets_1_pos:
+        	contexts_1_pos:
+        	contexts_0_pos_samples:
+
+        Returns:
+
+        """
         losses = []
         # lookup the 1-position weight values for the target char
         # for all target chars in the batch
@@ -111,6 +152,15 @@ class SkipGramModel(nn.Module):
     
     
     def train(self, train_batched_pairs, val_batched_pairs):
+        """
+
+        Args:
+        	train_batched_pairs:
+        	val_batched_pairs:
+
+        Returns:
+
+        """
         num_neg_samples = self.system_param_dict['num_neg_samples']
         max_eval_checks_not_improved = self.system_param_dict['max_eval_checks_not_improved_embed']
         max_num_epochs = self.system_param_dict['max_num_epochs_embed']
@@ -203,6 +253,14 @@ class SkipGramModel(nn.Module):
     
     
     def save_embed_weights_to_file(self, relative_path_to_file):
+        """
+
+        Args:
+        	relative_path_to_file:
+
+        Returns:
+
+        """
         # transfer back from GPU to CPU if GPU available
         if (self.cuda_is_avail):
             weights_array = self.embed_hidden.weight.cpu().data.numpy()
@@ -219,11 +277,28 @@ class SkipGramModel(nn.Module):
        
         
     def save_model_checkpoint_to_file(self, state, relative_path_to_file):
+        """
+
+        Args:
+        	state:
+        	relative_path_to_file:
+
+        Returns:
+
+        """
         torch.save(state, relative_path_to_file)
         print('Model checkpoint saved to file:', relative_path_to_file)
         
         
     def load_model_checkpoint_from_file(self, relative_path_to_file):
+        """
+
+        Args:
+        	relative_path_to_file:
+
+        Returns:
+
+        """
         state = torch.load(relative_path_to_file)
         results_dict = state['results_dict']
         self.load_state_dict(results_dict['state_dict'])

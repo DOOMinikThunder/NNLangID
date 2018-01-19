@@ -14,6 +14,16 @@ class RNNEvaluator(object):
 #        super(RNNEvaluator, self).__init__(model)
 
     def all_metrics(self, input_data, target_data, vocab_lang):
+        """
+
+        Args:
+        	input_data:
+        	target_data:
+        	vocab_lang:
+
+        Returns:
+
+        """
         mean_loss, predictions, targets = self.evaluate_data_set_basic(input_data,
                                                                        target_data,
                                                                        n_highest_probs=1)
@@ -25,6 +35,16 @@ class RNNEvaluator(object):
         return mean_loss, accuracy, confusion_matrix, precision, recall, f1_score
 
     def evaluate_data_set(self, input_data, target_data, n_highest_probs=1):
+        """
+
+        Args:
+        	input_data:
+        	target_data:
+        	n_highest_probs:
+
+        Returns:
+
+        """
         predictions = []
         target_list = []
         acc_loss = []
@@ -54,6 +74,16 @@ class RNNEvaluator(object):
         return mean_loss.data[0], accuracy
 
     def evaluate_data_set_basic(self, input_data, target_data, n_highest_probs=1):
+        """
+
+        Args:
+        	input_data:
+        	target_data:
+        	n_highest_probs:
+
+        Returns:
+
+        """
         if (len(input_data) != len(target_data)):
             print("input and target size different for 'evaluate_data_set_basic()'")
             return -1
@@ -70,18 +100,44 @@ class RNNEvaluator(object):
         return mean_loss.data[0], predictions, target_list
 
     def accuracy(self, predictions, targets):
+        """
+
+        Args:
+        	predictions:
+        	targets:
+
+        Returns:
+
+        """
         pred_true = 0
         for pred, target in zip(predictions, targets):
             pred_true += int(pred == target)
         return pred_true / len(targets)
 
     def f1_score(self, precision, recall):
+        """
+
+        Args:
+        	precision:
+        	recall:
+
+        Returns:
+
+        """
         try:
             return [2 * (p * r) / (p + r) for p, r in zip(precision, recall)]
         except ZeroDivisionError:
             return [0]
 
     def recall(self, confusion_matrix):
+        """
+
+        Args:
+        	confusion_matrix:
+
+        Returns:
+
+        """
         true_positives = self.true_positives(confusion_matrix)
         false_negatives = self.false_negatives(confusion_matrix)
         try:
@@ -90,6 +146,14 @@ class RNNEvaluator(object):
             return [0]
 
     def precision(self, confusion_matrix):
+        """
+
+        Args:
+        	confusion_matrix:
+
+        Returns:
+
+        """
         true_positives = self.true_positives(confusion_matrix)
         false_positives = self.false_positive(confusion_matrix)
         try:
@@ -97,22 +161,50 @@ class RNNEvaluator(object):
         except ZeroDivisionError:
             return [0]
 
-    def true_positives(self, confusion_matrix):
+    def __true_positives(self, confusion_matrix):
+        """
+
+        Args:
+        	confusion_matrix:
+
+        Returns:
+
+        """
         return [confusion_matrix[i][i] for i in range(len(confusion_matrix))]
 
-    def false_positive(self, confusion_matrix):
+    def __false_positive(self, confusion_matrix):
+        """
+
+        Args:
+        	confusion_matrix:
+
+        Returns:
+
+        """
         return [confusion_matrix[i][:i] + confusion_matrix[i][i + 1:] for i in range(len(confusion_matrix))]
 
-    def false_negatives(self, confusion_matrix):
+    def __false_negatives(self, confusion_matrix):
+        """
+
+        Args:
+        	confusion_matrix:
+
+        Returns:
+
+        """
         matrix_in_columns = list(zip(*confusion_matrix))
         return [matrix_in_columns[i][:i] + matrix_in_columns[i][i + 1:] for i in range(len(matrix_in_columns))]
 
     def evaluate_single_date(self, input, n_highest_probs, target=None):
         """
-        evaluates a single date
-        :param input: the input date/tweet
-        :param n_highest_probs: the n languages with the highest probabilites to be calculated
-        :return: list of (probability, language index)
+
+        Args:
+        	input:
+        	n_highest_probs:
+        	target:
+
+        Returns:
+
         """
         hidden = self.model.initHidden()
         output, hidden = self.model(input, hidden)
@@ -126,10 +218,13 @@ class RNNEvaluator(object):
     # prediction: tensor of languages-dimensional entries containing log softmax probabilities
     def evaluate_prediction(self, prediction, n_highest_probs):
         """
-        given a single date (tweet), calculates the respective language predictions
-        :param prediction: the predicted date/tweet
-        :param n_highest_probs: the n languages with the highest probabilites
-        :return: list of (probability, language index)
+
+        Args:
+        	prediction:
+        	n_highest_probs:
+
+        Returns:
+
         """
         lang_predictions = np.zeros([prediction.size()[1]])
         pred_size = prediction.size()[0]
@@ -144,11 +239,14 @@ class RNNEvaluator(object):
 
     def confusion_matrix(self, predictions, targets, vocab_lang):
         """
-        row = target language, column = predicted language
-        :param predictions: single language predictions
-        :param targets: single language targets
-        :param vocab_lang: dict containing all languages
-        :return: confusion matrix
+
+        Args:
+        	predictions:
+        	targets:
+        	vocab_lang:
+
+        Returns:
+
         """
         if (len(predictions) != len(targets)):
             print("predictions and target size different for 'confusion_matrix()'")
@@ -160,11 +258,14 @@ class RNNEvaluator(object):
 
     def to_string_confusion_matrix(self, confusion_matrix, vocab_lang, pad):
         """
-        converts calculated confusion matrix to string
-        :param confusion_matrix: the confusion matrix
-        :param vocab_lang: dict containing 'language':(index, frequency)
-        :param pad: padding for printout, use a number >= len(max(frequency in vocab lang)
-        :return: string confusion matrix
+
+        Args:
+        	confusion_matrix:
+        	vocab_lang:
+        	pad:
+
+        Returns:
+
         """
         idx_lang = []
         for language, (language_idx, _) in vocab_lang.items():
@@ -182,10 +283,13 @@ class RNNEvaluator(object):
 
     def row_as_string(self, row, pad):
         """
-        single confusion matrix row as a string
-        :param row: the confusion matrix row
-        :param pad: padding for printout, use a number >= len(max(frequency in vocab lang)
-        :return: the string row
+
+        Args:
+        	row:
+        	pad:
+
+        Returns:
+
         """
         str_row = ""
         for item in row:

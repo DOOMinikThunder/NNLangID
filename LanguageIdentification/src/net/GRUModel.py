@@ -13,6 +13,15 @@ class GRUModel(nn.Module):
     
     
     def __init__(self, vocab_chars, vocab_lang, input_size, num_classes, system_param_dict):
+        """
+
+        Args:
+        	vocab_chars:
+        	vocab_lang:
+        	input_size:
+        	num_classes:
+        	system_param_dict:
+        """
         super(GRUModel, self).__init__()
         self.vocab_chars = vocab_chars
         self.vocab_lang = vocab_lang
@@ -42,6 +51,11 @@ class GRUModel(nn.Module):
 
 
     def initHidden(self):
+        """
+
+        Returns:
+
+        """
         hidden = Variable(torch.zeros(self.num_layers * self.num_directions, self.batch_size, self.hidden_size))
         # transfer tensor to GPU if available
         if (self.cuda_is_avail):
@@ -51,6 +65,15 @@ class GRUModel(nn.Module):
     
 
     def forward(self, inp, hidden=None):
+        """
+
+        Args:
+        	inp:
+        	hidden:
+
+        Returns:
+
+        """
         output, next_hidden = self.gru_layer(inp, hidden)
         output = self.output_layer(output)
         output = output.view(-1, self.num_classes)
@@ -61,6 +84,17 @@ class GRUModel(nn.Module):
 
 
     def train(self, train_inputs, train_targets, val_inputs, val_targets):
+        """
+
+        Args:
+        	train_inputs:
+        	train_targets:
+        	val_inputs:
+        	val_targets:
+
+        Returns:
+
+        """
         batch_size = self.system_param_dict['batch_size_rnn']
         max_eval_checks_not_improved = self.system_param_dict['max_eval_checks_not_improved_rnn']
         max_num_epochs = self.system_param_dict['max_num_epochs_rnn']
@@ -158,11 +192,28 @@ class GRUModel(nn.Module):
             
         
     def save_model_checkpoint_to_file(self, state, relative_path_to_file):
+        """
+
+        Args:
+        	state:
+        	relative_path_to_file:
+
+        Returns:
+
+        """
         torch.save(state, relative_path_to_file)
         print('Model checkpoint saved to file:', relative_path_to_file)
         
         
     def load_model_checkpoint_from_file(self, relative_path_to_file):
+        """
+
+        Args:
+        	relative_path_to_file:
+
+        Returns:
+
+        """
         state = torch.load(relative_path_to_file)
         results_dict = state['results_dict']
         self.load_state_dict(results_dict['state_dict'])

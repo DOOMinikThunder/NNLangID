@@ -12,6 +12,16 @@ class InputData(object):
         
         
     def fetch_tweet_texts_and_lang_from_file(self, relative_path_to_file, fetch_only_langs=None, fetch_only_first_x_tweets=float('inf')):
+        """
+
+        Args:
+        	relative_path_to_file:
+        	fetch_only_langs:
+        	fetch_only_first_x_tweets:
+
+        Returns:
+
+        """
         texts_and_lang = []
         with open(relative_path_to_file, 'rb') as file:
             reader = csv.reader(file, delimiter=';', encoding='utf-8')
@@ -34,6 +44,14 @@ class InputData(object):
     
     
     def filter_out_irrelevant_tweet_parts(self, texts_and_lang):
+        """
+
+        Args:
+        	texts_and_lang:
+
+        Returns:
+
+        """
         filtered_texts_and_lang = []
         removal_mode = False
         for tweet_i in range(len(texts_and_lang)):
@@ -89,6 +107,15 @@ class InputData(object):
     # !!! DEPRECATED !!!
     # set_ratios must be: [train_ratio, val_ratio, test_ratio]
     def split_data_into_sets(self, texts_and_lang, set_ratios):
+        """
+
+        Args:
+        	texts_and_lang:
+        	set_ratios:
+
+        Returns:
+
+        """
         if (set_ratios[0] + set_ratios[1] != 1):
             print("Error: Set ratios do not sum to 1!")
             return -1
@@ -109,6 +136,15 @@ class InputData(object):
     
         
     def get_vocab_chars_and_lang(self, texts_and_lang, min_char_frequency):
+        """
+
+        Args:
+        	texts_and_lang:
+        	min_char_frequency:
+
+        Returns:
+
+        """
         occurred_chars = {}
         occurred_langs = {}
         # count occurrence of each char and language in the entire corpus
@@ -150,6 +186,15 @@ class InputData(object):
     
 
     def get_texts_with_only_vocab_chars(self, texts_and_lang, vocab_chars):
+        """
+
+        Args:
+        	texts_and_lang:
+        	vocab_chars:
+
+        Returns:
+
+        """
         texts_and_lang_only_vocab_chars = []
         for i in range(len(texts_and_lang)):
             temp_text = []
@@ -162,6 +207,16 @@ class InputData(object):
     
     
     def get_indexed_texts_and_lang(self, texts_and_lang_only_vocab_chars, vocab_chars, vocab_lang):
+        """
+
+        Args:
+        	texts_and_lang_only_vocab_chars:
+        	vocab_chars:
+        	vocab_lang:
+
+        Returns:
+
+        """
         indexed_texts_and_lang = []
         for i in range(len(texts_and_lang_only_vocab_chars)):
             temp_indexed_text = []
@@ -174,6 +229,20 @@ class InputData(object):
     
     
     def get_indexed_data(self, train_data_rel_path, validation_data_rel_path, test_data_rel_path, real_test_data_rel_path, min_char_frequency, fetch_only_langs=None, fetch_only_first_x_tweets=float('inf')):
+        """
+
+        Args:
+        	train_data_rel_path:
+        	validation_data_rel_path:
+        	test_data_rel_path:
+        	real_test_data_rel_path:
+        	min_char_frequency:
+        	fetch_only_langs:
+        	fetch_only_first_x_tweets:
+
+        Returns:
+
+        """
         tr_filtered = self.get_filtered_data(train_data_rel_path, min_char_frequency, fetch_only_langs, fetch_only_first_x_tweets, calc_vocab=True)
         vocab_chars, vocab_lang = self.get_vocab_chars_and_lang(tr_filtered, min_char_frequency)
         val_filtered =  self.get_filtered_data(validation_data_rel_path, min_char_frequency, fetch_only_langs, fetch_only_first_x_tweets)
@@ -187,6 +256,18 @@ class InputData(object):
 
 
     def get_filtered_data(self, data_path, min_char_frequency, fetch_only_langs=None, fetch_only_first_x_tweets=float('inf'), calc_vocab=False):
+        """
+
+        Args:
+        	data_path:
+        	min_char_frequency:
+        	fetch_only_langs:
+        	fetch_only_first_x_tweets:
+        	calc_vocab:
+
+        Returns:
+
+        """
         texts_and_lang = self.fetch_tweet_texts_and_lang_from_file(data_path, fetch_only_langs, fetch_only_first_x_tweets)
         random.shuffle(texts_and_lang)
         filtered_texts_and_lang = self.filter_out_irrelevant_tweet_parts(texts_and_lang)
@@ -194,12 +275,30 @@ class InputData(object):
 
 
     def get_single_indexed_data(self, filtered_texts_and_lang, vocab_lang, vocab_chars):
+        """
+
+        Args:
+        	filtered_texts_and_lang:
+        	vocab_lang:
+        	vocab_chars:
+
+        Returns:
+
+        """
         set_only_vocab_chars = self.get_texts_with_only_vocab_chars(filtered_texts_and_lang, vocab_chars)
         set_indexed = self.get_indexed_texts_and_lang(set_only_vocab_chars, vocab_chars, vocab_lang)
         return set_indexed
 
 
     def get_string2index_and_index2string(self, vocab_dict):
+        """
+
+        Args:
+        	vocab_dict:
+
+        Returns:
+
+        """
         string2index = {}
         index2string = {}
         for string in vocab_dict:
@@ -209,6 +308,14 @@ class InputData(object):
     
     
     def get_only_indexed_texts(self, indexed_texts_and_lang):
+        """
+
+        Args:
+        	indexed_texts_and_lang:
+
+        Returns:
+
+        """
         indexed_texts = []
         for i in range(len(indexed_texts_and_lang)):
             indexed_texts.append(indexed_texts_and_lang[i][0])
@@ -216,6 +323,16 @@ class InputData(object):
     
     
     def get_batched_target_context_index_pairs(self, indexed_tweet_texts, batch_size, max_window_size):
+        """
+
+        Args:
+        	indexed_tweet_texts:
+        	batch_size:
+        	max_window_size:
+
+        Returns:
+
+        """
         pairs = [[]]
         pair_counter = 0
         batch_counter = 0
@@ -254,6 +371,14 @@ class InputData(object):
     
     
     def create_embed_from_weights_file(self, relative_path_to_file):
+        """
+
+        Args:
+        	relative_path_to_file:
+
+        Returns:
+
+        """
         weights = []
         embed_dims = []
         with open(relative_path_to_file, 'rb') as file:
@@ -278,6 +403,16 @@ class InputData(object):
     
     
     def create_embed_input_and_target_tensors(self, indexed_texts_and_lang, embed_weights_rel_path, embed=None):
+        """
+
+        Args:
+        	indexed_texts_and_lang:
+        	embed_weights_rel_path:
+        	embed:
+
+        Returns:
+
+        """
         # if no embed is passed: get it first
         if (embed == None):
             embed, num_classes = self.create_embed_from_weights_file(embed_weights_rel_path)
@@ -306,6 +441,16 @@ class InputData(object):
     # (the last onehot-vector is always the target)
     # (context_window_size = 2 means 2 chars before and after the target char are considered)
     def create_context_target_onehot_vectors(self, context_window_size, tweet_texts_only_embed_chars, chars_for_embed):
+        """
+
+        Args:
+        	context_window_size:
+        	tweet_texts_only_embed_chars:
+        	chars_for_embed:
+
+        Returns:
+
+        """
         data = []
         total_num_chars_involved = (context_window_size * 2) + 1
         tensor_onehot = torch.FloatTensor(total_num_chars_involved, len(chars_for_embed))
@@ -343,6 +488,16 @@ class InputData(object):
     
     # !!! UNUSED !!!
     def get_batched_indexed_text(self, tweet_texts_only_embed_chars, chars_for_embed, batch_size):
+        """
+
+        Args:
+        	tweet_texts_only_embed_chars:
+        	chars_for_embed:
+        	batch_size:
+
+        Returns:
+
+        """
         batch_tweet_texts = [[]]
         tweet_counter = -1
         char_counter = 0
