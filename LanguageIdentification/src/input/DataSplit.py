@@ -20,10 +20,10 @@ class DataSplit(object):
 		if(len(ratio) != len(out_filenames)):
 			print("ratio and output files must have same size!")
 			return []
-		texts_and_languages = self.read_input(input_file)
-		languages_splitted = self.split_by_languages(texts_and_languages)
-		splitted_data = self.merge_splitted_languages(languages_splitted, ratio, shuffle_seed)
-		self.write_to_file(splitted_data,out_filenames)
+		texts_and_languages = self.__read_input(input_file)
+		languages_splitted = self.__split_by_languages(texts_and_languages)
+		splitted_data = self.__merge_splitted_languages(languages_splitted, ratio, shuffle_seed)
+		self.__write_to_file(splitted_data,out_filenames)
 		return splitted_data
 
 	def __write_to_file(self, splitted_data, out_filenames):
@@ -77,7 +77,7 @@ class DataSplit(object):
 		"""
 		splitted_data = [[] for i in range(len(ratio))]
 		for language in languages_splitted:
-			language_in_ratios = self.split_language_with_ratio(languages_splitted[language], ratio, shuffle_seed)#
+			language_in_ratios = self.__split_language_with_ratio(languages_splitted[language], ratio, shuffle_seed)#
 			for i,set in enumerate(language_in_ratios):
 				splitted_data[i] += set
 
@@ -123,7 +123,7 @@ class DataSplit(object):
 		shuffle(idx_list)
 		split_languages = []
 		for percentage in ratio[:-1]:
-			split_languages.append(self.take_from_list(input, 0, int(in_size*percentage)))
+			split_languages.append(self.__take_from_list(input, 0, int(in_size*percentage)))
 		split_languages.append(input)
 		return split_languages
 

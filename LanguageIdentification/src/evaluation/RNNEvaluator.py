@@ -151,8 +151,8 @@ class RNNEvaluator(object):
         Returns:
             recall: list of recall for each language
         """
-        true_positives = self.true_positives(confusion_matrix)
-        false_negatives = self.false_negatives(confusion_matrix)
+        true_positives = self.__true_positives(confusion_matrix)
+        false_negatives = self.__false_negatives(confusion_matrix)
         try:
             return [tp / (tp + sum(fn)) for tp, fn in zip(true_positives, false_negatives)]
         except ZeroDivisionError:
@@ -167,8 +167,8 @@ class RNNEvaluator(object):
         Returns:
             precision: list of precision for each language
         """
-        true_positives = self.true_positives(confusion_matrix)
-        false_positives = self.false_positive(confusion_matrix)
+        true_positives = self.__true_positives(confusion_matrix)
+        false_positives = self.__false_positive(confusion_matrix)
         try:
             return [tp / (tp + sum(fp)) for tp, fp in zip(true_positives, false_positives)]
         except ZeroDivisionError:
@@ -231,10 +231,10 @@ class RNNEvaluator(object):
             loss = self.model.criterion(output, target)
         else:
             loss = 0
-        lang_prediction = self.evaluate_prediction(output, n_highest_probs)
+        lang_prediction = self.__evaluate_prediction(output, n_highest_probs)
         return lang_prediction, loss
 
-    def evaluate_prediction(self, prediction, n_highest_probs):
+    def __evaluate_prediction(self, prediction, n_highest_probs):
         """
         Given a prediction, computes the most likely languages
         Args:
@@ -298,11 +298,11 @@ class RNNEvaluator(object):
         print_matrix = "t\p\t" + horizontal_lang + "\taccuracy\n"
         for i, row in enumerate(confusion_matrix):
             row_accuracy = (row[i] / sum(row)) * 100
-            print_matrix += idx_lang[i][1] + "\t" + self.row_as_string(row, pad) + '{0: >9.3}'.format(
+            print_matrix += idx_lang[i][1] + "\t" + self.__row_as_string(row, pad) + '{0: >9.3}'.format(
                 str(row_accuracy)) + "%\n"
         return print_matrix
 
-    def row_as_string(self, row, pad):
+    def __row_as_string(self, row, pad):
         """
 
         Args:

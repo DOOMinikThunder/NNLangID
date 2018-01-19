@@ -371,14 +371,7 @@ class InputData(object):
     
     
     def create_embed_from_weights_file(self, relative_path_to_file):
-        """
 
-        Args:
-        	relative_path_to_file:
-
-        Returns:
-
-        """
         weights = []
         embed_dims = []
         with open(relative_path_to_file, 'rb') as file:
@@ -403,16 +396,6 @@ class InputData(object):
     
     
     def create_embed_input_and_target_tensors(self, indexed_texts_and_lang, embed_weights_rel_path, embed=None):
-        """
-
-        Args:
-        	indexed_texts_and_lang:
-        	embed_weights_rel_path:
-        	embed:
-
-        Returns:
-
-        """
         # if no embed is passed: get it first
         if (embed == None):
             embed, num_classes = self.create_embed_from_weights_file(embed_weights_rel_path)
@@ -441,16 +424,6 @@ class InputData(object):
     # (the last onehot-vector is always the target)
     # (context_window_size = 2 means 2 chars before and after the target char are considered)
     def create_context_target_onehot_vectors(self, context_window_size, tweet_texts_only_embed_chars, chars_for_embed):
-        """
-
-        Args:
-        	context_window_size:
-        	tweet_texts_only_embed_chars:
-        	chars_for_embed:
-
-        Returns:
-
-        """
         data = []
         total_num_chars_involved = (context_window_size * 2) + 1
         tensor_onehot = torch.FloatTensor(total_num_chars_involved, len(chars_for_embed))
@@ -488,16 +461,6 @@ class InputData(object):
     
     # !!! UNUSED !!!
     def get_batched_indexed_text(self, tweet_texts_only_embed_chars, chars_for_embed, batch_size):
-        """
-
-        Args:
-        	tweet_texts_only_embed_chars:
-        	chars_for_embed:
-        	batch_size:
-
-        Returns:
-
-        """
         batch_tweet_texts = [[]]
         tweet_counter = -1
         char_counter = 0

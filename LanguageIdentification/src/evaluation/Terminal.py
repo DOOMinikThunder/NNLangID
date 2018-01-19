@@ -14,7 +14,7 @@ class Terminal(object):
         """
 
         Args:
-        	system_param_dict:
+        	system_param_dict: contains hyperparameters
         """
         self.system_param_dict = system_param_dict
 
@@ -43,7 +43,7 @@ class Terminal(object):
         if (self.system_param_dict['cuda_is_avail']):
             gru_model.cuda()
 
-        self.loop_input(gru_model=gru_model, input_data=input_data, can_use_live_tweets=can_use_live_tweets, embed=embed, vocab_lang=results_dict['vocab_lang'], vocab_chars=results_dict['vocab_chars'])
+        self.__loop_input(gru_model=gru_model, input_data=input_data, can_use_live_tweets=can_use_live_tweets, embed=embed, vocab_lang=results_dict['vocab_lang'], vocab_chars=results_dict['vocab_chars'])
 
 
     def __loop_input(self, gru_model, input_data, can_use_live_tweets, embed, vocab_lang, vocab_chars):
@@ -65,10 +65,10 @@ class Terminal(object):
 
         input_text = ''
         while input_text != 'exit':
-            input_text, input_text_lang_tuple, is_live_tweets = self.retrieve_text(can_use_live_tweets, index2lang, tweet_retriever, vocab_lang)
+            input_text, input_text_lang_tuple, is_live_tweets = self.__retrieve_text(can_use_live_tweets, index2lang, tweet_retriever, vocab_lang)
             if input_text is None:
                 continue
-            input_text_embed_char_text_inp_tensors, _ = self.prepare_data(input_data=input_data,
+            input_text_embed_char_text_inp_tensors, _ = self.__prepare_data(input_data=input_data,
                                                                           embed=embed,
                                                                           input_text_lang_tuple=input_text_lang_tuple,
                                                                           vocab_chars=vocab_chars,
@@ -77,7 +77,7 @@ class Terminal(object):
             if (self.system_param_dict['cuda_is_avail']):
                 input_text_embed_char_text_inp_tensors = input_text_embed_char_text_inp_tensors.cuda()
             n_highest_probs = 5
-            self.evaluate_and_print(gru_model=gru_model, input_text_embed_char_text_inp_tensors=input_text_embed_char_text_inp_tensors,
+            self.__evaluate_and_print(gru_model=gru_model, input_text_embed_char_text_inp_tensors=input_text_embed_char_text_inp_tensors,
                                     n_highest_probs=n_highest_probs, input_text=input_text, index2lang=index2lang, is_live_tweets=is_live_tweets)
 
     def __str_to_int(self, string):
@@ -96,7 +96,7 @@ class Terminal(object):
 #            print("Not a number")
             return 0
 
-    def sample_tweets(self, tweet_retriever, vocab_lang, amount):
+    def __sample_tweets(self, tweet_retriever, vocab_lang, amount):
         """
 
         Args:
@@ -118,7 +118,7 @@ class Terminal(object):
         else:
             return tweet_retriever.retrieve_sample_tweets(amount)
 
-    def retrieve_text(self, can_use_live_tweets, index2lang, tweet_retriever, vocab_lang):
+    def __retrieve_text(self, can_use_live_tweets, index2lang, tweet_retriever, vocab_lang):
         """
 
         Args:
@@ -131,11 +131,11 @@ class Terminal(object):
 
         """
         input_terminal = input('Enter text or number: ')
-        amount_live_tweets = self.str_to_int(input_terminal)
+        amount_live_tweets = self.__str_to_int(input_terminal)
         is_live_tweets = False
         if amount_live_tweets > 0:
             is_live_tweets = True
-            sample_tweets = self.sample_tweets(tweet_retriever, vocab_lang, amount_live_tweets)
+            sample_tweets = self.__sample_tweets(tweet_retriever, vocab_lang, amount_live_tweets)
             print('sample_tweets',sample_tweets)
             if sample_tweets is None:
                 return None, None
@@ -146,7 +146,7 @@ class Terminal(object):
             input_text_lang_tuple = [(input_text[0], index2lang[0])]  # language must be in vocab_lang
         return input_text, input_text_lang_tuple, is_live_tweets
 
-    def prepare_data(self, input_data, embed, input_text_lang_tuple, vocab_chars, vocab_lang):
+    def __prepare_data(self, input_data, embed, input_text_lang_tuple, vocab_chars, vocab_lang):
         """
 
         Args:
@@ -171,7 +171,7 @@ class Terminal(object):
              embed=embed)
         return input_text_embed_char_text_inp_tensors, input_text_target_tensors
 
-    def evaluate_and_print(self, gru_model, input_text_embed_char_text_inp_tensors, n_highest_probs, input_text, index2lang, is_live_tweets):
+    def __evaluate_and_print(self, gru_model, input_text_embed_char_text_inp_tensors, n_highest_probs, input_text, index2lang, is_live_tweets):
         """
 
         Args:
