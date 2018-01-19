@@ -137,10 +137,13 @@ class RNNEvaluator(object):
         	f1_score: list of f1_score for each language
 
         """
-        try:
-            return [2 * (p * r) / (p + r) for p, r in zip(precision, recall)]
-        except ZeroDivisionError:
-            return [0]
+        f1 = []
+        for p, r in zip(precision, recall):
+            try:
+                f1.append(2 * (p * r) / (p + r))
+            except ZeroDivisionError:
+                f1.append(0.0)
+        return f1
 
     def recall(self, confusion_matrix):
         """
@@ -153,10 +156,13 @@ class RNNEvaluator(object):
         """
         true_positives = self.__true_positives(confusion_matrix)
         false_negatives = self.__false_negatives(confusion_matrix)
-        try:
-            return [tp / (tp + sum(fn)) for tp, fn in zip(true_positives, false_negatives)]
-        except ZeroDivisionError:
-            return [0]
+        recall = []
+        for tp, fn in zip(true_positives, false_negatives):
+            try:
+                recall.append(tp / (tp + sum(fn)))
+            except ZeroDivisionError:
+                recall.append(0.0)
+        return recall
 
     def precision(self, confusion_matrix):
         """
@@ -169,10 +175,13 @@ class RNNEvaluator(object):
         """
         true_positives = self.__true_positives(confusion_matrix)
         false_positives = self.__false_positive(confusion_matrix)
-        try:
-            return [tp / (tp + sum(fp)) for tp, fp in zip(true_positives, false_positives)]
-        except ZeroDivisionError:
-            return [0]
+        precision = []
+        for tp, fp in zip(true_positives, false_positives):
+            try:
+                precision.append(tp/(tp + sum(fp)))
+            except ZeroDivisionError:
+                precision.append(0.0)
+        return precision
 
     def __true_positives(self, confusion_matrix):
         """
