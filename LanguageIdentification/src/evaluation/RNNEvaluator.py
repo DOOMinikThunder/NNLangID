@@ -103,9 +103,14 @@ class RNNEvaluator(object):
         target_list = []
         acc_loss = []
         for input, target in zip(input_data, target_data):
-            lang_prediction, loss = self.evaluate_single_date(input, n_highest_probs, target)
+            hidden = self.model.initHidden()
+            output, hidden = self.model(input, hidden)
+#            if target is not None:
+            loss = self.model.criterion(output, target)
+#            else:
+#                loss = 0
+            lang_prediction = self.__evaluate_prediction(output, n_highest_probs)
             acc_loss.append(loss)
-            # transfer back from GPU to CPU if GPU available
             target_list.append(target.data[0])
             predictions.append(lang_prediction[0][1])
         mean_loss = sum(acc_loss) / float(len(acc_loss))
@@ -220,28 +225,6 @@ class RNNEvaluator(object):
         """
         matrix_in_columns = list(zip(*confusion_matrix))
         return [matrix_in_columns[i][:i] + matrix_in_columns[i][i + 1:] for i in range(len(matrix_in_columns))]
-
-    def evaluate_single_date(self, input, n_highest_probs, target=None):
-        """
-        evaluates one tweet
-        Args:
-        	input: input tweet
-        	n_highest_probs: n highest probabilities of language predictions
-        	target: tweet's target
-
-        Returns:
-        	lang_predictions: list of highest probability-language pairs for n languages
-        	loss: loss of prediction to target
-
-        """
-        hidden = self.model.initHidden()
-        output, hidden = self.model(input, hidden)
-        if target is not None:
-            loss = self.model.criterion(output, target)
-        else:
-            loss = 0
-        lang_prediction = self.__evaluate_prediction(output, n_highest_probs)
-        return lang_prediction, loss
 
     def __evaluate_prediction(self, prediction, n_highest_probs):
         """
