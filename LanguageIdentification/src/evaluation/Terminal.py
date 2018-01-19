@@ -101,7 +101,7 @@ class Terminal(object):
         """
         calls tweet_retriever to get sample tweets from twitter
         Args:
-        	tweet_retriever: connects to twitter
+        	tweet_retriever: instance of TweetRetriever that connects to twitter
         	vocab_lang: dict of languages
         	amount: amount of tweets to sample
 
@@ -122,14 +122,17 @@ class Terminal(object):
 
     def __retrieve_text(self, can_use_live_tweets, index2lang, tweet_retriever, vocab_lang):
         """
-        
+        Asks for user input and calls manual or twitter evaluation based on response
         Args:
-        	can_use_live_tweets:
+        	can_use_live_tweets: true, if tweets can be retrieved from twitter
         	index2lang:
-        	tweet_retriever:
-        	vocab_lang:
+        	tweet_retriever: instance of TweetRetriever that connects to twitter
+        	vocab_lang: dict of languages
 
         Returns:
+        	input_text: manually entered phrase or tweets from twitter
+        	input_text_lang_tuple: tuple of input_text and its language
+        	is_live_tweets:
 
         """
         input_terminal = input('Enter text or number: ')
@@ -150,15 +153,17 @@ class Terminal(object):
 
     def __prepare_data(self, input_data, embed, input_text_lang_tuple, vocab_chars, vocab_lang):
         """
-
+        prepares input data to be fed in model
         Args:
-        	input_data:
-        	embed:
-        	input_text_lang_tuple:
-        	vocab_chars:
-        	vocab_lang:
+        	input_data: instance of InputData class
+        	embed: embedding needed to convert input data into char embedding
+        	input_text_lang_tuple: actual input data
+        	vocab_chars: dict of all characters learned
+        	vocab_lang: dict of all languages
 
         Returns:
+        	input_text_embed_char_text_inp_tensors:
+        	input_text_target_tensors:
 
         """
         filtered_texts_and_lang = input_data.filter_out_irrelevant_tweet_parts(input_text_lang_tuple)
@@ -175,14 +180,14 @@ class Terminal(object):
 
     def __evaluate_and_print(self, gru_model, input_text_embed_char_text_inp_tensors, n_highest_probs, input_text, index2lang, is_live_tweets):
         """
-
+        calls evaluator instance for prediction and prints languages with highest probabilites
         Args:
-        	gru_model:
-        	input_text_embed_char_text_inp_tensors:
-        	n_highest_probs:
-        	input_text:
-        	index2lang:
-        	is_live_tweets:
+        	gru_model: model used for evaluation
+        	input_text_embed_char_text_inp_tensors: input text as embedding for model
+        	n_highest_probs: n highest probabilites of languages to return
+        	input_text: actual input text
+        	index2lang: lookup from unique index to language
+        	is_live_tweets: true, if tweets from twitter are evaluated
 
         Returns:
 
