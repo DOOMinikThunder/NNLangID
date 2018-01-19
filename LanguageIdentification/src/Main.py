@@ -24,7 +24,7 @@ def main():
     ##############
     
     # ONLY SET THIS AND THE PARAMETERS IN CORRESPONDING YAML FILE
-    use_cluster_params = False                                                 # set True for use of cluster parameters
+    use_cluster_params = True                                                 # set True for use of cluster parameters
     
     
     

@@ -1,7 +1,7 @@
 # System parameters
 create_splitted_data_files: True                             # split into training, validation and test set from an original file
-train_embed: True
-train_rnn: True
+train_embed: False
+train_rnn: False
 eval_test_set: True
 run_terminal: False                                          # if True: disables all other calculations
 
