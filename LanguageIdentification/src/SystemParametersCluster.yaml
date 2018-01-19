@@ -1,6 +1,6 @@
 # System parameters
 create_splitted_data_files: True                             # split into training, validation and test set from an original file
-train_embed: False
+train_embed: True
 train_rnn: True
 eval_test_set: True
 run_terminal: False                                          # if True: disables all other calculations
@@ -11,7 +11,7 @@ print_model_checkpoint_embed_weights: null #"../data/save/trained/embed_weights.
 print_model_checkpoint: null #"../data/save/trained/rnn_model_checkpoint.pth" #None
 
 # Data paths
-input_tr_va_te_data_rel_path: "../data/input_data/original/recall_oriented_dl.csv"   # training, validation and test will be generated from this file
+input_tr_va_te_data_rel_path: "../data/input_data/original/uniformly_recall_merged.csv"   # training, validation and test will be generated from this file
 input_rt_data_rel_path: "../data/input_data/original/uniformly_sampled_dl.csv"  # to change later, rt = real test
 
 out_tr_data_rel_path: "../data/input_data/original_splitted/training.csv"
@@ -51,11 +51,11 @@ initial_lr_embed: 0.025
 hidden_size_rnn: 100
 num_layers_rnn: 1
 is_bidirectional: True
-batch_size_rnn: 10
+batch_size_rnn: 100
 max_eval_checks_not_improved_rnn: 10
 max_num_epochs_rnn: .inf #10 #.inf
-eval_every_num_batches_rnn: 5000
-lr_decay_every_num_batches_rnn: 5000
-lr_decay_factor_rnn: 0.9                                    # 1.0 means no decay
+eval_every_num_batches_rnn: 1000
+lr_decay_every_num_batches_rnn: 1000
+lr_decay_factor_rnn: 1.0                                    # 1.0 means no decay
 initial_lr_rnn: 0.01
 weight_decay_rnn: 0.00001
