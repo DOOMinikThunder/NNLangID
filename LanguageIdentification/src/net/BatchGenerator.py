@@ -3,11 +3,11 @@ import math
 class Batches(object):
     def __init__(self, data_set, targets, batch_size):
         """
-
+        Iterator class to ease the use of mini-batches
         Args:
-        	data_set:
-        	targets:
-        	batch_size:
+        	data_set: will be divided into batches
+        	targets: will be divided into batches
+        	batch_size: size each batch of input and target will have
         """
         self.data_set = data_set
         self.targets = targets
@@ -17,7 +17,7 @@ class Batches(object):
     def __iter__(self):
         """
 
-        Returns:
+        Returns: iterator over all batches
 
         """
         """

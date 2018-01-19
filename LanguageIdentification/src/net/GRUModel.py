@@ -16,11 +16,11 @@ class GRUModel(nn.Module):
         """
 
         Args:
-        	vocab_chars:
-        	vocab_lang:
-        	input_size:
-        	num_classes:
-        	system_param_dict:
+        	vocab_chars: every character occurence as a dict of character: index, occurrences
+        	vocab_lang: every language occurence as a dict of language: index, occurences
+        	input_size: input size of of character embeddings
+        	num_classes: number of languages
+        	system_param_dict: contains hyperparameters
         """
         super(GRUModel, self).__init__()
         self.vocab_chars = vocab_chars
@@ -52,8 +52,8 @@ class GRUModel(nn.Module):
 
     def initHidden(self):
         """
-
-        Returns:
+        before forwarding a new set of data, the initial rnn state can be set with this method
+        Returns: rnn state
 
         """
         hidden = Variable(torch.zeros(self.num_layers * self.num_directions, self.batch_size, self.hidden_size))
@@ -66,12 +66,14 @@ class GRUModel(nn.Module):
 
     def forward(self, inp, hidden=None):
         """
-
+        forward propagation
         Args:
-        	inp:
-        	hidden:
+        	inp: one tensor of input size, i.e. one tweet
+        	hidden: the previous hidden rnn state
 
         Returns:
+        	output: prediction for the input
+        	next_hidden: the new hidden state
 
         """
         output, next_hidden = self.gru_layer(inp, hidden)
@@ -85,12 +87,14 @@ class GRUModel(nn.Module):
 
     def train(self, train_inputs, train_targets, val_inputs, val_targets):
         """
-
+        model's training method
+        iterates over epochs and batches
+        updates weights after each batch, saves the best model and decays learning rate
         Args:
-        	train_inputs:
-        	train_targets:
-        	val_inputs:
-        	val_targets:
+        	train_inputs: set of all tweets to be trained
+        	train_targets: set of all targets for input tweets
+        	val_inputs: set all tweets to be used for validation
+        	val_targets: set of all targets for validation tweets
 
         Returns:
 
