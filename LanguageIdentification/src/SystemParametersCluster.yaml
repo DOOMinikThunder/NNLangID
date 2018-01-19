@@ -29,7 +29,7 @@ trained_model_checkpoint_rel_path: "../data/save/trained/rnn_model_checkpoint.pt
 # Data manipulation parameters
 tr_va_te_split_ratios: [0.8, 0.1, 0.1]                      # [train_ratio, val_ratio, test_ratio]
 split_shuffle_seed: 42                                      # ensures that splitted sets (training, validation, test) are always created identically (given a specified ratio)
-fetch_only_langs: ['de', 'en', 'es', 'fr', 'it'] #['de', 'en', 'es'] #['pl', 'sv'] #['el', 'fa', 'hi', 'ca'] #None
+fetch_only_langs: null #['de', 'en', 'es', 'fr', 'it'] #['de', 'en', 'es'] #['pl', 'sv'] #['el', 'fa', 'hi', 'ca'] #None
 fetch_only_first_x_tweets: .inf
 min_char_frequency: 2                                       # chars appearing less than min_char_frequency in the training set will not be used to create the vocabulary vocab_chars
 
@@ -43,7 +43,7 @@ batch_size_embed: 1000
 max_eval_checks_not_improved_embed: 10
 max_num_epochs_embed: 1 #.inf
 eval_every_num_batches_embed: 10000
-lr_decay_factor_embed: 1.0                                  # 1.0 means no decay
+lr_decay_factor_embed: 0.9                                  # 1.0 means no decay
 initial_lr_embed: 0.025
 
 # HYPERPARAMETERS RNN
@@ -54,6 +54,6 @@ batch_size_rnn: 100
 max_eval_checks_not_improved_rnn: 10
 max_num_epochs_rnn: .inf #10 #.inf
 eval_every_num_batches_rnn: 1000
-lr_decay_factor_rnn: 1.0                                    # 1.0 means no decay
+lr_decay_factor_rnn: 0.9                                    # 1.0 means no decay
 initial_lr_rnn: 0.01
 weight_decay_rnn: 0.00001
