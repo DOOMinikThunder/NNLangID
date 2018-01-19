@@ -43,8 +43,7 @@ batch_size_embed: 1000
 max_eval_checks_not_improved_embed: 10
 max_num_epochs_embed: 1 #.inf
 eval_every_num_batches_embed: 10000
-lr_decay_every_num_batches_embed: 10000
-lr_decay_factor_embed: 1.0                                  # 1.0 means no decay
+lr_decay_factor_embed: 0.9                                  # 1.0 means no decay
 initial_lr_embed: 0.025
 
 # HYPERPARAMETERS RNN
@@ -55,7 +54,6 @@ batch_size_rnn: 100
 max_eval_checks_not_improved_rnn: 10
 max_num_epochs_rnn: .inf #10 #.inf
 eval_every_num_batches_rnn: 1000
-lr_decay_every_num_batches_rnn: 1000
-lr_decay_factor_rnn: 1.0                                    # 1.0 means no decay
+lr_decay_factor_rnn: 0.9                                    # 1.0 means no decay
 initial_lr_rnn: 0.01
 weight_decay_rnn: 0.00001
