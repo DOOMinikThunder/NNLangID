@@ -1,7 +1,7 @@
 # System parameters
 create_splitted_data_files: True                             # split into training, validation and test set from an original file
 train_embed: False
-train_rnn: True
+train_rnn: False
 eval_test_set: True
 run_terminal: False                                          # if True: disables all other calculations
 
@@ -11,7 +11,7 @@ print_model_checkpoint_embed_weights: null #"../data/save/trained/embed_weights.
 print_model_checkpoint: null #"../data/save/trained/rnn_model_checkpoint.pth" #None
 
 # Data paths
-input_tr_va_te_data_rel_path: "../data/input_data/original/uniformly_recall_merged.csv"   # training, validation and test will be generated from this file
+input_tr_va_te_data_rel_path: "../data/input_data/original/uniformly_sampled_dl.csv"   # training, validation and test will be generated from this file
 input_rt_data_rel_path: "../data/input_data/original/uniformly_sampled_dl.csv"  # to change later, rt = real test
 
 out_tr_data_rel_path: "../data/input_data/original_splitted/training.csv"
