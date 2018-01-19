@@ -13,7 +13,8 @@ class DataSplit(object):
 			out_filenames: list of output file names
 			shuffle_seed: ensures the same splitup if files are created more than once
 
-		Returns: list splitted data sets
+		Returns:
+			splitted_data: list splitted data sets
 
 		"""
 		if(len(ratio) != len(out_filenames)):
@@ -51,7 +52,8 @@ class DataSplit(object):
 		Args:
 			csv_file: input csv file
 
-		Returns: data as list
+		Returns:
+			data: data as list
 
 		"""
 		with open(csv_file, 'rb') as file:
@@ -70,6 +72,7 @@ class DataSplit(object):
 			shuffle_seed: shuffles the languages itself
 
 		Returns:
+			splitted_data: list of lists containing all tweets splitted up in ratios keeping the original language distribution
 
 		"""
 		splitted_data = [[] for i in range(len(ratio))]
@@ -86,7 +89,8 @@ class DataSplit(object):
 		Args:
 			input: input tweets and language
 
-		Returns: dict containing the splitted languages
+		Returns:
+		 	languages_splitted: dict containing the splitted languages
 
 		"""
 		idx = 0
@@ -109,7 +113,8 @@ class DataSplit(object):
 			ratio: ratio the tweets will be splitted into
 			shuffle_seed: shuffles the tweets
 
-		Returns: list of len(ratio) language splitted into ratio parts
+		Returns:
+			split_languages: list of len(ratio) language splitted into ratio parts
 
 		"""
 		in_size = len(input)
@@ -130,7 +135,8 @@ class DataSplit(object):
 			start: start index
 			end: end index, not included
 
-		Returns: input list with list[start:end] deleted
+		Returns:
+			new_list: input list with list[start:end] deleted
 
 		"""
 		new_list = list[start:end]

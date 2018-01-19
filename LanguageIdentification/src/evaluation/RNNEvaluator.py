@@ -15,13 +15,19 @@ class RNNEvaluator(object):
 
     def all_metrics(self, input_data, target_data, vocab_lang):
         """
-
+        evaluates a data set and returns all possible metrics
         Args:
-        	input_data:
-        	target_data:
-        	vocab_lang:
+        	input_data: tweets to evaluate
+        	target_data: target language of tweets
+        	vocab_lang: dict containing all languages and their indices
 
         Returns:
+        	mean_loss: average loss of evaluation
+        	accuracy: overall accuracy
+        	confusion matrix: detailed matrix of how each tweet was evaluated
+        	precision: list of precision for each language
+        	recall: list of recall for each language
+        	f1_score: list of f1_score for each language
 
         """
         mean_loss, predictions, targets = self.evaluate_data_set_basic(input_data,
@@ -36,13 +42,16 @@ class RNNEvaluator(object):
 
     def evaluate_data_set(self, input_data, target_data, n_highest_probs=1):
         """
-
+        evaluates a data set as fast as possible
+        by merging needed functions and elminating if clauses
         Args:
-        	input_data:
-        	target_data:
-        	n_highest_probs:
+        	input_data: tweets to evaluate
+        	target_data: target languages of each char in each tweet
+        	n_highest_probs: n highest probability predictions for each tweet
 
         Returns:
+        	mean_loss: average loss over all tweets
+        	accuracy: overall accuracy
 
         """
         predictions = []
@@ -75,13 +84,16 @@ class RNNEvaluator(object):
 
     def evaluate_data_set_basic(self, input_data, target_data, n_highest_probs=1):
         """
-
+        evaluates a data set
         Args:
-        	input_data:
-        	target_data:
-        	n_highest_probs:
+        	input_data: tweets to evaluate
+        	target_data: target languages of each char in each tweet
+        	n_highest_probs: n highest probability predictions for each tweet
 
         Returns:
+        	mean_loss: average loss over all tweets
+        	predictions: predictions for each tweet
+        	target_list: target for each tweet
 
         """
         if (len(input_data) != len(target_data)):
@@ -101,13 +113,13 @@ class RNNEvaluator(object):
 
     def accuracy(self, predictions, targets):
         """
-
+        computes the accuracy over all prediction-target pairs
         Args:
-        	predictions:
-        	targets:
+        	predictions: predictions for each tweet
+        	target_list: target for each tweet
 
         Returns:
-
+            accuracy: overall accuracy
         """
         pred_true = 0
         for pred, target in zip(predictions, targets):
@@ -116,12 +128,13 @@ class RNNEvaluator(object):
 
     def f1_score(self, precision, recall):
         """
-
+        f1 score is the harmonic mean over precision and recall
         Args:
-        	precision:
-        	recall:
+        	precision: list of precision for each language
+        	recall: list of recall for each language
 
         Returns:
+        	f1_score: list of f1_score for each language
 
         """
         try:
@@ -131,12 +144,12 @@ class RNNEvaluator(object):
 
     def recall(self, confusion_matrix):
         """
-
+        recall is a measurement to tell if a language was often predicted although it should not have been
         Args:
-        	confusion_matrix:
+        	confusion_matrix: detailed matrix of how each tweet was evaluated
 
         Returns:
-
+            recall: list of recall for each language
         """
         true_positives = self.true_positives(confusion_matrix)
         false_negatives = self.false_negatives(confusion_matrix)
@@ -147,12 +160,12 @@ class RNNEvaluator(object):
 
     def precision(self, confusion_matrix):
         """
-
+        precision is a measurement to tell if a language was often classified as another one
         Args:
-        	confusion_matrix:
+        	confusion_matrix: detailed matrix of how each tweet was evaluated
 
         Returns:
-
+            precision: list of precision for each language
         """
         true_positives = self.true_positives(confusion_matrix)
         false_positives = self.false_positive(confusion_matrix)
@@ -163,33 +176,37 @@ class RNNEvaluator(object):
 
     def __true_positives(self, confusion_matrix):
         """
-
+        true positives equals the trace of the confusion matrix
+        i.e. prediction = target
         Args:
-        	confusion_matrix:
+        	confusion_matrix: detailed matrix of how each tweet was evaluated
 
         Returns:
+        	true_positives: list of all true_positives for each language
 
         """
         return [confusion_matrix[i][i] for i in range(len(confusion_matrix))]
 
     def __false_positive(self, confusion_matrix):
         """
-
+        false positive equals the sum of one row of the confusion matrix
         Args:
-        	confusion_matrix:
+        	confusion_matrix: detailed matrix of how each tweet was evaluated
 
         Returns:
+        	false_positives: list of all false_positives for each language(row)
 
         """
         return [confusion_matrix[i][:i] + confusion_matrix[i][i + 1:] for i in range(len(confusion_matrix))]
 
     def __false_negatives(self, confusion_matrix):
         """
-
+        false negative equals the sum one column of the confusion matrix
         Args:
-        	confusion_matrix:
+        	confusion_matrix: detailed matrix of how each tweet was evaluated
 
         Returns:
+        	false_negatives: list of all false_negatives for each language(column)
 
         """
         matrix_in_columns = list(zip(*confusion_matrix))
@@ -197,13 +214,15 @@ class RNNEvaluator(object):
 
     def evaluate_single_date(self, input, n_highest_probs, target=None):
         """
-
+        evaluates one tweet
         Args:
-        	input:
-        	n_highest_probs:
-        	target:
+        	input: input tweet
+        	n_highest_probs: n highest probabilities of language predictions
+        	target: tweet's target
 
         Returns:
+        	lang_predictions: list of highest probability-language pairs for n languages
+        	loss: loss of prediction to target
 
         """
         hidden = self.model.initHidden()
@@ -215,15 +234,15 @@ class RNNEvaluator(object):
         lang_prediction = self.evaluate_prediction(output, n_highest_probs)
         return lang_prediction, loss
 
-    # prediction: tensor of languages-dimensional entries containing log softmax probabilities
     def evaluate_prediction(self, prediction, n_highest_probs):
         """
-
+        Given a prediction, computes the most likely languages
         Args:
-        	prediction:
-        	n_highest_probs:
+        	prediction: tensor of languages-dimensional entries containing log softmax probabilities
+        	n_highest_probs: n highest probabilities of languages to return
 
         Returns:
+        	highest_probs: list of highest probability-language pairs for n languages
 
         """
         lang_predictions = np.zeros([prediction.size()[1]])
@@ -239,13 +258,14 @@ class RNNEvaluator(object):
 
     def confusion_matrix(self, predictions, targets, vocab_lang):
         """
-
+        Confusion matrix has language x language entries, corresponding to predictions(row) and targets(column)
         Args:
-        	predictions:
-        	targets:
-        	vocab_lang:
+        	predictions: predicted languages
+        	targets: target languages
+        	vocab_lang: dict containing languages and there unique indices
 
         Returns:
+        	conf_matrix: detailed matrix of how each tweet was evaluated
 
         """
         if (len(predictions) != len(targets)):
@@ -260,11 +280,12 @@ class RNNEvaluator(object):
         """
 
         Args:
-        	confusion_matrix:
-        	vocab_lang:
-        	pad:
+        	confusion_matrix: detailed matrix of how each tweet was evaluated
+        	vocab_lang: dict containing languages and there unique indices
+        	pad: padding to insert to keep the string readable
 
         Returns:
+        	print_matrix: string conversion of confustion_matrix
 
         """
         idx_lang = []
@@ -285,10 +306,11 @@ class RNNEvaluator(object):
         """
 
         Args:
-        	row:
-        	pad:
+        	row: one row of a confusion_matrix
+        	pad: padding to insert to keep the string readable
 
         Returns:
+        	str_row: the row as string
 
         """
         str_row = ""
