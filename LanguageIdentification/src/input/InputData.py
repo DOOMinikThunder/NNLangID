@@ -11,7 +11,7 @@ import random
 class InputData(object):
         
         
-    def fetch_tweet_texts_and_lang_from_file(self, relative_path_to_file, fetch_only_langs=None, fetch_only_first_x_tweets=float('inf')):
+    def __fetch_tweet_texts_and_lang_from_file(self, relative_path_to_file, fetch_only_langs=None, fetch_only_first_x_tweets=float('inf')):
         """
 
         Args:
@@ -135,7 +135,7 @@ class InputData(object):
         return train_set, val_set
     
         
-    def get_vocab_chars_and_lang(self, texts_and_lang, min_char_frequency):
+    def __get_vocab_chars_and_lang(self, texts_and_lang, min_char_frequency):
         """
 
         Args:
@@ -243,19 +243,19 @@ class InputData(object):
         Returns:
 
         """
-        tr_filtered = self.get_filtered_data(train_data_rel_path, min_char_frequency, fetch_only_langs, fetch_only_first_x_tweets, calc_vocab=True)
-        vocab_chars, vocab_lang = self.get_vocab_chars_and_lang(tr_filtered, min_char_frequency)
-        val_filtered =  self.get_filtered_data(validation_data_rel_path, min_char_frequency, fetch_only_langs, fetch_only_first_x_tweets)
-        te_filtered =  self.get_filtered_data(test_data_rel_path, min_char_frequency, fetch_only_langs, fetch_only_first_x_tweets)
-        rt_filtered =  self.get_filtered_data(real_test_data_rel_path, min_char_frequency, fetch_only_langs, fetch_only_first_x_tweets)
-        tr_indexed = self.get_single_indexed_data(tr_filtered, vocab_lang, vocab_chars)
-        val_indexed = self.get_single_indexed_data(val_filtered, vocab_lang, vocab_chars)
-        te_indexed = self.get_single_indexed_data(te_filtered, vocab_lang, vocab_chars)
-        rt_indexed = self.get_single_indexed_data(rt_filtered, vocab_lang, vocab_chars)
+        tr_filtered = self.__get_filtered_data(train_data_rel_path, min_char_frequency, fetch_only_langs, fetch_only_first_x_tweets, calc_vocab=True)
+        vocab_chars, vocab_lang = self.__get_vocab_chars_and_lang(tr_filtered, min_char_frequency)
+        val_filtered =  self.__get_filtered_data(validation_data_rel_path, min_char_frequency, fetch_only_langs, fetch_only_first_x_tweets)
+        te_filtered =  self.__get_filtered_data(test_data_rel_path, min_char_frequency, fetch_only_langs, fetch_only_first_x_tweets)
+        rt_filtered =  self.__get_filtered_data(real_test_data_rel_path, min_char_frequency, fetch_only_langs, fetch_only_first_x_tweets)
+        tr_indexed = self.__get_single_indexed_data(tr_filtered, vocab_lang, vocab_chars)
+        val_indexed = self.__get_single_indexed_data(val_filtered, vocab_lang, vocab_chars)
+        te_indexed = self.__get_single_indexed_data(te_filtered, vocab_lang, vocab_chars)
+        rt_indexed = self.__get_single_indexed_data(rt_filtered, vocab_lang, vocab_chars)
         return tr_indexed, val_indexed, te_indexed, rt_indexed, vocab_chars, vocab_lang
 
 
-    def get_filtered_data(self, data_path, min_char_frequency, fetch_only_langs=None, fetch_only_first_x_tweets=float('inf'), calc_vocab=False):
+    def __get_filtered_data(self, data_path, min_char_frequency, fetch_only_langs=None, fetch_only_first_x_tweets=float('inf'), calc_vocab=False):
         """
 
         Args:
@@ -268,13 +268,13 @@ class InputData(object):
         Returns:
 
         """
-        texts_and_lang = self.fetch_tweet_texts_and_lang_from_file(data_path, fetch_only_langs, fetch_only_first_x_tweets)
+        texts_and_lang = self.__fetch_tweet_texts_and_lang_from_file(data_path, fetch_only_langs, fetch_only_first_x_tweets)
         random.shuffle(texts_and_lang)
         filtered_texts_and_lang = self.filter_out_irrelevant_tweet_parts(texts_and_lang)
         return filtered_texts_and_lang
 
 
-    def get_single_indexed_data(self, filtered_texts_and_lang, vocab_lang, vocab_chars):
+    def __get_single_indexed_data(self, filtered_texts_and_lang, vocab_lang, vocab_chars):
         """
 
         Args:

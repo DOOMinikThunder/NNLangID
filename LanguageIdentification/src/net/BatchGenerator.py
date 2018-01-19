@@ -20,9 +20,5 @@ class Batches(object):
         Returns: iterator over all batches
 
         """
-        """
-        iterator function over a tweet_retriever_data set
-        :return: the next batch from the tweet_retriever_data set
-        """
         for batch in range(self.num_batches):
             yield self.data_set[batch*self.batch_size:(batch+1)*self.batch_size], self.targets[batch*self.batch_size:(batch+1)*self.batch_size]

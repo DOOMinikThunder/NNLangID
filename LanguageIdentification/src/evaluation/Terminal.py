@@ -23,9 +23,9 @@ class Terminal(object):
     """
     def run_terminal(self, can_use_live_tweets=False):
         """
-
+        Enters an infinite loop to evaluate tweets entered manually or retrieved live from twitter
         Args:
-        	can_use_live_tweets:
+        	can_use_live_tweets: true, if tweets can be retrieved from twitter
 
         Returns:
 
@@ -48,9 +48,9 @@ class Terminal(object):
 
     def __loop_input(self, gru_model, input_data, can_use_live_tweets, embed, vocab_lang, vocab_chars):
         """
-
+        Takes user input and evaluates the resulting 'tweet'
         Args:
-        	gru_model:
+        	gru_model: model which will evaluate
         	input_data:
         	can_use_live_tweets:
         	embed:
@@ -82,11 +82,12 @@ class Terminal(object):
 
     def __str_to_int(self, string):
         """
-
+        Tries to cast a string to an integer
         Args:
-        	string:
+        	string: will be cast to int
 
         Returns:
+        	number: int(string), 0 otherwise
 
         """
         try:
@@ -98,13 +99,14 @@ class Terminal(object):
 
     def __sample_tweets(self, tweet_retriever, vocab_lang, amount):
         """
-
+        calls tweet_retriever to get sample tweets from twitter
         Args:
-        	tweet_retriever:
-        	vocab_lang:
-        	amount:
+        	tweet_retriever: connects to twitter
+        	vocab_lang: dict of languages
+        	amount: amount of tweets to sample
 
         Returns:
+        	sample tweets
 
         """
         track = input("(Optional) Specify a keyword to search in tweets: ")
@@ -120,7 +122,7 @@ class Terminal(object):
 
     def __retrieve_text(self, can_use_live_tweets, index2lang, tweet_retriever, vocab_lang):
         """
-
+        
         Args:
         	can_use_live_tweets:
         	index2lang:
@@ -133,7 +135,7 @@ class Terminal(object):
         input_terminal = input('Enter text or number: ')
         amount_live_tweets = self.__str_to_int(input_terminal)
         is_live_tweets = False
-        if amount_live_tweets > 0:
+        if amount_live_tweets > 0 and can_use_live_tweets:
             is_live_tweets = True
             sample_tweets = self.__sample_tweets(tweet_retriever, vocab_lang, amount_live_tweets)
             print('sample_tweets',sample_tweets)
