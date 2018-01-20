@@ -11,12 +11,25 @@ except ImportError:
 class Terminal(object):
     
     def __init__(self, system_param_dict):
+        """
+
+        Args:
+        	system_param_dict: contains hyperparameters
+        """
         self.system_param_dict = system_param_dict
 
     """
     to run the terminal, only this function needs to be called
     """
     def run_terminal(self, can_use_live_tweets=False):
+        """
+        Enters an infinite loop to evaluate tweets entered manually or retrieved live from twitter
+        Args:
+        	can_use_live_tweets: true, if tweets can be retrieved from twitter
+
+        Returns:
+
+        """
         input_data = InputData.InputData()
         embed, num_classes = input_data.create_embed_from_weights_file(self.system_param_dict['trained_embed_weights_rel_path'])
         gru_model = GRUModel.GRUModel(vocab_chars={},
@@ -30,19 +43,32 @@ class Terminal(object):
         if (self.system_param_dict['cuda_is_avail']):
             gru_model.cuda()
 
-        self.loop_input(gru_model=gru_model, input_data=input_data, can_use_live_tweets=can_use_live_tweets, embed=embed, vocab_lang=results_dict['vocab_lang'], vocab_chars=results_dict['vocab_chars'])
+        self.__loop_input(gru_model=gru_model, input_data=input_data, can_use_live_tweets=can_use_live_tweets, embed=embed, vocab_lang=results_dict['vocab_lang'], vocab_chars=results_dict['vocab_chars'])
 
 
-    def loop_input(self, gru_model, input_data, can_use_live_tweets, embed, vocab_lang, vocab_chars):
+    def __loop_input(self, gru_model, input_data, can_use_live_tweets, embed, vocab_lang, vocab_chars):
+        """
+        Takes user input and evaluates the resulting 'tweet'
+        Args:
+        	gru_model: model which will evaluate
+        	input_data:
+        	can_use_live_tweets:
+        	embed:
+        	vocab_lang:
+        	vocab_chars:
+
+        Returns:
+
+        """
         tweet_retriever = TweetRetriever.TweetRetriever()
         lang2index, index2lang = input_data.get_string2index_and_index2string(vocab_lang)
 
         input_text = ''
         while input_text != 'exit':
-            input_text, input_text_lang_tuple, is_live_tweets = self.retrieve_text(can_use_live_tweets, index2lang, tweet_retriever, vocab_lang)
+            input_text, input_text_lang_tuple, is_live_tweets = self.__retrieve_text(can_use_live_tweets, index2lang, tweet_retriever, vocab_lang)
             if input_text is None:
                 continue
-            input_text_embed_char_text_inp_tensors, _ = self.prepare_data(input_data=input_data,
+            input_text_embed_char_text_inp_tensors, _ = self.__prepare_data(input_data=input_data,
                                                                           embed=embed,
                                                                           input_text_lang_tuple=input_text_lang_tuple,
                                                                           vocab_chars=vocab_chars,
@@ -51,10 +77,19 @@ class Terminal(object):
             if (self.system_param_dict['cuda_is_avail']):
                 input_text_embed_char_text_inp_tensors = input_text_embed_char_text_inp_tensors.cuda()
             n_highest_probs = 5
-            self.evaluate_and_print(gru_model=gru_model, input_text_embed_char_text_inp_tensors=input_text_embed_char_text_inp_tensors,
+            self.__evaluate_and_print(gru_model=gru_model, input_text_embed_char_text_inp_tensors=input_text_embed_char_text_inp_tensors,
                                     n_highest_probs=n_highest_probs, input_text=input_text, index2lang=index2lang, is_live_tweets=is_live_tweets)
 
-    def str_to_int(self, string):
+    def __str_to_int(self, string):
+        """
+        Tries to cast a string to an integer
+        Args:
+        	string: will be cast to int
+
+        Returns:
+        	number: int(string), 0 otherwise
+
+        """
         try:
             number = int(string)
             return number
@@ -62,7 +97,18 @@ class Terminal(object):
 #            print("Not a number")
             return 0
 
-    def sample_tweets(self, tweet_retriever, vocab_lang, amount):
+    def __sample_tweets(self, tweet_retriever, vocab_lang, amount):
+        """
+        calls tweet_retriever to get sample tweets from twitter
+        Args:
+        	tweet_retriever: instance of TweetRetriever that connects to twitter
+        	vocab_lang: dict of languages
+        	amount: amount of tweets to sample
+
+        Returns:
+        	sample tweets
+
+        """
         track = input("(Optional) Specify a keyword to search in tweets: ")
         if track != "":
             language = input("(Optional) Specify a language identifier to search in tweets: ")
@@ -74,13 +120,27 @@ class Terminal(object):
         else:
             return tweet_retriever.retrieve_sample_tweets(amount)
 
-    def retrieve_text(self, can_use_live_tweets, index2lang, tweet_retriever, vocab_lang):
+    def __retrieve_text(self, can_use_live_tweets, index2lang, tweet_retriever, vocab_lang):
+        """
+        Asks for user input and calls manual or twitter evaluation based on response
+        Args:
+        	can_use_live_tweets: true, if tweets can be retrieved from twitter
+        	index2lang:
+        	tweet_retriever: instance of TweetRetriever that connects to twitter
+        	vocab_lang: dict of languages
+
+        Returns:
+        	input_text: manually entered phrase or tweets from twitter
+        	input_text_lang_tuple: tuple of input_text and its language
+        	is_live_tweets:
+
+        """
         input_terminal = input('Enter text or number: ')
-        amount_live_tweets = self.str_to_int(input_terminal)
+        amount_live_tweets = self.__str_to_int(input_terminal)
         is_live_tweets = False
-        if amount_live_tweets > 0:
+        if amount_live_tweets > 0 and can_use_live_tweets:
             is_live_tweets = True
-            sample_tweets = self.sample_tweets(tweet_retriever, vocab_lang, amount_live_tweets)
+            sample_tweets = self.__sample_tweets(tweet_retriever, vocab_lang, amount_live_tweets)
             print('sample_tweets',sample_tweets)
             if sample_tweets is None:
                 return None, None
@@ -91,7 +151,21 @@ class Terminal(object):
             input_text_lang_tuple = [(input_text[0], index2lang[0])]  # language must be in vocab_lang
         return input_text, input_text_lang_tuple, is_live_tweets
 
-    def prepare_data(self, input_data, embed, input_text_lang_tuple, vocab_chars, vocab_lang):
+    def __prepare_data(self, input_data, embed, input_text_lang_tuple, vocab_chars, vocab_lang):
+        """
+        prepares input data to be fed in model
+        Args:
+        	input_data: instance of InputData class
+        	embed: embedding needed to convert input data into char embedding
+        	input_text_lang_tuple: actual input data
+        	vocab_chars: dict of all characters learned
+        	vocab_lang: dict of all languages
+
+        Returns:
+        	input_text_embed_char_text_inp_tensors:
+        	input_text_target_tensors:
+
+        """
         filtered_texts_and_lang = input_data.filter_out_irrelevant_tweet_parts(input_text_lang_tuple)
         # print('filtered_texts_and_lang',filtered_texts_and_lang)
         input_text_only_vocab_chars = input_data.get_texts_with_only_vocab_chars(filtered_texts_and_lang, vocab_chars)
@@ -104,7 +178,20 @@ class Terminal(object):
              embed=embed)
         return input_text_embed_char_text_inp_tensors, input_text_target_tensors
 
-    def evaluate_and_print(self, gru_model, input_text_embed_char_text_inp_tensors, n_highest_probs, input_text, index2lang, is_live_tweets):
+    def __evaluate_and_print(self, gru_model, input_text_embed_char_text_inp_tensors, n_highest_probs, input_text, index2lang, is_live_tweets):
+        """
+        calls evaluator instance for prediction and prints languages with highest probabilites
+        Args:
+        	gru_model: model used for evaluation
+        	input_text_embed_char_text_inp_tensors: input text as embedding for model
+        	n_highest_probs: n highest probabilites of languages to return
+        	input_text: actual input text
+        	index2lang: lookup from unique index to language
+        	is_live_tweets: true, if tweets from twitter are evaluated
+
+        Returns:
+
+        """
         rnn_evaluator = RNNEvaluator.RNNEvaluator(gru_model)
         for i, input_tensor in enumerate(input_text_embed_char_text_inp_tensors):
             lang_prediction, _ = rnn_evaluator.evaluate_single_date(input_tensor, n_highest_probs)
