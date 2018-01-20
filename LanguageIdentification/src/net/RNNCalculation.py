@@ -1,5 +1,6 @@
 import pprint
 from input import InputData
+from embedding import SkipGramModel
 from net import GRUModel
 from evaluation import RNNEvaluator
 
@@ -9,11 +10,26 @@ class RNNCalculation(object):
     
     
     def __init__(self, system_param_dict):
+        """
+
+        Args:
+        	system_param_dict:
+        """
         self.system_param_dict = system_param_dict
 
 
     def train_rnn(self, data_sets, vocab_chars, vocab_lang):
-        input_and_target_tensors, gru_model = self.get_model_and_data(data_sets, vocab_chars, vocab_lang, self.system_param_dict['embed_weights_rel_path'])
+        """
+
+        Args:
+        	data_sets:
+        	vocab_chars:
+        	vocab_lang:
+
+        Returns:
+
+        """
+        input_and_target_tensors, gru_model = self.get_model_and_data(data_sets, vocab_chars, vocab_lang, self.system_param_dict['embed_weights_rel_path'], True)
         if (len(data_sets) < 2):
             print("ERROR: Two data sets (training, validation) are needed!")
             return
@@ -28,7 +44,17 @@ class RNNCalculation(object):
 
 
     def test_rnn(self, data_sets, vocab_chars, vocab_lang):
-        input_and_target_tensors, gru_model = self.get_model_and_data(data_sets, vocab_chars, vocab_lang, self.system_param_dict['embed_weights_rel_path'])
+        """
+
+        Args:
+        	data_sets:
+        	vocab_chars:
+        	vocab_lang:
+
+        Returns:
+
+        """
+        input_and_target_tensors, gru_model = self.get_model_and_data(data_sets, vocab_chars, vocab_lang, self.system_param_dict['embed_weights_rel_path'], True)
         state = gru_model.load_model_checkpoint_from_file(self.system_param_dict['rnn_model_checkpoint_rel_path'])
         results_dict = state['results_dict']
         rnn_evaluator = RNNEvaluator.RNNEvaluator(gru_model)
@@ -63,12 +89,26 @@ class RNNCalculation(object):
         gru_model.save_model_checkpoint_to_file(state, self.system_param_dict['rnn_model_checkpoint_rel_path'])
 
 
-    def print_model_checkpoint(self, vocab_chars, vocab_lang):
-        _, gru_model = self.get_model_and_data([], vocab_chars, vocab_lang, self.system_param_dict['print_model_checkpoint_embed_weights'])
-        state = gru_model.load_model_checkpoint_from_file(self.system_param_dict['print_model_checkpoint'])
+    def print_model_checkpoint(self, vocab_chars, vocab_lang, is_rnn_model):
+        """
+
+        Args:
+        	vocab_chars:
+        	vocab_lang:
+
+        Returns:
+
+        """
+        _, model = self.get_model_and_data([], vocab_chars, vocab_lang, self.system_param_dict['print_model_checkpoint_embed_weights'], is_rnn_model)
+        # check which model shall be printed
+        if (is_rnn_model):
+            model_checkpoint = self.system_param_dict['print_rnn_model_checkpoint']
+        else:
+            model_checkpoint = self.system_param_dict['print_embed_model_checkpoint']
+        state = model.load_model_checkpoint_from_file(model_checkpoint)
         system_param_dict = state['system_param_dict']
         results_dict = state['results_dict']
-        rnn_evaluator = RNNEvaluator.RNNEvaluator(gru_model)
+        rnn_evaluator = RNNEvaluator.RNNEvaluator(model)
         
         conf_matrix_exists = False
         # get nice formatting for confusion matrix
@@ -87,7 +127,7 @@ class RNNCalculation(object):
                 results_print_dict[result] = results_dict[result]
         
         print('Model checkpoint data:')
-        to_print = [('Model:\n', gru_model),
+        to_print = [('Model:\n', model),
                     ('System parameters:', system_param_dict),
                     ('Results:', results_print_dict)]
         if (conf_matrix_exists):
@@ -95,7 +135,18 @@ class RNNCalculation(object):
         self.print_out(to_print)
         
 
-    def get_model_and_data(self, data_sets, vocab_chars, vocab_lang, embed_weights_rel_path):
+    def get_model_and_data(self, data_sets, vocab_chars, vocab_lang, embed_weights_rel_path, is_rnn_model):
+        """
+
+        Args:
+        	data_sets:
+        	vocab_chars:
+        	vocab_lang:
+        	embed_weights_rel_path:
+
+        Returns:
+
+        """
         input_data = InputData.InputData()
         embed, num_classes = input_data.create_embed_from_weights_file(embed_weights_rel_path)
         input_and_target_tensors = []
@@ -109,18 +160,33 @@ class RNNCalculation(object):
             else:
                 input_and_target_tensors.append((inputs, targets))
 
-        gru_model = GRUModel.GRUModel(vocab_chars=vocab_chars,
+        # choose which model to create
+        if (is_rnn_model):
+            model = GRUModel.GRUModel(vocab_chars=vocab_chars,
                                       vocab_lang=vocab_lang,
                                       input_size=embed.weight.size()[1],  # equals embedding dimension
                                       num_classes=num_classes,
                                       system_param_dict=self.system_param_dict)
+        else:
+            model = SkipGramModel.SkipGramModel(vocab_chars=vocab_chars,
+                                                vocab_lang=vocab_lang,
+                                                embed_dim=embed.weight.size()[1],
+                                                system_param_dict=self.system_param_dict)
         # run on GPU if available
         if (self.system_param_dict['cuda_is_avail']):
-            gru_model.cuda()
-        return input_and_target_tensors, gru_model
+            model.cuda()
+        return input_and_target_tensors, model
 
 
     def print_out(self, string_date_tuple):
+        """
+
+        Args:
+        	string_date_tuple:
+
+        Returns:
+
+        """
         for string, date in string_date_tuple:
             print('========================================')
             # print dicts with new line for every key

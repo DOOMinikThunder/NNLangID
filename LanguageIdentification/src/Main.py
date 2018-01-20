@@ -66,10 +66,10 @@ def main():
         if (system_param_dict['create_splitted_data_files'] or not files_exist):
             out_filenames = [system_param_dict['out_tr_data_rel_path'], system_param_dict['out_va_data_rel_path'], system_param_dict['out_te_data_rel_path']] #same size as ratios
             data_splitter = DataSplit.DataSplit()
-            splitted_data = data_splitter.split_percent_of_languages(system_param_dict['input_tr_va_te_data_rel_path'],
-                                                                     system_param_dict['tr_va_te_split_ratios'],
-                                                                     out_filenames,
-                                                                     system_param_dict['split_shuffle_seed'])
+            splitted_data = data_splitter.split_percent_of_languages(input_file=system_param_dict['input_tr_va_te_data_rel_path'],
+                                                                     ratio=system_param_dict['tr_va_te_split_ratios'],
+                                                                     out_filenames=out_filenames,
+                                                                     shuffle_seed=system_param_dict['split_shuffle_seed'])
 
     ###################################
     # DATA RETRIEVAL & TRANSFORMATION #
@@ -120,7 +120,9 @@ def main():
         
         # train RNN model
         if (system_param_dict['train_rnn']):
-            rnn_calculation.train_rnn([train_set_indexed, val_set_indexed], vocab_chars, vocab_lang)
+            rnn_calculation.train_rnn(data_sets=[train_set_indexed, val_set_indexed],
+                                      vocab_chars=vocab_chars,
+                                      vocab_lang=vocab_lang)
 
     ##############
     # EVALUATION #
@@ -128,11 +130,21 @@ def main():
 
         # evaluate test set
         if (system_param_dict['eval_test_set']):
-            rnn_calculation.test_rnn([test_set_indexed], vocab_chars, vocab_lang)
+            rnn_calculation.test_rnn(data_sets=[test_set_indexed],
+                                     vocab_chars=vocab_chars,
+                                     vocab_lang=vocab_lang)
 
         # print saved model checkpoint from file
-        if (system_param_dict['print_model_checkpoint'] != None and system_param_dict['print_model_checkpoint_embed_weights'] != None):
-            rnn_calculation.print_model_checkpoint(vocab_chars, vocab_lang)
+        if (system_param_dict['print_model_checkpoint_embed_weights'] != None and system_param_dict['print_rnn_model_checkpoint'] != None):
+            rnn_calculation.print_model_checkpoint(vocab_chars=vocab_chars,
+                                                   vocab_lang=vocab_lang,
+                                                   is_rnn_model=True)
+        elif (system_param_dict['print_model_checkpoint_embed_weights'] != None and system_param_dict['print_embed_model_checkpoint'] != None):
+            rnn_calculation.print_model_checkpoint(vocab_chars=vocab_chars,
+                                                   vocab_lang=vocab_lang,
+                                                   is_rnn_model=False)
+        else:
+            print('Both embedding weights and model checkpoint path required!')
 
 
 if __name__ == '__main__':

@@ -2,6 +2,13 @@ import math
 
 class Batches(object):
     def __init__(self, data_set, targets, batch_size):
+        """
+        Iterator class to ease the use of mini-batches
+        Args:
+        	data_set: will be divided into batches
+        	targets: will be divided into batches
+        	batch_size: size each batch of input and target will have
+        """
         self.data_set = data_set
         self.targets = targets
         self.batch_size = batch_size
@@ -9,8 +16,9 @@ class Batches(object):
 
     def __iter__(self):
         """
-        iterator function over a tweet_retriever_data set
-        :return: the next batch from the tweet_retriever_data set
+
+        Returns: iterator over all batches
+
         """
         for batch in range(self.num_batches):
             yield self.data_set[batch*self.batch_size:(batch+1)*self.batch_size], self.targets[batch*self.batch_size:(batch+1)*self.batch_size]

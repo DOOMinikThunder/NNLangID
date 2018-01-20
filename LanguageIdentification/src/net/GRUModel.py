@@ -13,6 +13,15 @@ class GRUModel(nn.Module):
     
     
     def __init__(self, vocab_chars, vocab_lang, input_size, num_classes, system_param_dict):
+        """
+
+        Args:
+        	vocab_chars: every character occurence as a dict of character: index, occurrences
+        	vocab_lang: every language occurence as a dict of language: index, occurences
+        	input_size: input size of of character embeddings
+        	num_classes: number of languages
+        	system_param_dict: contains hyperparameters
+        """
         super(GRUModel, self).__init__()
         self.vocab_chars = vocab_chars
         self.vocab_lang = vocab_lang
@@ -42,6 +51,11 @@ class GRUModel(nn.Module):
 
 
     def initHidden(self):
+        """
+        before forwarding a new set of data, the initial rnn state can be set with this method
+        Returns: rnn state
+
+        """
         hidden = Variable(torch.zeros(self.num_layers * self.num_directions, self.batch_size, self.hidden_size))
         # transfer tensor to GPU if available
         if (self.cuda_is_avail):
@@ -51,6 +65,17 @@ class GRUModel(nn.Module):
     
 
     def forward(self, inp, hidden=None):
+        """
+        forward propagation
+        Args:
+        	inp: one tensor of input size, i.e. one tweet
+        	hidden: the previous hidden rnn state
+
+        Returns:
+        	output: prediction for the input
+        	next_hidden: the new hidden state
+
+        """
         output, next_hidden = self.gru_layer(inp, hidden)
         output = self.output_layer(output)
         output = output.view(-1, self.num_classes)
@@ -61,6 +86,19 @@ class GRUModel(nn.Module):
 
 
     def train(self, train_inputs, train_targets, val_inputs, val_targets):
+        """
+        model's training method
+        iterates over epochs and batches
+        updates weights after each batch, saves the best model and decays learning rate
+        Args:
+        	train_inputs: set of all tweets to be trained
+        	train_targets: set of all targets for input tweets
+        	val_inputs: set all tweets to be used for validation
+        	val_targets: set of all targets for validation tweets
+
+        Returns:
+
+        """
         batch_size = self.system_param_dict['batch_size_rnn']
         max_eval_checks_not_improved = self.system_param_dict['max_eval_checks_not_improved_rnn']
         max_num_epochs = self.system_param_dict['max_num_epochs_rnn']
@@ -158,11 +196,28 @@ class GRUModel(nn.Module):
             
         
     def save_model_checkpoint_to_file(self, state, relative_path_to_file):
+        """
+
+        Args:
+        	state:
+        	relative_path_to_file:
+
+        Returns:
+
+        """
         torch.save(state, relative_path_to_file)
         print('Model checkpoint saved to file:', relative_path_to_file)
         
         
     def load_model_checkpoint_from_file(self, relative_path_to_file):
+        """
+
+        Args:
+        	relative_path_to_file:
+
+        Returns:
+
+        """
         state = torch.load(relative_path_to_file)
         results_dict = state['results_dict']
         self.load_state_dict(results_dict['state_dict'])
