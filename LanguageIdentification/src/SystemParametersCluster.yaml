@@ -1,6 +1,6 @@
 # System parameters
 create_splitted_data_files: True                             # split into training, validation and test set from an original file
-train_embed: True
+train_embed: False
 train_rnn: True
 eval_test_set: True
 run_terminal: False                                          # if True: disables all other calculations
@@ -51,10 +51,10 @@ initial_lr_embed: 0.025
 hidden_size_rnn: 100
 num_layers_rnn: 1
 is_bidirectional: True
-batch_size_rnn: 1
+batch_size_rnn: 10
 max_eval_checks_not_improved_rnn: 10
 max_num_epochs_rnn: .inf #10 #.inf
-eval_every_num_batches_rnn: 7000                            # 107300 tweets in uniformly_recall_merged
+eval_every_num_batches_rnn: 439                            # 107300 tweets in uniformly_recall_merged; 4391 tweets in ['de', 'en', 'es', 'fr', 'it'] 
 lr_decay_factor_rnn: 0.1                                    # 1.0 means no decay
 initial_lr_rnn: 0.01
 weight_decay_rnn: 0.00001
