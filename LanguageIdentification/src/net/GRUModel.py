@@ -26,6 +26,7 @@
 import torch
 from torch import nn, optim
 from torch.autograd import Variable
+#import torch.nn.functional as F
 from . import BatchGenerator
 from evaluation import RNNEvaluator
 
@@ -98,6 +99,9 @@ class GRUModel(nn.Module):
         output, next_hidden = self.gru_layer(inp, hidden)
         output = self.output_layer(output)
         output = output.view(-1, self.num_classes)
+#        # use tanh for output layer instead of linear
+#        for i in range(len(output)):
+#            output[i] = F.tanh(output.data[i])
         output = self.log_softmax(output)
         return output, next_hidden
 
@@ -140,6 +144,7 @@ class GRUModel(nn.Module):
                 if (continue_training):  
                     self.zero_grad()
                     batch_loss_acc = 0
+                    # for every tweet in the batch
                     for tweet_input, tweet_target in zip(input_batch, target_batch):
                         hidden = self.initHidden()
                         output, hidden = self(tweet_input, hidden)
@@ -235,5 +240,6 @@ class GRUModel(nn.Module):
         self.optimizer.load_state_dict(results_dict['optimizer'])
         self.vocab_chars = results_dict['vocab_chars']
         self.vocab_lang = results_dict['vocab_lang']
+#        self.eval() # set model to evaluation mode (instead of default initialized train mode)
         print('Model checkpoint loaded from file:', relative_path_to_file)
         return state

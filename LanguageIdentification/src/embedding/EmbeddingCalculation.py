@@ -80,6 +80,7 @@ class EmbeddingCalculation(object):
         ###########
         
         if (system_param_dict['print_embed_testing']):
+#            print("VOCABULARY:\n", vocab_chars)
             input_data = InputData.InputData()
             embed, num_classes = input_data.create_embed_from_weights_file(system_param_dict['embed_weights_rel_path'])
             char2index, index2char = input_data.get_string2index_and_index2string(vocab_chars)
