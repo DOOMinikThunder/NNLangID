@@ -101,7 +101,7 @@ class DataSplit(object):
         """
         splitted_data = [[] for i in range(len(ratio))]
         for language in languages_splitted:
-            language_in_ratios = self.__split_language_with_ratio(languages_splitted[language], ratio, shuffle_seed)#
+            language_in_ratios = self.split_data_with_ratio(languages_splitted[language], ratio, shuffle_seed)#
             for i,set in enumerate(language_in_ratios):
                 splitted_data[i] += set
 
@@ -125,28 +125,27 @@ class DataSplit(object):
                 languages_splitted[tweet[2]] = [tweet]
         return languages_splitted
 
-    def __split_language_with_ratio(self, input, ratio, shuffle_seed):
+    def split_data_with_ratio(self, input, ratio, shuffle_seed):
         """
-        Splits a list of tweets of one language into ratio parts.
+        Splits a list of dates into ratio parts.
         
         Args:
-            input: list of tweets one language
-            ratio: list of ratios the tweets will be splitted into,
+            input: data to split into ratio
+            ratio: list of ratios the data will be splitted into,
                 e.g. [0.5, 0.5] for two lists, [0.4, 0.4, 0.2] for three lists
-            shuffle_seed: seed for shuffling the tweets
+            shuffle_seed: seed for shuffling the data
 
         Returns:
-            split_languages: list of len(ratio) language splitted into ratio parts
+            split_data: list of data splitted into len(ratio) parts
         """
         in_size = len(input)
-        idx_list = [i for i in range(len(input))]
         seed(shuffle_seed)
-        shuffle(idx_list)
-        split_languages = []
+        shuffle(input)
+        split_data = []
         for percentage in ratio[:-1]:
-            split_languages.append(self.__take_from_list(input, 0, int(in_size*percentage)))
-        split_languages.append(input)
-        return split_languages
+            split_data.append(self.__take_from_list(input, 0, int(in_size*percentage)))
+        split_data.append(input)
+        return split_data
 
     def __take_from_list(self, list, start, end):
         """
