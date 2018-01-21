@@ -3,7 +3,7 @@ create_splitted_data_files: True                             # if True: split in
 train_embed: True                                            # if True: train the embedding
 train_rnn: True                                              # if True: train the RNN
 eval_test_set: True                                          # if True: evaluate the test set for the RNN
-run_terminal: False                                          # if True: runs the terminal and disables all other calculations
+run_terminal: True                                          # if True: runs the terminal and disables all other calculations
 
 # Print parameters
 print_embed_testing: True                                    # if True: print the embedding test
@@ -58,3 +58,8 @@ eval_every_num_batches_rnn: 100                             # do an evaluation c
 lr_decay_factor_rnn: 0.1                                    # factor which is multiplied with the learning rate when the decay is active, which is the case every not improved evaluation check >= half of max_eval_checks_not_improved_embed
 initial_lr_rnn: 0.01                                        # initial learning rate
 weight_decay_rnn: 0.00001                                   # weight decay (L2 penalty) for Adam
+
+# ca. 53100 tweets in recall_oriented_dl.csv
+# 54812 tweets in uniformly_sampled_dl.csv
+# ca. 107300 tweets in uniformly_recall_merged.csv
+# 4391 tweets in recall_oriented_dl: ['de', 'en', 'es', 'fr', 'it']
