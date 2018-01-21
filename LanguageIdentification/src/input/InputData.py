@@ -15,9 +15,9 @@ class InputData(object):
         """
 
         Args:
-        	relative_path_to_file:
-        	fetch_only_langs:
-        	fetch_only_first_x_tweets:
+            relative_path_to_file:
+            fetch_only_langs:
+            fetch_only_first_x_tweets:
 
         Returns:
 
@@ -47,7 +47,7 @@ class InputData(object):
         """
 
         Args:
-        	texts_and_lang:
+            texts_and_lang:
 
         Returns:
 
@@ -110,8 +110,8 @@ class InputData(object):
         """
 
         Args:
-        	texts_and_lang:
-        	set_ratios:
+            texts_and_lang:
+            set_ratios:
 
         Returns:
 
@@ -139,8 +139,8 @@ class InputData(object):
         """
 
         Args:
-        	texts_and_lang:
-        	min_char_frequency:
+            texts_and_lang:
+            min_char_frequency:
 
         Returns:
 
@@ -189,8 +189,8 @@ class InputData(object):
         """
 
         Args:
-        	texts_and_lang:
-        	vocab_chars:
+            texts_and_lang:
+            vocab_chars:
 
         Returns:
 
@@ -210,9 +210,9 @@ class InputData(object):
         """
 
         Args:
-        	texts_and_lang_only_vocab_chars:
-        	vocab_chars:
-        	vocab_lang:
+            texts_and_lang_only_vocab_chars:
+            vocab_chars:
+            vocab_lang:
 
         Returns:
 
@@ -229,19 +229,32 @@ class InputData(object):
     
     
     def get_indexed_data(self, train_data_rel_path, validation_data_rel_path, test_data_rel_path, real_test_data_rel_path, min_char_frequency, fetch_only_langs=None, fetch_only_first_x_tweets=float('inf')):
-        """
+        """Gets all relevant data in indexed form, as well as the vocabularies, to be readily used by the embedding and RNN.
 
         Args:
-        	train_data_rel_path:
-        	validation_data_rel_path:
-        	test_data_rel_path:
-        	real_test_data_rel_path:
-        	min_char_frequency:
-        	fetch_only_langs:
-        	fetch_only_first_x_tweets:
+            train_data_rel_path: Relative path to training set file.
+            validation_data_rel_path: Relative path to validation set file.
+            test_data_rel_path: Relative path to test set file.
+            real_test_data_rel_path: Relative path to real test set file.
+            min_char_frequency: Minimum character frequency for a character in the training set to be in the vocabulary (and later used).
+            fetch_only_langs: Fetch only the as a list of language tags specified languages. If 'None', all languages will be fetched.
+            fetch_only_first_x_tweets: Fetch only the first x amount of tweets in the files. Set to infinity to fetch all tweets.
 
         Returns:
-
+            train_set_indexed: List of tuples, with each tuple representing one tweet in the data set with the data set being (true) randomly shuffled each time.
+                The first tuple element is the preprocessed tweet text as a list of characters, the second is the language.
+                Thereby, both characters and languages are replaced by their unique indices,
+                which are obtained by the two vocabularies for characters (vocab_chars) and languages (vocab_lang).
+                Example for a set with two tweets:
+                    [([0,1,0,1], 0), ([2,3,2,3], 1)] for [([a,b,a,b], 'de'), ([c,d,c,d], 'en')]
+            val_set_indexed: See train_set_indexed.
+            test_set_indexed: See train_set_indexed.
+            real_test_set_indexed: See train_set_indexed.
+            vocab_chars: Dict for a mapping of each ocurred character in the training data with frequency >= min_char_frequency
+                to a tuple of unique index and frequency of its occurence. In the form: {character: (index, frequency)}.
+                Example for two occured characters:
+                    {'a': (0, 1337), 'b': (1, 42)}
+            vocab_lang: The same as vocab_chars, but for languages instead of characters (and no frequency threshold).
         """
         tr_filtered = self.__get_filtered_data(train_data_rel_path, min_char_frequency, fetch_only_langs, fetch_only_first_x_tweets, calc_vocab=True)
         vocab_chars, vocab_lang = self.__get_vocab_chars_and_lang(tr_filtered, min_char_frequency)
@@ -259,11 +272,11 @@ class InputData(object):
         """
 
         Args:
-        	data_path:
-        	min_char_frequency:
-        	fetch_only_langs:
-        	fetch_only_first_x_tweets:
-        	calc_vocab:
+            data_path:
+            min_char_frequency:
+            fetch_only_langs:
+            fetch_only_first_x_tweets:
+            calc_vocab:
 
         Returns:
 
@@ -278,9 +291,9 @@ class InputData(object):
         """
 
         Args:
-        	filtered_texts_and_lang:
-        	vocab_lang:
-        	vocab_chars:
+            filtered_texts_and_lang:
+            vocab_lang:
+            vocab_chars:
 
         Returns:
 
@@ -294,7 +307,7 @@ class InputData(object):
         """
 
         Args:
-        	vocab_dict:
+            vocab_dict:
 
         Returns:
 
@@ -311,7 +324,7 @@ class InputData(object):
         """
 
         Args:
-        	indexed_texts_and_lang:
+            indexed_texts_and_lang:
 
         Returns:
 
@@ -326,9 +339,9 @@ class InputData(object):
         """
 
         Args:
-        	indexed_tweet_texts:
-        	batch_size:
-        	max_window_size:
+            indexed_tweet_texts:
+            batch_size:
+            max_window_size:
 
         Returns:
 
