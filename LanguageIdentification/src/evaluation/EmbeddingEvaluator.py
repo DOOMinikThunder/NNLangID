@@ -23,34 +23,31 @@
 #    SOFTWARE.
 
 
-import math
-import numpy as np
-from scipy import stats
 import torch
 from torch.autograd import Variable
-from collections import Counter
-from evaluation import Evaluator
+
 
 class EmbeddingEvaluator(object):
-
+    """Class for embedding evaluation.
+    """
+    
     def __init__(self, model):
         """
-
         Args:
-        	model:
+            model: The model to be evaluated.
         """
         self.model = model
-#        super(EmbeddingEvaluator, self).__init__(model)
     
     def evaluate_data_set(self, val_batched_pairs, num_neg_samples):
         """
-
+        Evaluate the model on a given data set.
+        
         Args:
-        	val_batched_pairs:
-        	num_neg_samples:
+            val_batched_pairs: List of validation batched pairs.
+            num_neg_samples: Number of negative samples to use.
 
         Returns:
-
+            The batch mean loss.
         """
         for batch_i, batch in enumerate(val_batched_pairs):
             batch_size = len(batch)

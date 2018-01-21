@@ -31,22 +31,22 @@ from embedding import SkipGramModel
 #from tqdm import tqdm
 
 
-
 class EmbeddingCalculation(object):
-        
+    """Class containing the set-up and execution of the embedding training,
+    with some basic testing functionality.
+    """
 
     def train_embed(self, train_set_indexed, val_set_indexed, vocab_chars, vocab_lang, system_param_dict):
         """
-
+        Create embedding model and batched pairs for training, then train the model.
+        After training, a basic test may be printed.
+        
         Args:
-        	train_set_indexed:
-        	val_set_indexed:
-        	vocab_chars:
-        	vocab_lang:
-        	system_param_dict:
-
-        Returns:
-
+            train_set_indexed: The indexed training set (list of tuples).
+            val_set_indexed: The indexed validation set (list of tuples).
+            vocab_chars: Every character occurence as a dict of {character: (index, occurrences)}.
+            vocab_lang: Every language occurence as a dict of {language: (index, occurences)}.
+            system_param_dict: Dict containing the system parameters.
         """
         # set embedding dimension to: roundup(log2(vocabulary-size))
         embed_dim = math.ceil(math.log(len(vocab_chars),2))

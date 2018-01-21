@@ -25,14 +25,17 @@
 
 import math
 
+
 class Batches(object):
+    """Iterator class to ease the use of mini-batches.
+    """
+    
     def __init__(self, data_set, targets, batch_size):
         """
-        Iterator class to ease the use of mini-batches
         Args:
-        	data_set: will be divided into batches
-        	targets: will be divided into batches
-        	batch_size: size each batch of input and target will have
+            data_set: Will be divided into batches.
+            targets: Will be divided into batches.
+            batch_size: The size of each batch the inputs and targets will have.
         """
         self.data_set = data_set
         self.targets = targets
@@ -41,9 +44,8 @@ class Batches(object):
 
     def __iter__(self):
         """
-
-        Returns: iterator over all batches
-
+        Yields:
+            Iterator over all batches.
         """
         for batch in range(self.num_batches):
             yield self.data_set[batch*self.batch_size:(batch+1)*self.batch_size], self.targets[batch*self.batch_size:(batch+1)*self.batch_size]

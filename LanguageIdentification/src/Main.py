@@ -48,7 +48,7 @@ def main():
     # USER PARAMETER
     # (only set this and the parameters in the corresponding YAML settings file;
     # True for SystemParametersCluster.yaml, False for SystemParameters.yaml)
-    use_cluster_params = True
+    use_cluster_params = False
     
     
     ###########################################################################

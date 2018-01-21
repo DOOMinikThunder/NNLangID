@@ -42,17 +42,21 @@ target = autograd.Variable((torch.rand(batch_size)*num_classes).long())
 
 
 class Net(nn.Module):
-	def __init__(self, input_size, hidden_size, num_classes):
-		super(Net, self).__init__()
-		self.h1 = nn.Linear(input_size, hidden_size)
-		self.h2 = nn.Linear(hidden_size, num_classes)
+    """Simple ANN class for testing.
+    """
+    
+    def __init__(self, input_size, hidden_size, num_classes):
+        super(Net, self).__init__()
+        self.h1 = nn.Linear(input_size, hidden_size)
+        self.h2 = nn.Linear(hidden_size, num_classes)
 
-	def forward(self, x):
-		x = self.h1(x)
-		x = F.tanh(x)
-		x = self.h2(x)
-		x = F.softmax(x)
-		return x
+    def forward(self, x):
+        x = self.h1(x)
+        x = F.tanh(x)
+        x = self.h2(x)
+        x = F.softmax(x)
+        return x
+
 
 model = Net(input_size=input_size, hidden_size=hidden_size, num_classes=num_classes)
 #model.zero_grad() #zero the gradient on the weights in both hidden layers
@@ -60,16 +64,16 @@ model = Net(input_size=input_size, hidden_size=hidden_size, num_classes=num_clas
 opt = optim.Adam(params=model.parameters(), lr=learning_rate) #params are weights
 
 for  epoch in range(1000):
-	out = model(input)
-	#print('out', out)
-	_, pred = out.max(1)
-	print('target', str(target.view(1,-1)).split('\n')[1])
-	print('pred', str(pred.view(1,-1)).split('\n')[1])
-	loss = F.nll_loss(out, target)
-	print('loss', loss.data[0])
+    out = model(input)
+    #print('out', out)
+    _, pred = out.max(1)
+    print('target', str(target.view(1,-1)).split('\n')[1])
+    print('pred', str(pred.view(1,-1)).split('\n')[1])
+    loss = F.nll_loss(out, target)
+    print('loss', loss.data[0])
 
-	model.zero_grad()
-	loss.backward()
-	opt.step()
+    model.zero_grad()
+    loss.backward()
+    opt.step()
 
 

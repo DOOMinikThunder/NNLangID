@@ -31,19 +31,18 @@ from . import BatchGenerator
 from evaluation import RNNEvaluator
 
 
-
 class GRUModel(nn.Module):
-    
+    """Class implementing the GRU model.
+    """
     
     def __init__(self, vocab_chars, vocab_lang, input_size, num_classes, system_param_dict):
         """
-
         Args:
-        	vocab_chars: every character occurence as a dict of character: index, occurrences
-        	vocab_lang: every language occurence as a dict of language: index, occurences
-        	input_size: input size of of character embeddings
-        	num_classes: number of languages
-        	system_param_dict: contains hyperparameters
+            vocab_chars: Every character occurence as a dict of {character: (index, occurrences)}.
+            vocab_lang: Every language occurence as a dict of {language: (index, occurences)}.
+            input_size: Input size of character embeddings (embedding dimension).
+            num_classes: Number of languages.
+            system_param_dict: Dict containing system parameters.
         """
         super(GRUModel, self).__init__()
         self.vocab_chars = vocab_chars
@@ -72,12 +71,12 @@ class GRUModel(nn.Module):
         self.criterion = torch.nn.NLLLoss()
         self.optimizer = optim.Adam(params=self.parameters(), lr=self.lr, weight_decay=self.weight_decay)
 
-
     def initHidden(self):
         """
-        before forwarding a new set of data, the initial rnn state can be set with this method
-        Returns: rnn state
-
+        Before forwarding a new set of data, the initial RNN hidden state can be set with this method.
+        
+        Returns:
+            hidden: Zeroed RNN hidden state.
         """
         hidden = Variable(torch.zeros(self.num_layers * self.num_directions, self.batch_size, self.hidden_size))
         # transfer tensor to GPU if available
@@ -86,18 +85,17 @@ class GRUModel(nn.Module):
         else:
             return hidden
     
-
     def forward(self, inp, hidden=None):
         """
-        forward propagation
+        Forward propagation.
+        
         Args:
-        	inp: one tensor of input size, i.e. one tweet
-        	hidden: the previous hidden rnn state
+            inp: One tensor of input size, i.e. one tweet.
+            hidden: The previous hidden RNN state.
 
         Returns:
-        	output: prediction for the input
-        	next_hidden: the new hidden state
-
+            output: Prediction for the input.
+            next_hidden: The new hidden state.
         """
         output, next_hidden = self.gru_layer(inp, hidden)
         output = self.output_layer(output)
@@ -107,20 +105,17 @@ class GRUModel(nn.Module):
         output = self.log_softmax(output)
         return output, next_hidden
 
-
     def train(self, train_inputs, train_targets, val_inputs, val_targets):
-        """
-        model's training method
-        iterates over epochs and batches
-        updates weights after each batch, saves the best model and decays learning rate
+        """Model's training method.
+        
+        Iterates over epochs and batches and updates weights after each batch.
+        Saves the best model to file and decays learning rate when learning stagnates.
+        
         Args:
-        	train_inputs: set of all tweets to be trained
-        	train_targets: set of all targets for input tweets
-        	val_inputs: set all tweets to be used for validation
-        	val_targets: set of all targets for validation tweets
-
-        Returns:
-
+            train_inputs: Set of all tweets to be trained.
+            train_targets: Set of all targets for input tweets.
+            val_inputs: Set of all tweets to be used for validation checks.
+            val_targets: Set of all targets for validation tweets.
         """
         batch_size = self.system_param_dict['batch_size_rnn']
         max_eval_checks_not_improved = self.system_param_dict['max_eval_checks_not_improved_rnn']
@@ -217,29 +212,27 @@ class GRUModel(nn.Module):
                 total_trained_batches_counter += 1
             epoch += 1
             
-        
     def save_model_checkpoint_to_file(self, state, relative_path_to_file):
         """
-
+        Saves a model state (checkpoint) to file.
+        
         Args:
-        	state:
-        	relative_path_to_file:
-
-        Returns:
-
+            state: Dict containing the model state to be saved.
+            relative_path_to_file: Relative path for the save file.
         """
         torch.save(state, relative_path_to_file)
         print('Model checkpoint saved to file:', relative_path_to_file)
         
-        
     def load_model_checkpoint_from_file(self, relative_path_to_file):
         """
-
+        Loads a model state (checkpoint) from file and initializes some model parameters with it.
+        The state is also returned.
+        
         Args:
-        	relative_path_to_file:
+            relative_path_to_file: Relative path to the save file.
 
         Returns:
-
+            state: The loaded model state.
         """
         state = torch.load(relative_path_to_file)
         results_dict = state['results_dict']
