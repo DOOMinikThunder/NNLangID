@@ -142,23 +142,10 @@ class DataSplit(object):
         seed(shuffle_seed)
         shuffle(input)
         split_data = []
-        for percentage in ratio[:-1]:
-            split_data.append(self.__take_from_list(input, 0, int(in_size*percentage)))
-        split_data.append(input)
+        indices = [0]
+        for i,percentage in enumerate(ratio[:-1]):
+            indices.append(int(in_size*percentage)+indices[i])
+        indices.append(in_size)
+        for i,j in zip(indices[:-1], indices[1:]):
+            split_data.append(input[i:j])
         return split_data
-
-    def __take_from_list(self, list, start, end):
-        """
-        retrieves elements from list and deletes the retrieved elements
-        
-        Args:
-            list: input list
-            start: start index
-            end: end index, not included
-
-        Returns:
-            new_list: input list with list[start:end] deleted
-        """
-        new_list = list[start:end]
-        del list[start:end]
-        return new_list
