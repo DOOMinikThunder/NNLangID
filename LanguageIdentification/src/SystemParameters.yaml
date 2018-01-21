@@ -7,7 +7,7 @@ run_terminal: False                                          # if True: runs the
 
 # Print parameters
 print_embed_testing: True                                    # if True: print the embedding test
-print_model_checkpoint_embed_weights: null #"../data/save/trained/embed_weights.txt"     # path for the embedding weights for printing the model; set to 'null' to disable
+print_model_checkpoint_embed_weights: null #"../data/save/trained/embed_weights_recall_de_en_es_fr_it_valmloss0.38_19.01.2018.txt"     # path for the embedding weights for printing the model; set to 'null' to disable
 print_rnn_model_checkpoint: null #"../data/save/trained/rnn_checkpoint_recall_de_en_es_fr_it_valmloss0.38_testmloss0.42_valacc0.91_testacc0.88_20.01.2018_nocuda.pth"     # path for the RNN model to be printed; set to 'null' to disable
 print_embed_model_checkpoint: null #"../data/save/trained/embed_model_checkpoint.pth"   # path for the embedding model to be printed; set to 'null' to disable
 

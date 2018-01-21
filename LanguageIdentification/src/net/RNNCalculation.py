@@ -127,14 +127,7 @@ class RNNCalculation(object):
         state = model.load_model_checkpoint_from_file(model_checkpoint)
         system_param_dict = state['system_param_dict']
         results_dict = state['results_dict']
-#        rnn_evaluator = RNNEvaluator.RNNEvaluator(model)
-        
-#        conf_matrix_exists = False
-#        # get nice formatting for confusion matrix
-#        if ('confusion_matrix' in results_dict):
-#            conf_matrix_exists = True
-#            confusion_matrix = rnn_evaluator.to_string_confusion_matrix(results_dict['confusion_matrix'], vocab_lang, 5)
-        
+ 
         results_print_dict = {}
         for result in results_dict:
             # only print relevant and not too verbose data
@@ -142,15 +135,12 @@ class RNNCalculation(object):
                 and result != 'optimizer'
                 and result != 'vocab_chars'
                 and result != 'vocab_lang'):
-#                and result != 'confusion_matrix'):
                 results_print_dict[result] = results_dict[result]
         
         print('Model checkpoint data:')
         to_print = [('Model:\n', model),
                     ('System parameters:', system_param_dict),
                     ('Results:', results_print_dict)]
-#        if (conf_matrix_exists):
-#            to_print.append(('Confusion matrix:\n', confusion_matrix))
         self.__print_out(to_print)
         
     def __get_model_and_data(self, data_sets, vocab_chars, vocab_lang, embed_weights_rel_path, is_rnn_model):
