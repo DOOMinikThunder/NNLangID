@@ -125,39 +125,7 @@ class InputData(object):
             if (filtered_tweet_text != []):
                 filtered_texts_and_lang.append((''.join(filtered_tweet_text), texts_and_lang[tweet_i][1]))
         return filtered_texts_and_lang
-    
-    # !!! DEPRECATED !!!
-    def __split_data_into_sets(self, texts_and_lang, set_ratios):
-        """
-        Splits into training, validation and test set.
-        
-        Args:
-            texts_and_lang: List of tuples in the form: (tweet_text, language_tag).
-            set_ratios: The splitting ratios: [train_ratio, val_ratio, test_ratio].
 
-        Returns:
-            train_set: Training set.
-            val_set: Validation set.
-            test_set: Test set.
-        """
-        if (set_ratios[0] + set_ratios[1] != 1):
-            print("Error: Set ratios do not sum to 1!")
-            return -1
-        data_size = len(texts_and_lang)
-        val_size = int(set_ratios[1] * data_size)
-        # train set size is adapted to fit total tweet_retriever_data size
-        # (as it is usually the largest set, the error will be neglectible)
-        train_size = data_size - (val_size)
-
-        train_set = []
-        val_set = []
-        test_set = []
-        for i in range(train_size):
-            train_set.append(texts_and_lang[i])
-        for i in range(val_size):
-            val_set.append(texts_and_lang[i+train_size])
-        return train_set, val_set, test_set
-    
     def __get_vocab_chars_and_lang(self, texts_and_lang, min_char_frequency):
         """
         Get the character and language vocabularies.
@@ -251,7 +219,8 @@ class InputData(object):
                 indexed_texts_and_lang.append((temp_indexed_text, vocab_lang[texts_and_lang_only_vocab_chars[i][1]][0]))
         return indexed_texts_and_lang
     
-    def get_indexed_data(self, train_data_rel_path, validation_data_rel_path, test_data_rel_path, real_test_data_rel_path, min_char_frequency, fetch_only_langs=None, fetch_only_first_x_tweets=float('inf')):
+    def get_indexed_data(self, train_data_rel_path, validation_data_rel_path, test_data_rel_path, real_test_data_rel_path,
+                         min_char_frequency, fetch_only_langs=None, fetch_only_first_x_tweets=float('inf')):
         """Gets all relevant data in indexed form, as well as the vocabularies, to be readily used by the embedding and RNN.
 
         Args:

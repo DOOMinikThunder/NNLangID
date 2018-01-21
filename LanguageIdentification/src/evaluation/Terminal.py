@@ -62,7 +62,6 @@ class Terminal(object):
                                       system_param_dict=self.system_param_dict)
         state = gru_model.load_model_checkpoint_from_file(self.system_param_dict['trained_model_checkpoint_rel_path'])
         results_dict = state['results_dict']
-        # run on GPU if available
         if (self.system_param_dict['cuda_is_avail']):
             gru_model.cuda()
 
@@ -93,7 +92,6 @@ class Terminal(object):
                                                                           input_text_lang_tuple=input_text_lang_tuple,
                                                                           vocab_chars=vocab_chars,
                                                                           vocab_lang=vocab_lang)
-            # transfer tensors to GPU if available
             if (self.system_param_dict['cuda_is_avail']):
                 input_text_embed_char_text_inp_tensors = input_text_embed_char_text_inp_tensors.cuda()
             n_highest_probs = 5
@@ -114,7 +112,6 @@ class Terminal(object):
             number = int(string)
             return number
         except ValueError:
-#            print("Not a number")
             return 0
 
     def __sample_tweets(self, tweet_retriever, vocab_lang, amount):
@@ -187,11 +184,8 @@ class Terminal(object):
             input_text_target_tensors: the embedded target tensor (not used)
         """
         filtered_texts_and_lang = input_data.filter_out_irrelevant_tweet_parts(input_text_lang_tuple)
-        # print('filtered_texts_and_lang',filtered_texts_and_lang)
         input_text_only_vocab_chars = input_data.get_texts_with_only_vocab_chars(filtered_texts_and_lang, vocab_chars)
-        # print('input_text_only_vocab_chars', input_text_only_vocab_chars)
         input_text_indexed = input_data.get_indexed_texts_and_lang(input_text_only_vocab_chars, vocab_chars, vocab_lang)
-        # print('input_text_indexed',input_text_indexed)
         input_text_embed_char_text_inp_tensors, input_text_target_tensors = input_data.create_embed_input_and_target_tensors \
             (indexed_texts_and_lang=input_text_indexed,
              embed_weights_rel_path=self.system_param_dict['trained_embed_weights_rel_path'],

@@ -210,7 +210,7 @@ class RNNEvaluator(object):
 
     def __f1_score(self, precision, recall):
         """
-        f1 score is the harmonic mean over precision and recall
+        f1 score computes the harmonic mean over precision and recall
         
         Args:
             precision: list of precision for each language

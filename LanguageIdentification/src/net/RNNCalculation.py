@@ -170,7 +170,6 @@ class RNNCalculation(object):
             inputs, targets = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=data_set,
                                                                                embed_weights_rel_path=embed_weights_rel_path,
                                                                                embed=embed)
-            # transfer tensors to GPU if available
             if (self.system_param_dict['cuda_is_avail']):
                 input_and_target_tensors.append(([tensor.cuda() for tensor in inputs], [tensor.cuda() for tensor in targets]))
             else:
@@ -188,7 +187,6 @@ class RNNCalculation(object):
                                                 vocab_lang=vocab_lang,
                                                 embed_dim=embed.weight.size()[1],
                                                 system_param_dict=self.system_param_dict)
-        # run on GPU if available
         if (self.system_param_dict['cuda_is_avail']):
             model.cuda()
         return input_and_target_tensors, model

@@ -117,8 +117,6 @@ class DataSplit(object):
         Returns:
              languages_splitted: dict containing the splitted languages
         """
-#        idx = 0
-#        end_of_list = len(input)-1
         languages_splitted = {}
         for tweet in input:
             if tweet[2] in languages_splitted:

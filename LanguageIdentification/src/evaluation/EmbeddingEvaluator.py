@@ -59,7 +59,6 @@ class EmbeddingEvaluator(object):
             targets_1_pos = Variable(torch.LongTensor(targets_1_pos))
             contexts_1_pos = Variable(torch.LongTensor(contexts_1_pos))
             contexts_0_pos_samples = Variable(torch.LongTensor(contexts_0_pos_samples))
-            # transfer tensors to GPU if available
             if (self.model.cuda_is_avail):
                 targets_1_pos = targets_1_pos.cuda()
                 contexts_1_pos = contexts_1_pos.cuda()

@@ -51,11 +51,6 @@ class TweetRetriever(object):
         #Init connection to twitter streaming api
         self.twitter_stream = TwitterStream(auth=self.oAuth)
         self.twitter = Twitter(auth=self.oAuth)
-
-        #sample_id = 484049529764052992
-        #tweet = self.twitter.statuses.show(id=sample_id)
-        #tweet = self.twitter.statuses.lookup(_id=sample_id)
-        #print(json.dumps(tweet))
         self.tweets = []
 
     def __tweet_not_deleted(self, tweet):
@@ -220,15 +215,6 @@ class TweetRetriever(object):
                 print(to_write)
                 writer.writerow(to_write)
 
-    # !!! UNUSED !!!
-    def read_downloaded_tweets(self, csv_file):
-        with open(csv_file, 'rb') as file:
-            data = [row for row in csv.reader(file.read().splitlines())]
-        print(data[0])
-        #todo
-        #self.tweets.append({'id':row[0],'text':row[1],'language':row[2]})
-
-
 def main():
     
     cur_dir = os.path.dirname(os.path.abspath(__file__))
@@ -239,8 +225,6 @@ def main():
     tweets = tr.read_tweets_from_file(tweet_file)
     print(len(tweets))
     tr.write_to_csv(output_file, tweets)
-
-    #tr.read_downloaded_tweets(output_file)
 
     #tweet_new = tr.retrieve_single_tweet("935995896637964290")
     #print(json.dumps(tweet_new))
