@@ -1,0 +1,92 @@
+!!! TERMINAL LIVE TWEETS ON !!!
+!!! CUDA OFF !!!
+Embedding weights loaded from file: ../data/save/trained/embed_weights_recall_de_en_es_fr_it_valmloss0.38_19.01.2018.txt
+Model checkpoint loaded from file: ../data/save/trained/rnn_checkpoint_recall_de_en_es_fr_it_valmloss0.38_testmloss0.42_valacc0.91_testacc0.88_20.01.2018_nocuda.pth
+Model checkpoint data:
+========================================
+Model:
+ GRUModel (
+  (gru_layer): GRU(8, 100, bidirectional=True)
+  (output_layer): Linear (200 -> 5)
+  (log_softmax): LogSoftmax ()
+  (criterion): NLLLoss (
+  )
+)
+========================================
+System parameters:
+{'batch_size_embed': 10,
+ 'batch_size_rnn': 10,
+ 'can_use_live_tweets': False,
+ 'create_splitted_data_files': True,
+ 'cuda_is_avail': False,
+ 'embed_model_checkpoint_rel_path': '../data/save/embed_model_checkpoint.pth',
+ 'embed_weights_rel_path': '../data/save/embed_weights.txt',
+ 'eval_every_num_batches_embed': 100000,
+ 'eval_every_num_batches_rnn': 439,
+ 'eval_test_set': True,
+ 'fetch_only_first_x_tweets': inf,
+ 'fetch_only_langs': ['de', 'en', 'es', 'fr', 'it'],
+ 'hidden_size_rnn': 100,
+ 'initial_lr_embed': 0.025,
+ 'initial_lr_rnn': 0.01,
+ 'input_rt_data_rel_path': '../data/input_data/original/uniformly_sampled_dl.csv',
+ 'input_tr_va_te_data_rel_path': '../data/input_data/original/recall_oriented_dl.csv',
+ 'is_bidirectional': True,
+ 'lr_decay_factor_embed': 0.1,
+ 'lr_decay_factor_rnn': 0.1,
+ 'max_context_window_size': 3,
+ 'max_eval_checks_not_improved_embed': 10,
+ 'max_eval_checks_not_improved_rnn': 10,
+ 'max_num_epochs_embed': inf,
+ 'max_num_epochs_rnn': inf,
+ 'min_char_frequency': 2,
+ 'num_layers_rnn': 1,
+ 'num_neg_samples': 5,
+ 'out_te_data_rel_path': '../data/input_data/original_splitted/test.csv',
+ 'out_tr_data_rel_path': '../data/input_data/original_splitted/training.csv',
+ 'out_va_data_rel_path': '../data/input_data/original_splitted/validation.csv',
+ 'print_embed_model_checkpoint': None,
+ 'print_embed_testing': False,
+ 'print_model_checkpoint_embed_weights': None,
+ 'print_rnn_model_checkpoint': None,
+ 'rnn_model_checkpoint_rel_path': '../data/save/rnn_model_checkpoint.pth',
+ 'run_terminal': False,
+ 'sampling_table_min_char_count': 1,
+ 'sampling_table_specified_size_cap': inf,
+ 'split_shuffle_seed': 42,
+ 'tr_va_te_split_ratios': [0.8, 0.1, 0.1],
+ 'train_embed': False,
+ 'train_rnn': True,
+ 'trained_embed_weights_rel_path': '../data/save/trained/embed_weights.txt',
+ 'trained_model_checkpoint_rel_path': '../data/save/trained/rnn_model_checkpoint.pth',
+ 'weight_decay_rnn': 1e-05}
+========================================
+Results:
+{'best_val_accuracy': 0.906764168190128,
+ 'best_val_mean_loss': 0.3766825497150421,
+ 'confusion_matrix': 't\\p\t   fr\t   de\t   en\t   it\t   es\t\taccuracy\n'
+                     'fr\t   91\t    4\t    6\t    2\t    0\t      88.%\n'
+                     'de\t    2\t  110\t    6\t    1\t    0\t      92.%\n'
+                     'en\t    4\t    4\t   84\t    4\t    2\t      85.%\n'
+                     'it\t    2\t    2\t    1\t   97\t    7\t      88.%\n'
+                     'es\t    2\t    2\t    0\t   13\t  108\t      86.%\n',
+ 'f1_score': [0.8921568627450982,
+              0.9128630705394191,
+              0.8615384615384615,
+              0.8584070796460178,
+              0.8925619834710743],
+ 'precision': [0.883495145631068,
+               0.9243697478991597,
+               0.8571428571428571,
+               0.8899082568807339,
+               0.864],
+ 'recall': [0.900990099009901,
+            0.9016393442622951,
+            0.865979381443299,
+            0.8290598290598291,
+            0.9230769230769231],
+ 'start_epoch': 14,
+ 'start_total_trained_batches_counter': 5708,
+ 'test_accuracy': 0.8844765342960289,
+ 'test_mean_loss': 0.41638484597206116}
+========================================
