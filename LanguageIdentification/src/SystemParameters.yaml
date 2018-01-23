@@ -24,8 +24,8 @@ embed_weights_rel_path: "../data/save/embed_weights.txt"    # save path for the 
 embed_model_checkpoint_rel_path: "../data/save/embed_model_checkpoint.pth"  # save path for the embedding model checkpoint
 rnn_model_checkpoint_rel_path: "../data/save/rnn_model_checkpoint.pth"  # save path for the RNN model checkpoint
 
-trained_embed_weights_rel_path: "../data/save/trained/embed_weights_recall_de_en_es_fr_it_valmloss0.38_19.01.2018.txt"    # load path for the embedding weights for the terminal
-trained_model_checkpoint_rel_path: "../data/save/trained/rnn_checkpoint_recall_de_en_es_fr_it_valmloss0.38_testmloss0.42_valacc0.91_testacc0.88_20.01.2018_nocuda.pth"  # load path for the RNN model checkpoint for the terminal
+trained_embed_weights_rel_path: "../data/save/trained/embed_weights_uniformlyrecallmerged_all_valmloss0.48_19.01.2018.txt"    # load path for the embedding weights for the terminal
+trained_model_checkpoint_rel_path: "../data/save/trained/rnn_checkpoint_uniformlyrecallmerged_all_valmloss0.95_valacc0.75_23.01.2018_nocuda.pth"  # load path for the RNN model checkpoint for the terminal
 
 # Data manipulation parameters
 tr_va_te_split_ratios: [0.8, 0.1, 0.1]                      # [train_ratio, val_ratio, test_ratio]; according to this the training, validation and test set files will be generated

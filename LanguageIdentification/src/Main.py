@@ -71,7 +71,7 @@ def main():
         print('!!! CUDA ON !!!')
     else:
         print('!!! CUDA OFF !!!')
-
+        
     ############
     # TERMINAL #
     ############    
