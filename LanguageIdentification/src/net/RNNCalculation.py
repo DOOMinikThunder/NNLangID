@@ -1,3 +1,28 @@
+# -*- coding: utf-8 -*-
+
+#    MIT License
+#    
+#    Copyright (c) 2018 Alexander Heilig, Dominik Sauter, Tabea Kiupel
+#    
+#    Permission is hereby granted, free of charge, to any person obtaining a copy
+#    of this software and associated documentation files (the "Software"), to deal
+#    in the Software without restriction, including without limitation the rights
+#    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#    copies of the Software, and to permit persons to whom the Software is
+#    furnished to do so, subject to the following conditions:
+#    
+#    The above copyright notice and this permission notice shall be included in all
+#    copies or substantial portions of the Software.
+#    
+#    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#    SOFTWARE.
+
+
 import pprint
 from input import InputData
 from embedding import SkipGramModel
@@ -5,31 +30,28 @@ from net import GRUModel
 from evaluation import RNNEvaluator
 
 
-
 class RNNCalculation(object):
-    
+    """Class containing the set-up and execution of the RNN training,
+    as well as testing and printing functionalities.
+    """
     
     def __init__(self, system_param_dict):
         """
-
         Args:
-        	system_param_dict:
+            system_param_dict: Dict containing the system parameters.
         """
         self.system_param_dict = system_param_dict
 
-
     def train_rnn(self, data_sets, vocab_chars, vocab_lang):
         """
+        Get RNN model and tensors for training, then train the model.
 
         Args:
-        	data_sets:
-        	vocab_chars:
-        	vocab_lang:
-
-        Returns:
-
+            data_sets: Training and validation sets.
+            vocab_chars: Every character occurence as a dict of {character: (index, occurrences)}.
+            vocab_lang: Every language occurence as a dict of {language: (index, occurences)}.
         """
-        input_and_target_tensors, gru_model = self.get_model_and_data(data_sets, vocab_chars, vocab_lang, self.system_param_dict['embed_weights_rel_path'], True)
+        input_and_target_tensors, gru_model = self.__get_model_and_data(data_sets, vocab_chars, vocab_lang, self.system_param_dict['embed_weights_rel_path'], True)
         if (len(data_sets) < 2):
             print("ERROR: Two data sets (training, validation) are needed!")
             return
@@ -42,19 +64,17 @@ class RNNCalculation(object):
                         val_inputs=input_and_target_tensors[1][0],
                         val_targets=input_and_target_tensors[1][1])
 
-
     def test_rnn(self, data_sets, vocab_chars, vocab_lang):
         """
-
+        Load RNN model checkpoint, test it on the test set
+        and store it again with the new results to the checkpoint file.
+        
         Args:
-        	data_sets:
-        	vocab_chars:
-        	vocab_lang:
-
-        Returns:
-
+            data_sets: Test set.
+            vocab_chars: Every character occurence as a dict of {character: (index, occurrences)}.
+            vocab_lang: Every language occurence as a dict of {language: (index, occurences)}.
         """
-        input_and_target_tensors, gru_model = self.get_model_and_data(data_sets, vocab_chars, vocab_lang, self.system_param_dict['embed_weights_rel_path'], True)
+        input_and_target_tensors, gru_model = self.__get_model_and_data(data_sets, vocab_chars, vocab_lang, self.system_param_dict['embed_weights_rel_path'], True)
         state = gru_model.load_model_checkpoint_from_file(self.system_param_dict['rnn_model_checkpoint_rel_path'])
         results_dict = state['results_dict']
         rnn_evaluator = RNNEvaluator.RNNEvaluator(gru_model)
@@ -76,7 +96,7 @@ class RNNCalculation(object):
                     ('Epochs trained:', results_dict['start_epoch']),
                     ('Total batches trained:', results_dict['start_total_trained_batches_counter']),
                     ('System parameters used:', self.system_param_dict)]
-        self.print_out(to_print)
+        self.__print_out(to_print)
 
         # save with new results to file
         results_dict['test_mean_loss'] = test_mean_loss
@@ -88,18 +108,17 @@ class RNNCalculation(object):
         state['results_dict'] = results_dict
         gru_model.save_model_checkpoint_to_file(state, self.system_param_dict['rnn_model_checkpoint_rel_path'])
 
-
     def print_model_checkpoint(self, vocab_chars, vocab_lang, is_rnn_model):
         """
-
+        Print model checkpoint data to the console.
+        Note: Some parameters in the YAML settings file have to be the same as in the checkpoint
+        (e.g. input_tr_va_te_data_rel_path and hidden_size_rnn).
+        
         Args:
-        	vocab_chars:
-        	vocab_lang:
-
-        Returns:
-
+            vocab_chars: Every character occurence as a dict of {character: (index, occurrences)}.
+            vocab_lang: Every language occurence as a dict of {language: (index, occurences)}.
         """
-        _, model = self.get_model_and_data([], vocab_chars, vocab_lang, self.system_param_dict['print_model_checkpoint_embed_weights'], is_rnn_model)
+        _, model = self.__get_model_and_data([], vocab_chars, vocab_lang, self.system_param_dict['print_model_checkpoint_embed_weights'], is_rnn_model)
         # check which model shall be printed
         if (is_rnn_model):
             model_checkpoint = self.system_param_dict['print_rnn_model_checkpoint']
@@ -108,44 +127,31 @@ class RNNCalculation(object):
         state = model.load_model_checkpoint_from_file(model_checkpoint)
         system_param_dict = state['system_param_dict']
         results_dict = state['results_dict']
-        rnn_evaluator = RNNEvaluator.RNNEvaluator(model)
-        
-        conf_matrix_exists = False
-        # get nice formatting for confusion matrix
-        if ('confusion_matrix' in results_dict):
-            conf_matrix_exists = True
-            confusion_matrix = rnn_evaluator.to_string_confusion_matrix(results_dict['confusion_matrix'], vocab_lang, 5)
-        
+ 
         results_print_dict = {}
         for result in results_dict:
             # only print relevant and not too verbose data
             if (result != 'state_dict'
                 and result != 'optimizer'
                 and result != 'vocab_chars'
-                and result != 'vocab_lang'
-                and result != 'confusion_matrix'):
+                and result != 'vocab_lang'):
                 results_print_dict[result] = results_dict[result]
         
         print('Model checkpoint data:')
         to_print = [('Model:\n', model),
                     ('System parameters:', system_param_dict),
                     ('Results:', results_print_dict)]
-        if (conf_matrix_exists):
-            to_print.append(('Confusion matrix:\n', confusion_matrix))
-        self.print_out(to_print)
+        self.__print_out(to_print)
         
-
-    def get_model_and_data(self, data_sets, vocab_chars, vocab_lang, embed_weights_rel_path, is_rnn_model):
+    def __get_model_and_data(self, data_sets, vocab_chars, vocab_lang, embed_weights_rel_path, is_rnn_model):
         """
-
+        Create the model and the tensors.
+        
         Args:
-        	data_sets:
-        	vocab_chars:
-        	vocab_lang:
-        	embed_weights_rel_path:
-
-        Returns:
-
+            data_sets: The data sets of which the tensors are created.
+            vocab_chars: Every character occurence as a dict of {character: (index, occurrences)}.
+            vocab_lang: Every language occurence as a dict of {language: (index, occurences)}.
+            embed_weights_rel_path: Relative path to the used embedding weights.
         """
         input_data = InputData.InputData()
         embed, num_classes = input_data.create_embed_from_weights_file(embed_weights_rel_path)
@@ -154,7 +160,6 @@ class RNNCalculation(object):
             inputs, targets = input_data.create_embed_input_and_target_tensors(indexed_texts_and_lang=data_set,
                                                                                embed_weights_rel_path=embed_weights_rel_path,
                                                                                embed=embed)
-            # transfer tensors to GPU if available
             if (self.system_param_dict['cuda_is_avail']):
                 input_and_target_tensors.append(([tensor.cuda() for tensor in inputs], [tensor.cuda() for tensor in targets]))
             else:
@@ -172,20 +177,16 @@ class RNNCalculation(object):
                                                 vocab_lang=vocab_lang,
                                                 embed_dim=embed.weight.size()[1],
                                                 system_param_dict=self.system_param_dict)
-        # run on GPU if available
         if (self.system_param_dict['cuda_is_avail']):
             model.cuda()
         return input_and_target_tensors, model
 
-
-    def print_out(self, string_date_tuple):
+    def __print_out(self, string_date_tuple):
         """
-
+        Print results to the console in a formatted way.
+       
         Args:
-        	string_date_tuple:
-
-        Returns:
-
+            string_date_tuple: List of (string, variable)-tuples for printing.
         """
         for string, date in string_date_tuple:
             print('========================================')

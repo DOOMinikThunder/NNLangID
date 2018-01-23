@@ -1,5 +1,28 @@
 # -*- coding: utf-8 -*-
 
+#    MIT License
+#    
+#    Copyright (c) 2018 Alexander Heilig, Dominik Sauter, Tabea Kiupel
+#    
+#    Permission is hereby granted, free of charge, to any person obtaining a copy
+#    of this software and associated documentation files (the "Software"), to deal
+#    in the Software without restriction, including without limitation the rights
+#    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#    copies of the Software, and to permit persons to whom the Software is
+#    furnished to do so, subject to the following conditions:
+#    
+#    The above copyright notice and this permission notice shall be included in all
+#    copies or substantial portions of the Software.
+#    
+#    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#    SOFTWARE.
+
+
 import math
 import numpy as np
 import torch
@@ -10,24 +33,23 @@ from torch.autograd import Variable
 from evaluation import EmbeddingEvaluator
 
 
-
-"""
-Loss calculation in forward method is based on the Negative sampling objective (NEG) (formula 4)
-in paper "Distributed Representations of Words and Phrases and their Compositionality"
-by Tomas Mikolov et al. (Oct. 2013).
-Initializations and optimizations are suggested by Xiaofei Sun on
-https://adoni.github.io/2017/11/08/word2vec-pytorch/ (Access: 11.01.2018)
-"""
 class SkipGramModel(nn.Module):
+    """Class implementing the Skip-Gram model.
+    
+    The loss calculation in the forward method is based on the Negative sampling objective (NEG)
+    (formula 4) in paper "Distributed Representations of Words and Phrases and their Compositionality"
+    by Tomas Mikolov et al. (Oct. 2013).
+    Initializations and optimizations are suggested by Xiaofei Sun on
+    https://adoni.github.io/2017/11/08/word2vec-pytorch/ (Access: 11.01.2018)
+    """
 
     def __init__(self, vocab_chars, vocab_lang, embed_dim, system_param_dict):
         """
-
         Args:
-        	vocab_chars:
-        	vocab_lang:
-        	embed_dim:
-        	system_param_dict:
+            vocab_chars: Every character occurence as a dict of {character: (index, occurrences)}.
+            vocab_lang: Every language occurence as a dict of {language: (index, occurences)}.
+            embed_dim: The embedding dimension.
+            system_param_dict: Dict containing system parameters.
         """
         super(SkipGramModel, self).__init__()
         self.vocab_chars = vocab_chars
@@ -42,35 +64,29 @@ class SkipGramModel(nn.Module):
         self.embed_hidden = nn.Embedding(self.vocab_chars_size, int(embed_dim), sparse=True)
         self.embed_output = nn.Embedding(self.vocab_chars_size, int(embed_dim), sparse=True)
         self.sampling_table = []
-        self.init_embed()
-        self.init_sampling_table(vocab_chars, self.sampling_table_min_char_count, self.sampling_table_specified_size_cap)
+        self.__init_embed()
+        self.__init_sampling_table(vocab_chars, self.sampling_table_min_char_count, self.sampling_table_specified_size_cap)
         self.cuda_is_avail = system_param_dict['cuda_is_avail']
         # no weight_decay and momentum set because they
         # "require the global calculation on embedding matrix, which is extremely time-consuming"
         self.optimizer = optim.SGD(params=self.parameters(), lr=self.lr)
         
-        
-    def init_embed(self):
+    def __init_embed(self):
         """
-
-        Returns:
-
+        Initializes the embedding objects.
         """
         init_range = 0.5 / self.embed_dim
         self.embed_hidden.weight.data.uniform_(-init_range, init_range)
         self.embed_output.weight.data.uniform_(-0, 0)
 
-
-    def init_sampling_table(self, vocab_chars, min_char_count=1, specified_size_cap=100000000):
+    def __init_sampling_table(self, vocab_chars, min_char_count=1, specified_size_cap=100000000):
         """
-
+        Initializes the sampling table for negative sampling.
+        
         Args:
-        	vocab_chars:
-        	min_char_count:
-        	specified_size_cap:
-
-        Returns:
-
+            vocab_chars: Every character occurence as a dict of {character: (index, occurrences)}.
+            min_char_count: The minimum amout of occurence of each character in the sampling table.
+            specified_size_cap: The maximum specified size of the sampling table (no matter what min_char_count would lead to).
         """
         char_pow_frequencies = {}
         char_pow_frequencies_acc = 0
@@ -95,30 +111,30 @@ class SkipGramModel(nn.Module):
             for i in range(int(num_of_char)):
                 self.sampling_table.append(char_index)
                 
-    
     def get_neg_samples(self, num_pairs, num_samples):
         """
-
+        Get negative samples, i.e. 0-position indexes.
+        
         Args:
-        	num_pairs:
-        	num_samples:
+            num_pairs: The batch size.
+            num_samples: The number of negative samples.
 
         Returns:
-
+            List of negative samples.
         """
         return np.random.choice(self.sampling_table, size=(num_pairs, num_samples)).tolist()
                 
-
     def forward(self, targets_1_pos, contexts_1_pos, contexts_0_pos_samples):
         """
-
+        Calculation of Negative sampling objective (NEG), normalized by the batch size.
+        
         Args:
-        	targets_1_pos:
-        	contexts_1_pos:
-        	contexts_0_pos_samples:
+            targets_1_pos: Target 1-indexes (1-position in onehot-vector).
+            contexts_1_pos: Context 1-indexes (1-position in onehot-vector).
+            contexts_0_pos_samples: Context 0-indexes samples (0-positions in onehot-vector).
 
         Returns:
-
+            Batch mean loss (mean NEG).
         """
         losses = []
         # lookup the 1-position weight values for the target char
@@ -150,16 +166,15 @@ class SkipGramModel(nn.Module):
         # and normalize the loss by dividing by the batch size
         return (-1 * sum(losses)) / len(targets_1_pos)
     
-    
     def train(self, train_batched_pairs, val_batched_pairs):
-        """
+        """Model's training method.
+        
+        Iterates over epochs and batches and updates weights after each batch.
+        Saves the best model and its embedding weights to file and decays learning rate when learning stagnates.
 
         Args:
-        	train_batched_pairs:
-        	val_batched_pairs:
-
-        Returns:
-
+            train_batched_pairs: The batched pairs used for training.
+            val_batched_pairs: The batched pairs used for the validation checks.
         """
         num_neg_samples = self.system_param_dict['num_neg_samples']
         max_eval_checks_not_improved = self.system_param_dict['max_eval_checks_not_improved_embed']
@@ -193,7 +208,6 @@ class SkipGramModel(nn.Module):
                     targets_1_pos = Variable(torch.LongTensor(targets_1_pos))
                     contexts_1_pos = Variable(torch.LongTensor(contexts_1_pos))
                     contexts_0_pos_samples = Variable(torch.LongTensor(contexts_0_pos_samples))
-                    # transfer tensors to GPU if available
                     if (self.cuda_is_avail):
                         targets_1_pos = targets_1_pos.cuda()
                         contexts_1_pos = contexts_1_pos.cuda()
@@ -219,7 +233,7 @@ class SkipGramModel(nn.Module):
                         if (best_val_mean_loss > cur_val_mean_loss):
                             best_val_mean_loss = cur_val_mean_loss
                             eval_checks_not_improved_counter = 0
-                            self.save_embed_weights_to_file(embed_weights_rel_path)
+                            self.__save_embed_weights_to_file(embed_weights_rel_path)
                             self.save_model_checkpoint_to_file({
                                                                 'system_param_dict': self.system_param_dict,
                                                                 'results_dict': {
@@ -251,15 +265,13 @@ class SkipGramModel(nn.Module):
                 total_trained_batches_counter += 1
             epoch += 1
     
-    
-    def save_embed_weights_to_file(self, relative_path_to_file):
+    def __save_embed_weights_to_file(self, relative_path_to_file):
         """
-
+        Saves the embedding weights to file together with the vocabulary size,
+        the embedding dimension and the number of languages occured.
+        
         Args:
-        	relative_path_to_file:
-
-        Returns:
-
+            relative_path_to_file: Relative path to the save file.
         """
         # transfer back from GPU to CPU if GPU available
         if (self.cuda_is_avail):
@@ -275,29 +287,27 @@ class SkipGramModel(nn.Module):
             writer.write('\n%s' % line)
         print('Embedding weights saved to file:', relative_path_to_file)
        
-        
     def save_model_checkpoint_to_file(self, state, relative_path_to_file):
         """
-
+        Saves a model state (checkpoint) to file.
+        
         Args:
-        	state:
-        	relative_path_to_file:
-
-        Returns:
-
+            state: Dict containing the model state to be saved.
+            relative_path_to_file: Relative path for the save file.
         """
         torch.save(state, relative_path_to_file)
         print('Model checkpoint saved to file:', relative_path_to_file)
         
-        
     def load_model_checkpoint_from_file(self, relative_path_to_file):
         """
-
+        Loads a model state (checkpoint) from file and initializes some model parameters with it.
+        The state is also returned.
+        
         Args:
-        	relative_path_to_file:
+            relative_path_to_file: Relative path to the save file.
 
         Returns:
-
+            state: The loaded model state.
         """
         state = torch.load(relative_path_to_file)
         results_dict = state['results_dict']

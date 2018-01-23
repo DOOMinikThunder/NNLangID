@@ -1,5 +1,28 @@
 # -*- coding: utf-8 -*-
 
+#    MIT License
+#    
+#    Copyright (c) 2018 Alexander Heilig, Dominik Sauter, Tabea Kiupel
+#    
+#    Permission is hereby granted, free of charge, to any person obtaining a copy
+#    of this software and associated documentation files (the "Software"), to deal
+#    in the Software without restriction, including without limitation the rights
+#    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#    copies of the Software, and to permit persons to whom the Software is
+#    furnished to do so, subject to the following conditions:
+#    
+#    The above copyright notice and this permission notice shall be included in all
+#    copies or substantial portions of the Software.
+#    
+#    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#    SOFTWARE.
+
+
 import math
 import torch
 from torch.autograd import Variable
@@ -8,22 +31,22 @@ from embedding import SkipGramModel
 #from tqdm import tqdm
 
 
-
 class EmbeddingCalculation(object):
-        
+    """Class containing the set-up and execution of the embedding training,
+    with some basic testing functionality.
+    """
 
     def train_embed(self, train_set_indexed, val_set_indexed, vocab_chars, vocab_lang, system_param_dict):
         """
-
+        Create embedding model and batched pairs for training, then train the model.
+        After training, a basic test may be printed.
+        
         Args:
-        	train_set_indexed:
-        	val_set_indexed:
-        	vocab_chars:
-        	vocab_lang:
-        	system_param_dict:
-
-        Returns:
-
+            train_set_indexed: The indexed training set (list of tuples).
+            val_set_indexed: The indexed validation set (list of tuples).
+            vocab_chars: Every character occurence as a dict of {character: (index, occurrences)}.
+            vocab_lang: Every language occurence as a dict of {language: (index, occurences)}.
+            system_param_dict: Dict containing the system parameters.
         """
         # set embedding dimension to: roundup(log2(vocabulary-size))
         embed_dim = math.ceil(math.log(len(vocab_chars),2))
@@ -45,7 +68,6 @@ class EmbeddingCalculation(object):
                                                       vocab_lang=vocab_lang,
                                                       embed_dim=embed_dim,
                                                       system_param_dict=system_param_dict)
-        # run on GPU if available
         if (system_param_dict['cuda_is_avail']):
             skip_gram_model.cuda()
         
