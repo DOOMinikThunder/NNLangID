@@ -139,10 +139,14 @@ class TweetRetriever(object):
         short_tweets = {}
         i = 0
         for tweet in iterator:
+            #print(tweet.keys())
             if 'full_text' in tweet:
                 short_tweets[str(tweet['id'])] = tweet['full_text']
                 i += 1
-            if i == amount:
+            elif 'text' in tweet:
+                short_tweets[str(tweet['id'])] = tweet['text']
+                i += 1
+            if i >= amount:
                 break
         return short_tweets
 
@@ -217,14 +221,15 @@ class TweetRetriever(object):
 
 def main():
     
-    cur_dir = os.path.dirname(os.path.abspath(__file__))
-    tweet_file = cur_dir+"\\..\\..\\data\\tweet_retriever_data\\recall_tweets.csv"
-    output_file = cur_dir + "\\..\\..\\data\\tweet_retriever_data\\downloaded\\recall_oriented_dl2.csv"
+    #cur_dir = os.path.dirname(os.path.abspath(__file__))
+    #tweet_file = cur_dir+"\\..\\..\\data\\tweet_retriever_data\\recall_tweets.csv"
+    #output_file = cur_dir + "\\..\\..\\data\\tweet_retriever_data\\downloaded\\recall_oriented_dl2.csv"
     tr = TweetRetriever()
-
-    tweets = tr.read_tweets_from_file(tweet_file)
-    print(len(tweets))
-    tr.write_to_csv(output_file, tweets)
+    tweets = tr.retrieve_sample_tweets(4)
+    print(tweets)
+    #tweets = tr.read_tweets_from_file(tweet_file)
+    #print(len(tweets))
+    #tr.write_to_csv(output_file, tweets)
 
     #tweet_new = tr.retrieve_single_tweet("935995896637964290")
     #print(json.dumps(tweet_new))
