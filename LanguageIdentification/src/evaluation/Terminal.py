@@ -233,7 +233,7 @@ class Terminal(object):
         if amount_live_tweets > 0 and can_use_live_tweets:
             is_live_tweets = True
             sample_tweets = self.__sample_tweets(tweet_retriever, vocab_lang, amount_live_tweets)
-            print('sample_tweets',sample_tweets)
+            #print('sample_tweets',sample_tweets)
             if sample_tweets is None:
                 return None, None
             input_text =  list(sample_tweets.values())
