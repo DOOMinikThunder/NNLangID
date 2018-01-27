@@ -1,60 +1,65 @@
-# System parameters
-create_splitted_data_files: True                             # split into training, validation and test set from an original file
-train_embed: False
-train_rnn: True
-eval_test_set: True
-run_terminal: False                                          # if True: disables all other calculations
+# Calculation parameters
+create_splitted_data_files: True                             # if True: split into training, validation and test set files from an original file
+train_embed: True                                            # if True: train the embedding
+train_rnn: True                                              # if True: train the RNN
+eval_test_set: True                                          # if True: evaluate the test set for the RNN
+run_terminal: False                                          # if True: runs the terminal and disables all other calculations
 
 # Print parameters
-print_embed_testing: False
-print_model_checkpoint_embed_weights: null #"../data/save/trained/embed_weights_recall_all_valmloss1.08_18.01.2018.txt" #null
-print_rnn_model_checkpoint: null #"../data/save/trained/rnn_checkpoint_recall_all_valmloss1.42_19.01.2018.pth" #null
-print_embed_model_checkpoint: null #"../data/save/trained/embed_checkpoint_recall_all_18.01.2018.pth" #null
+print_embed_testing: False                                    # if True: print the embedding test
+print_model_checkpoint_embed_weights: null # "../data/save/trained/embed_weights_recall_all_18.01.2018.txt"     # path for the embedding weights for printing the model; set to 'null' to disable
+print_rnn_model_checkpoint: null #"../data/save/trained/rnn_checkpoint_recall_all_18.01.2018.pth"     # path for the RNN model to be printed; set to 'null' to disable
+print_embed_model_checkpoint: null #"../data/save/trained/embed_checkpoint_uniformlyrecallmerged_all_valmloss0.48_19.01.2018.pth"   # path for the embedding model to be printed; set to 'null' to disable
 
 # Data paths
-input_tr_va_te_data_rel_path: "../data/input_data/original/recall_oriented_dl.csv"   # training, validation and test will be generated from this file
-input_rt_data_rel_path: "../data/input_data/original/uniformly_sampled_dl.csv"  # to change later, rt = real test
+input_tr_va_te_data_rel_path: "../data/input_data/original/uniformly_sampled_dl.csv"   # training, validation and test set files will be generated from this file
+input_rt_data_rel_path: "../data/input_data/original/recall_oriented_dl.csv"  # real test set file
 
-out_tr_data_rel_path: "../data/input_data/original_splitted/training.csv"
-out_va_data_rel_path: "../data/input_data/original_splitted/validation.csv"
-out_te_data_rel_path: "../data/input_data/original_splitted/test.csv"
+out_tr_data_rel_path: "../data/input_data/original_splitted/training.csv"   # generated training set file
+out_va_data_rel_path: "../data/input_data/original_splitted/validation.csv"     # generated validation set file
+out_te_data_rel_path: "../data/input_data/original_splitted/test.csv"   # generated test set file
 
 # Save and load paths for embedding weights and model checkpoints
-embed_weights_rel_path: "../data/save/embed_weights.txt"
-embed_model_checkpoint_rel_path: "../data/save/embed_model_checkpoint.pth"
-rnn_model_checkpoint_rel_path: "../data/save/rnn_model_checkpoint.pth"
+embed_weights_rel_path: "../data/save/embed_weights.txt"    # save path for the embedding weights
+embed_model_checkpoint_rel_path: "../data/save/embed_model_checkpoint.pth"  # save path for the embedding model checkpoint
+rnn_model_checkpoint_rel_path: "../data/save/rnn_model_checkpoint.pth"  # save path for the RNN model checkpoint
 
-trained_embed_weights_rel_path: "../data/save/trained/embed_weights.txt"
-trained_model_checkpoint_rel_path: "../data/save/trained/rnn_model_checkpoint.pth"
+trained_embed_weights_rel_path: "../data/save/trained/embed_weights.txt"    # load path for the embedding weights for the terminal
+trained_model_checkpoint_rel_path: "../data/save/trained/rnn_model_checkpoint.pth"  # load path for the RNN model checkpoint for the terminal
 
 # Data manipulation parameters
-tr_va_te_split_ratios: [0.8, 0.1, 0.1]                      # [train_ratio, val_ratio, test_ratio]
-split_shuffle_seed: 42                                      # ensures that splitted sets (training, validation, test) are always created identically (given a specified ratio)
-fetch_only_langs: null #['de', 'en', 'es', 'fr', 'it'] #['de', 'en', 'es'] #['pl', 'sv'] #['el', 'fa', 'hi', 'ca'] #None
-fetch_only_first_x_tweets: .inf
-min_char_frequency: 2                                       # chars appearing less than min_char_frequency in the training set will not be used to create the vocabulary vocab_chars
+tr_va_te_split_ratios: [0.8, 0.1, 0.1]                      # [train_ratio, val_ratio, test_ratio]; according to this the training, validation and test set files will be generated
+split_shuffle_seed: 42                                      # fixed shuffle seed ensures that splitted sets (training, validation, test) are always created identically (given a specified ratio)
+fetch_only_langs: null #['de', 'en', 'es', 'fr', 'it'] #['de', 'en', 'es'] #['pl', 'sv'] #['el', 'fa', 'hi', 'ca']  # if not 'null', only the in a list of language tags specified languages will be fetched from file
+fetch_only_first_x_tweets: .inf                             # only the x amount of tweets are fetched from file; set to '.inf' to fetch all tweets
+min_char_frequency: 2                                       # characters appearing less than min_char_frequency in the training set will not be used to create the vocabulary vocab_chars (and therefore not used later)
 
 # HYPERPARAMETERS EMBEDDING
-sampling_table_min_char_count: 1                            # determines the precision of the sampling (should be 1 or higher)
-sampling_table_specified_size_cap: .inf #10000 #.inf              # caps specified sampling table size to this value (no matter how big it would be according to sampling_table_min_char_count)
+sampling_table_min_char_count: 1                            # determines the precision of the sampling on the sampling table (should be at least 1 to have every character in the table)
+sampling_table_specified_size_cap: .inf                     # caps specified sampling table size to this value (no matter how big it would be according to sampling_table_min_char_count); set to '.inf' for no cap
                                                             # note: this is only the specified size, the actual table size may slightly deviate due to roundings in the calculation
-max_context_window_size: 3
-num_neg_samples: 5
-batch_size_embed: 100
-max_eval_checks_not_improved_embed: 10
-max_num_epochs_embed: .inf
-eval_every_num_batches_embed: 10000
-lr_decay_factor_embed: 0.1                                  # 1.0 means no decay
-initial_lr_embed: 0.025
+max_context_window_size: 3                                  # maximum context window for sampling context characters
+num_neg_samples: 5                                          # number of negative samples, i.e. number of 0-positions that will be used to train the Skip-Gram
+batch_size_embed: 100                                       # number of target-context pairs in one batch
+max_eval_checks_not_improved_embed: 10                      # maximum number of evaluation checks at which the loss may not improve until the training is stopped
+max_num_epochs_embed: .inf                                  # maximum number of epochs before the training is stopped (set to '.inf' to not stop based on the number of epochs)
+eval_every_num_batches_embed: 1000                          # do an evaluation check on the validation set every eval_every_num_batches_embed batches
+lr_decay_factor_embed: 0.1                                  # factor which is multiplied with the learning rate when the decay is active, which is the case every not improved evaluation check >= half of max_eval_checks_not_improved_embed
+initial_lr_embed: 0.025                                     # initial learning rate
 
 # HYPERPARAMETERS RNN
-hidden_size_rnn: 100
-num_layers_rnn: 1
-is_bidirectional: True
-batch_size_rnn: 1000
-max_eval_checks_not_improved_rnn: 10
-max_num_epochs_rnn: .inf #10 #.inf
-eval_every_num_batches_rnn: 53                            # 107300 tweets in uniformly_recall_merged; ca. 53100 tweets in recall; 4391 tweets in ['de', 'en', 'es', 'fr', 'it']
-lr_decay_factor_rnn: 0.1                                    # 1.0 means no decay
-initial_lr_rnn: 0.01
-weight_decay_rnn: 0.00001
+hidden_size_rnn: 100                                        # number of neurons in the hidden layer of the RNN
+num_layers_rnn: 1                                           # number of hidden layers of the RNN
+is_bidirectional: True                                      # if True: RNN (GRU) is bidirectional
+batch_size_rnn: 10                                          # number of tweets in one batch
+max_eval_checks_not_improved_rnn: 10                        # maximum number of evaluation checks at which the loss may not improve until the training is stopped
+max_num_epochs_rnn: .inf                                    # maximum number of epochs before the training is stopped (set to '.inf' to not stop based on the number of epochs)
+eval_every_num_batches_rnn: 5481                            # do an evaluation check on the validation set every eval_every_num_batches_embed batches
+lr_decay_factor_rnn: 0.1                                    # factor which is multiplied with the learning rate when the decay is active, which is the case every not improved evaluation check >= half of max_eval_checks_not_improved_embed
+initial_lr_rnn: 0.01                                        # initial learning rate
+weight_decay_rnn: 0.00001                                   # weight decay (L2 penalty) for Adam
+
+# ca. 53100 tweets in recall_oriented_dl.csv
+# 54812 tweets in uniformly_sampled_dl.csv
+# ca. 107300 tweets in uniformly_recall_merged.csv
+# 4391 tweets in recall_oriented_dl: ['de', 'en', 'es', 'fr', 'it']

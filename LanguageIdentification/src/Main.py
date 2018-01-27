@@ -1,5 +1,28 @@
 # -*- coding: utf-8 -*-
 
+#    MIT License
+#    
+#    Copyright (c) 2018 Alexander Heilig, Dominik Sauter, Tabea Kiupel
+#    
+#    Permission is hereby granted, free of charge, to any person obtaining a copy
+#    of this software and associated documentation files (the "Software"), to deal
+#    in the Software without restriction, including without limitation the rights
+#    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#    copies of the Software, and to permit persons to whom the Software is
+#    furnished to do so, subject to the following conditions:
+#    
+#    The above copyright notice and this permission notice shall be included in all
+#    copies or substantial portions of the Software.
+#    
+#    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+#    SOFTWARE.
+
+
 from pathlib import Path
 import yaml
 import torch
@@ -16,17 +39,19 @@ except ImportError:
     can_use_live_tweets = False
 
 
-
 def main():
     
     ##############
     # PARAMETERS #
     ##############
     
-    # ONLY SET THIS AND THE PARAMETERS IN CORRESPONDING YAML FILE
-    use_cluster_params = True                                                 # set True for use of cluster parameters
+    # USER PARAMETER
+    # (only set this and the parameters in the corresponding YAML settings file;
+    # True for SystemParametersCluster.yaml, False for SystemParameters.yaml)
+    use_cluster_params = False
     
     
+    ###########################################################################
     
     # automatically determined parameters
     if(use_cluster_params):
@@ -36,7 +61,7 @@ def main():
     with open(yaml_file, 'r') as stream:
         system_param_dict = yaml.load(stream)
         
-    system_param_dict['can_use_live_tweets'] = can_use_live_tweets            # (change this if you want to sample live tweets)
+    system_param_dict['can_use_live_tweets'] = can_use_live_tweets
     if (system_param_dict['can_use_live_tweets']):
         print('!!! TERMINAL LIVE TWEETS ON !!!')
     else:
@@ -46,12 +71,12 @@ def main():
         print('!!! CUDA ON !!!')
     else:
         print('!!! CUDA OFF !!!')
-
+        
     ############
     # TERMINAL #
     ############    
     
-    # simple terminal for testing
+    # terminal for interactive testing on arbitrary input text or live tweets
     if (system_param_dict['run_terminal']):
         terminal = Terminal.Terminal(system_param_dict)
         terminal.run_terminal(system_param_dict['can_use_live_tweets'])
@@ -61,7 +86,7 @@ def main():
     # DATA FILES SPLITTING #
     ########################
 
-        # split into training, validation and test set from an original file
+        # split into training, validation and test set files from an original file
         files_exist = Path(system_param_dict['out_tr_data_rel_path']).is_file() and Path(system_param_dict['out_va_data_rel_path']).is_file() and Path(system_param_dict['out_te_data_rel_path']).is_file()
         if (system_param_dict['create_splitted_data_files'] or not files_exist):
             out_filenames = [system_param_dict['out_tr_data_rel_path'], system_param_dict['out_va_data_rel_path'], system_param_dict['out_te_data_rel_path']] #same size as ratios
@@ -71,21 +96,13 @@ def main():
                                                                      out_filenames=out_filenames,
                                                                      shuffle_seed=system_param_dict['split_shuffle_seed'])
 
-    ###################################
-    # DATA RETRIEVAL & TRANSFORMATION #
-    ###################################
+    ##################################################
+    # DATA RETRIEVAL, PREPROCESSING & TRANSFORMATION #
+    ##################################################
 
+        # retrieve, preprocess and transform data for readily use for embedding and RNN,
+        # and get the vocabularies
         input_data = InputData.InputData()
-        """
-        train_set_indexed: list of every date where each character and target gets unique id, e.g. 
-            ([0,1,0,1],0),([2,3,2,3],1) for ([a,b,a,b], 'de'), ([c,d,c,d], 'en)
-        val_set_indexed: see train_set_indexed
-        test_set_indexed: see train_set_indexed
-        vocab_chars: every character occurence as a dict of character: index, occurrences, e.g. 
-            {'a': (0, 700), 'b': (1, 700)}
-        vocab_lang: every language occurence as a dict of language: index, occurences, e.g. 
-            {'de': (0, 32)}
-        """
         train_set_indexed, val_set_indexed, test_set_indexed, real_test_set_indexed, vocab_chars, vocab_lang = input_data.get_indexed_data(
             train_data_rel_path=system_param_dict['out_tr_data_rel_path'],
             validation_data_rel_path=system_param_dict['out_va_data_rel_path'],
@@ -94,16 +111,13 @@ def main():
             min_char_frequency=system_param_dict['min_char_frequency'],
             fetch_only_langs=system_param_dict['fetch_only_langs'],
             fetch_only_first_x_tweets=system_param_dict['fetch_only_first_x_tweets'])
-#        print(train_set_indexed, val_set_indexed, test_set_indexed)
-#        print(vocab_chars)
-#        print(len(vocab_chars))
-#        print(vocab_lang)
-#        print(len(vocab_lang))
 
     ######################
     # EMBEDDING TRAINING #
     ######################
 
+        # train character embedding (Skip-Gram with Negative Sampling) to get embedding weights;
+        # the loss-based best embedding model checkpoint and its weights are saved to file
         if (system_param_dict['train_embed']):
             embedding_calculation = EmbeddingCalculation.EmbeddingCalculation()
             embedding_calculation.train_embed(train_set_indexed=train_set_indexed,
@@ -118,7 +132,8 @@ def main():
 
         rnn_calculation = RNNCalculation.RNNCalculation(system_param_dict)
         
-        # train RNN model
+        # train RNN model (mono- or bidirectional GRU) with character embeddings;
+        # the loss-based best model checkpoint is saved to file
         if (system_param_dict['train_rnn']):
             rnn_calculation.train_rnn(data_sets=[train_set_indexed, val_set_indexed],
                                       vocab_chars=vocab_chars,
@@ -128,13 +143,15 @@ def main():
     # EVALUATION #
     ##############
 
-        # evaluate test set
+        # evaluate RNN model checkpoint on test set
         if (system_param_dict['eval_test_set']):
             rnn_calculation.test_rnn(data_sets=[test_set_indexed],
                                      vocab_chars=vocab_chars,
                                      vocab_lang=vocab_lang)
 
-        # print saved model checkpoint from file
+        # print saved model checkpoint from file (RNN or embedding)
+        # note: some parameters in the YAML settings file have to be the same as in the checkpoint
+        # (e.g. input_tr_va_te_data_rel_path and hidden_size_rnn)
         if (system_param_dict['print_model_checkpoint_embed_weights'] != None and system_param_dict['print_rnn_model_checkpoint'] != None):
             rnn_calculation.print_model_checkpoint(vocab_chars=vocab_chars,
                                                    vocab_lang=vocab_lang,
@@ -143,8 +160,6 @@ def main():
             rnn_calculation.print_model_checkpoint(vocab_chars=vocab_chars,
                                                    vocab_lang=vocab_lang,
                                                    is_rnn_model=False)
-        else:
-            print('Both embedding weights and model checkpoint path required!')
 
 
 if __name__ == '__main__':
