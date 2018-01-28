@@ -24,6 +24,7 @@
 
 
 #!bin/bash
+twitter_imported = True
 try:
     import json
 except:
@@ -31,7 +32,8 @@ except:
 try:
     from twitter import Twitter, OAuth, TwitterHTTPError, TwitterStream
 except ImportError:
-    raise
+    twitter_imported = False
+    print('Error: No twitter module imported!')
 #import csv
 import unicodecsv as csv
 import os
@@ -47,10 +49,11 @@ class TweetRetriever(object):
     """
     
     def __init__(self):
-        self.oAuth = OAuth(ACCESS_TOKEN, ACCESS_SECRET, CONSUMER_KEY, CONSUMER_SECRET)
-        #Init connection to twitter streaming api
-        self.twitter_stream = TwitterStream(auth=self.oAuth)
-        self.twitter = Twitter(auth=self.oAuth)
+        if (twitter_imported):
+            self.oAuth = OAuth(ACCESS_TOKEN, ACCESS_SECRET, CONSUMER_KEY, CONSUMER_SECRET)
+            #Init connection to twitter streaming api
+            self.twitter_stream = TwitterStream(auth=self.oAuth)
+            self.twitter = Twitter(auth=self.oAuth)
         self.tweets = []
 
     def __tweet_not_deleted(self, tweet):
