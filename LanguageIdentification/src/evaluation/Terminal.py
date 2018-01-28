@@ -158,20 +158,20 @@ class Terminal(object):
         lang2index, index2lang = input_data.get_string2index_and_index2string(vocab_lang)
 
         input_text = ''
-        while input_text != 'exit':
+        while input_text != ['exit']:
             input_text, input_text_lang_tuple, is_live_tweets = self.__retrieve_text(can_use_live_tweets, index2lang, tweet_retriever, vocab_lang)
             if input_text is None:
                 continue
             input_text_embed_char_text_inp_tensors, _ = self.__prepare_data(input_data=input_data,
-                                                                          embed=embed,
-                                                                          input_text_lang_tuple=input_text_lang_tuple,
-                                                                          vocab_chars=vocab_chars,
-                                                                          vocab_lang=vocab_lang)
+                                                                            embed=embed,
+                                                                            input_text_lang_tuple=input_text_lang_tuple,
+                                                                            vocab_chars=vocab_chars,
+                                                                            vocab_lang=vocab_lang)
             if (self.system_param_dict['cuda_is_avail']):
                 input_text_embed_char_text_inp_tensors = input_text_embed_char_text_inp_tensors.cuda()
             n_highest_probs = 5
             self.__evaluate_and_print(gru_model=gru_model, input_text_embed_char_text_inp_tensors=input_text_embed_char_text_inp_tensors,
-                                    n_highest_probs=n_highest_probs, input_text=input_text, index2lang=index2lang, is_live_tweets=is_live_tweets)
+                                      n_highest_probs=n_highest_probs, input_text=input_text, index2lang=index2lang, is_live_tweets=is_live_tweets)
 
     def __str_to_int(self, string):
         """
