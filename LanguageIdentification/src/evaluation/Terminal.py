@@ -44,6 +44,81 @@ class Terminal(object):
             system_param_dict: contains system parameters
         """
         self.system_param_dict = system_param_dict
+        # "All Tweets are from July 2014 and cover 70 languages"
+        self.tag2language = {
+            'am': 'Amharic',
+            'ar': 'Arabic',
+            'bg': 'Bulgarian',
+            'bn': 'Bengali',
+            'bo': 'Tibetan',
+            'bs': 'Bosnian',
+            'ca': 'Catalan',
+            'ckb': 'Sorani Kurdish',
+            'cs': 'Czech',
+            'cy': 'Welsh',
+            'da': 'Danish',
+            'de': 'German',
+            'dv': 'Maldivian',
+            'el': 'Greek',
+            'en': 'English',
+            'es': 'Spanish',
+            'et': 'Estonian',
+            'eu': 'Basque',
+            'fa': 'Persian',
+            'fi': 'Finnish',
+            'fr': 'French',
+            'gu': 'Gujarati',
+            'he': 'Hebrew',
+            'hi': 'Hindi',
+            'hi-Latn': 'Latinized Hindi',
+            'hr': 'Croatian',
+            'ht': 'Haitian Creole',
+            'hu': 'Hungarian',
+            'hy': 'Armenian',
+            'id': 'Indonesian',
+            'is': 'Icelandic',
+            'it': 'Italian',
+            'ja': 'Japanese',
+            'ka': 'Georgian',
+            'km': 'Khmer',
+            'kn': 'Kannada',
+            'ko': 'Korean',
+            'lo': 'Lao',
+            'lt': 'Lithuanian',
+            'lv': 'Latvian',
+            'ml': 'Malayalam',
+            'mr': 'Marathi',
+            'ms': 'Malay',
+            'my': 'Burmese',
+            'ne': 'Nepali',
+            'nl': 'Dutch',
+            'no': 'Norwegian',
+            'pa': 'Panjabi',
+            'pl': 'Polish',
+            'ps': 'Pashto',
+            'pt': 'Portuguese',
+            'ro': 'Romanian',
+            'ru': 'Russian',
+            'sd': 'Sindhi',
+            'si': 'Sinhala',
+            'sk': 'Slovak',
+            'sl': 'Slovenian',
+            'sr': 'Serbian',
+            'sv': 'Swedish',
+            'ta': 'Tamil',
+            'te': 'Telugu',
+            'th': 'Thai',
+            'tl': 'Tagalog',
+            'tr': 'Turkish',
+            'ug': 'Uyghur',
+            'uk': 'Ukrainian',
+            'ur': 'Urdu',
+            'vi': 'Vietnamese',
+            'zh-CN': 'Simplified Chinese',
+            'zh-TW': 'Traditional Chinese',
+            'not-en': 'not English',
+            'und': 'Undefined',
+            }
 
     def run_terminal(self, can_use_live_tweets=False):
         """To run the terminal, only this function needs to be called.
@@ -158,7 +233,7 @@ class Terminal(object):
         if amount_live_tweets > 0 and can_use_live_tweets:
             is_live_tweets = True
             sample_tweets = self.__sample_tweets(tweet_retriever, vocab_lang, amount_live_tweets)
-            print('sample_tweets',sample_tweets)
+            #print('sample_tweets',sample_tweets)
             if sample_tweets is None:
                 return None, None
             input_text =  list(sample_tweets.values())
@@ -208,14 +283,18 @@ class Terminal(object):
         for i, input_tensor in enumerate(input_text_embed_char_text_inp_tensors):
             lang_prediction, _ = rnn_evaluator.evaluate_single_date(input_tensor, n_highest_probs)
             if (is_live_tweets):
-                print("====================\nTweet detected: \n\n%s\n" % input_text[i])
+                print('====================\nTweet detected: \n\n%s\n' % input_text[i])
 
             # print n_highest_probs for input
             print('Language:')
             for i in range(len(lang_prediction)):
-                if (i == 0):
-                    print("{0:.2f}".format(lang_prediction[i][0] * 100) + "%: " + str(
-                        index2lang[lang_prediction[i][1]]) + "\n")
+                lang_tag = index2lang[lang_prediction[i][1]]
+                if (lang_tag in self.tag2language):
+                    lang = self.tag2language[lang_tag]
                 else:
-                    print(
-                        "{0:.2f}".format(lang_prediction[i][0] * 100) + "%: " + str(index2lang[lang_prediction[i][1]]))
+                    lang = 'Unknown'
+                    
+                if (i == 0):
+                    print('{0:.2f}'.format(lang_prediction[i][0] * 100) + '%: ' + lang + ' (' + lang_tag + ')\n')
+                else:
+                    print('{0:.2f}'.format(lang_prediction[i][0] * 100) + '%: ' + lang + ' (' + lang_tag + ')')

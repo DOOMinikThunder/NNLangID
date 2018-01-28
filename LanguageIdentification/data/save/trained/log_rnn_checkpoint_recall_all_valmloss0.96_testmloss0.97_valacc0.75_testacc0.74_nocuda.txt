@@ -1,0 +1,627 @@
+!!! TERMINAL LIVE TWEETS OFF !!!
+!!! CUDA OFF !!!
+('Embedding weights loaded from file:', '../data/save/embed_weights.txt')
+('Model:\n', GRUModel (
+  (gru_layer): GRU(13, 100, bidirectional=True)
+  (output_layer): Linear (200 -> 70)
+  (log_softmax): LogSoftmax ()
+  (criterion): NLLLoss (
+  )
+))
+('[RNN] Epoch', 0, '| Batch', 0, '/', 52, '| Training mean loss: ', 4.253338489294052)
+========================================
+('[RNN] Epoch', 0, '| Batch', 0, '/', 52, '| Validation mean loss: ', 4.120201110839844)
+========================================
+('[RNN] Epoch', 0, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.042900302114803626)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 0, '| Batch', 10, '/', 52, '| Training mean loss: ', 3.599237299919128)
+('[RNN] Epoch', 0, '| Batch', 20, '/', 52, '| Training mean loss: ', 3.455675268292427)
+('[RNN] Epoch', 0, '| Batch', 30, '/', 52, '| Training mean loss: ', 3.2732408151626586)
+('[RNN] Epoch', 0, '| Batch', 40, '/', 52, '| Training mean loss: ', 3.1181618783473968)
+('[RNN] Epoch', 0, '| Batch', 50, '/', 52, '| Training mean loss: ', 3.0588276332616804)
+('[RNN] Epoch', 1, '| Batch', 0, '/', 52, '| Training mean loss: ', 2.9829090241789817)
+========================================
+('[RNN] Epoch', 1, '| Batch', 0, '/', 52, '| Validation mean loss: ', 2.990757942199707)
+========================================
+('[RNN] Epoch', 1, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.17084592145015107)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 1, '| Batch', 10, '/', 52, '| Training mean loss: ', 2.871823655128479)
+('[RNN] Epoch', 1, '| Batch', 20, '/', 52, '| Training mean loss: ', 2.7677706986665727)
+('[RNN] Epoch', 1, '| Batch', 30, '/', 52, '| Training mean loss: ', 2.710494988203049)
+('[RNN] Epoch', 1, '| Batch', 40, '/', 52, '| Training mean loss: ', 2.6037392992973327)
+('[RNN] Epoch', 1, '| Batch', 50, '/', 52, '| Training mean loss: ', 2.547469392195344)
+('[RNN] Epoch', 2, '| Batch', 0, '/', 52, '| Training mean loss: ', 2.5108141970336435)
+========================================
+('[RNN] Epoch', 2, '| Batch', 0, '/', 52, '| Validation mean loss: ', 2.524261236190796)
+========================================
+('[RNN] Epoch', 2, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.2824773413897281)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 2, '| Batch', 10, '/', 52, '| Training mean loss: ', 2.4108489354327323)
+('[RNN] Epoch', 2, '| Batch', 20, '/', 52, '| Training mean loss: ', 2.316549564063549)
+('[RNN] Epoch', 2, '| Batch', 30, '/', 52, '| Training mean loss: ', 2.310776647999883)
+('[RNN] Epoch', 2, '| Batch', 40, '/', 52, '| Training mean loss: ', 2.2642515306603164)
+('[RNN] Epoch', 2, '| Batch', 50, '/', 52, '| Training mean loss: ', 2.1848108563218265)
+('[RNN] Epoch', 3, '| Batch', 0, '/', 52, '| Training mean loss: ', 2.2053527292595243)
+========================================
+('[RNN] Epoch', 3, '| Batch', 0, '/', 52, '| Validation mean loss: ', 2.245053768157959)
+========================================
+('[RNN] Epoch', 3, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.3919939577039275)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 3, '| Batch', 10, '/', 52, '| Training mean loss: ', 2.136383020037785)
+('[RNN] Epoch', 3, '| Batch', 20, '/', 52, '| Training mean loss: ', 2.0799631369132547)
+('[RNN] Epoch', 3, '| Batch', 30, '/', 52, '| Training mean loss: ', 2.0244771411307156)
+('[RNN] Epoch', 3, '| Batch', 40, '/', 52, '| Training mean loss: ', 2.0162201487726996)
+('[RNN] Epoch', 3, '| Batch', 50, '/', 52, '| Training mean loss: ', 1.9648778853493276)
+('[RNN] Epoch', 4, '| Batch', 0, '/', 52, '| Training mean loss: ', 1.9352886335216462)
+========================================
+('[RNN] Epoch', 4, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.9376606941223145)
+========================================
+('[RNN] Epoch', 4, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.45740181268882174)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 4, '| Batch', 10, '/', 52, '| Training mean loss: ', 1.8736623902674765)
+('[RNN] Epoch', 4, '| Batch', 20, '/', 52, '| Training mean loss: ', 1.7954737635375932)
+('[RNN] Epoch', 4, '| Batch', 30, '/', 52, '| Training mean loss: ', 1.7498166649905034)
+('[RNN] Epoch', 4, '| Batch', 40, '/', 52, '| Training mean loss: ', 1.8002743661601561)
+('[RNN] Epoch', 4, '| Batch', 50, '/', 52, '| Training mean loss: ', 1.703136400014395)
+('[RNN] Epoch', 5, '| Batch', 0, '/', 52, '| Training mean loss: ', 1.731447193816537)
+========================================
+('[RNN] Epoch', 5, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.695281982421875)
+========================================
+('[RNN] Epoch', 5, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.529607250755287)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 5, '| Batch', 10, '/', 52, '| Training mean loss: ', 1.7239357385750627)
+('[RNN] Epoch', 5, '| Batch', 20, '/', 52, '| Training mean loss: ', 1.615048882230185)
+('[RNN] Epoch', 5, '| Batch', 30, '/', 52, '| Training mean loss: ', 1.610029157973593)
+('[RNN] Epoch', 5, '| Batch', 40, '/', 52, '| Training mean loss: ', 1.6120458632841475)
+('[RNN] Epoch', 5, '| Batch', 50, '/', 52, '| Training mean loss: ', 1.55451312496874)
+('[RNN] Epoch', 6, '| Batch', 0, '/', 52, '| Training mean loss: ', 1.5834463924926823)
+========================================
+('[RNN] Epoch', 6, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.5699764490127563)
+========================================
+('[RNN] Epoch', 6, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.5646525679758309)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 6, '| Batch', 10, '/', 52, '| Training mean loss: ', 1.5367749415028376)
+('[RNN] Epoch', 6, '| Batch', 20, '/', 52, '| Training mean loss: ', 1.5002004494909198)
+('[RNN] Epoch', 6, '| Batch', 30, '/', 52, '| Training mean loss: ', 1.511823819040088)
+('[RNN] Epoch', 6, '| Batch', 40, '/', 52, '| Training mean loss: ', 1.5179171196023236)
+('[RNN] Epoch', 6, '| Batch', 50, '/', 52, '| Training mean loss: ', 1.4368226298554219)
+('[RNN] Epoch', 7, '| Batch', 0, '/', 52, '| Training mean loss: ', 1.4689007465875474)
+========================================
+('[RNN] Epoch', 7, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.4555003643035889)
+========================================
+('[RNN] Epoch', 7, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.5935045317220544)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 7, '| Batch', 10, '/', 52, '| Training mean loss: ', 1.4211355442822096)
+('[RNN] Epoch', 7, '| Batch', 20, '/', 52, '| Training mean loss: ', 1.4097860665398185)
+('[RNN] Epoch', 7, '| Batch', 30, '/', 52, '| Training mean loss: ', 1.423058095882996)
+('[RNN] Epoch', 7, '| Batch', 40, '/', 52, '| Training mean loss: ', 1.4375002244241768)
+('[RNN] Epoch', 7, '| Batch', 50, '/', 52, '| Training mean loss: ', 1.3547930652287905)
+('[RNN] Epoch', 8, '| Batch', 0, '/', 52, '| Training mean loss: ', 1.4031825193098921)
+========================================
+('[RNN] Epoch', 8, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.3989288806915283)
+========================================
+('[RNN] Epoch', 8, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.6087613293051359)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 8, '| Batch', 10, '/', 52, '| Training mean loss: ', 1.3754717164999166)
+('[RNN] Epoch', 8, '| Batch', 20, '/', 52, '| Training mean loss: ', 1.3312955828167032)
+('[RNN] Epoch', 8, '| Batch', 30, '/', 52, '| Training mean loss: ', 1.3363021586150863)
+('[RNN] Epoch', 8, '| Batch', 40, '/', 52, '| Training mean loss: ', 1.3583264468009584)
+('[RNN] Epoch', 8, '| Batch', 50, '/', 52, '| Training mean loss: ', 1.2786940495418966)
+('[RNN] Epoch', 9, '| Batch', 0, '/', 52, '| Training mean loss: ', 1.3027016795818345)
+========================================
+('[RNN] Epoch', 9, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.3256853818893433)
+========================================
+('[RNN] Epoch', 9, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.6262839879154078)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 9, '| Batch', 10, '/', 52, '| Training mean loss: ', 1.2735642916486831)
+('[RNN] Epoch', 9, '| Batch', 20, '/', 52, '| Training mean loss: ', 1.2593407341775018)
+('[RNN] Epoch', 9, '| Batch', 30, '/', 52, '| Training mean loss: ', 1.26660148739774)
+('[RNN] Epoch', 9, '| Batch', 40, '/', 52, '| Training mean loss: ', 1.3148242352491943)
+('[RNN] Epoch', 9, '| Batch', 50, '/', 52, '| Training mean loss: ', 1.2200673902834969)
+('[RNN] Epoch', 10, '| Batch', 0, '/', 52, '| Training mean loss: ', 1.2431595104977022)
+========================================
+('[RNN] Epoch', 10, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.2814685106277466)
+========================================
+('[RNN] Epoch', 10, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.6373111782477341)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 10, '| Batch', 10, '/', 52, '| Training mean loss: ', 1.2235313146268163)
+('[RNN] Epoch', 10, '| Batch', 20, '/', 52, '| Training mean loss: ', 1.199955100038147)
+('[RNN] Epoch', 10, '| Batch', 30, '/', 52, '| Training mean loss: ', 1.2074633147383866)
+('[RNN] Epoch', 10, '| Batch', 40, '/', 52, '| Training mean loss: ', 1.2529751865645522)
+('[RNN] Epoch', 10, '| Batch', 50, '/', 52, '| Training mean loss: ', 1.1662338772988732)
+('[RNN] Epoch', 11, '| Batch', 0, '/', 52, '| Training mean loss: ', 1.1813066181756002)
+========================================
+('[RNN] Epoch', 11, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.244545578956604)
+========================================
+('[RNN] Epoch', 11, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.6481873111782477)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 11, '| Batch', 10, '/', 52, '| Training mean loss: ', 1.2064903050030844)
+('[RNN] Epoch', 11, '| Batch', 20, '/', 52, '| Training mean loss: ', 1.1654508419679477)
+('[RNN] Epoch', 11, '| Batch', 30, '/', 52, '| Training mean loss: ', 1.188005978628702)
+('[RNN] Epoch', 11, '| Batch', 40, '/', 52, '| Training mean loss: ', 1.2085729651613655)
+('[RNN] Epoch', 11, '| Batch', 50, '/', 52, '| Training mean loss: ', 1.1308322009349212)
+('[RNN] Epoch', 12, '| Batch', 0, '/', 52, '| Training mean loss: ', 1.1398731851657575)
+========================================
+('[RNN] Epoch', 12, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.193466067314148)
+========================================
+('[RNN] Epoch', 12, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.6712990936555892)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 12, '| Batch', 10, '/', 52, '| Training mean loss: ', 1.1499698979360256)
+('[RNN] Epoch', 12, '| Batch', 20, '/', 52, '| Training mean loss: ', 1.1189069936087763)
+('[RNN] Epoch', 12, '| Batch', 30, '/', 52, '| Training mean loss: ', 1.1374696208426904)
+('[RNN] Epoch', 12, '| Batch', 40, '/', 52, '| Training mean loss: ', 1.1445268026467965)
+('[RNN] Epoch', 12, '| Batch', 50, '/', 52, '| Training mean loss: ', 1.0862494684308186)
+('[RNN] Epoch', 13, '| Batch', 0, '/', 52, '| Training mean loss: ', 1.0961822952674773)
+========================================
+('[RNN] Epoch', 13, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.1697088479995728)
+========================================
+('[RNN] Epoch', 13, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.6812688821752266)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 13, '| Batch', 10, '/', 52, '| Training mean loss: ', 1.107919666964437)
+('[RNN] Epoch', 13, '| Batch', 20, '/', 52, '| Training mean loss: ', 1.0823569842928629)
+('[RNN] Epoch', 13, '| Batch', 30, '/', 52, '| Training mean loss: ', 1.1075157587013964)
+('[RNN] Epoch', 13, '| Batch', 40, '/', 52, '| Training mean loss: ', 1.1120878783738808)
+('[RNN] Epoch', 13, '| Batch', 50, '/', 52, '| Training mean loss: ', 1.0550946846014122)
+('[RNN] Epoch', 14, '| Batch', 0, '/', 52, '| Training mean loss: ', 1.0702878123430637)
+========================================
+('[RNN] Epoch', 14, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.1467818021774292)
+========================================
+('[RNN] Epoch', 14, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.6827794561933535)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 14, '| Batch', 10, '/', 52, '| Training mean loss: ', 1.0755907741413904)
+('[RNN] Epoch', 14, '| Batch', 20, '/', 52, '| Training mean loss: ', 1.0434797221344707)
+('[RNN] Epoch', 14, '| Batch', 30, '/', 52, '| Training mean loss: ', 1.0952635465255844)
+('[RNN] Epoch', 14, '| Batch', 40, '/', 52, '| Training mean loss: ', 1.0919759050329159)
+('[RNN] Epoch', 14, '| Batch', 50, '/', 52, '| Training mean loss: ', 1.0420332638038525)
+('[RNN] Epoch', 15, '| Batch', 0, '/', 52, '| Training mean loss: ', 1.0602743137910402)
+========================================
+('[RNN] Epoch', 15, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.143978238105774)
+========================================
+('[RNN] Epoch', 15, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.6861027190332326)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 15, '| Batch', 10, '/', 52, '| Training mean loss: ', 1.0562881426127824)
+('[RNN] Epoch', 15, '| Batch', 20, '/', 52, '| Training mean loss: ', 1.0134222682319451)
+('[RNN] Epoch', 15, '| Batch', 30, '/', 52, '| Training mean loss: ', 1.0453572349409805)
+('[RNN] Epoch', 15, '| Batch', 40, '/', 52, '| Training mean loss: ', 1.0565059870081532)
+('[RNN] Epoch', 15, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.9951269618963997)
+('[RNN] Epoch', 16, '| Batch', 0, '/', 52, '| Training mean loss: ', 1.0311601352311954)
+========================================
+('[RNN] Epoch', 16, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.113216757774353)
+========================================
+('[RNN] Epoch', 16, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.6947129909365559)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 16, '| Batch', 10, '/', 52, '| Training mean loss: ', 1.022063526180642)
+('[RNN] Epoch', 16, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.9817254169784283)
+('[RNN] Epoch', 16, '| Batch', 30, '/', 52, '| Training mean loss: ', 1.0026702213053504)
+('[RNN] Epoch', 16, '| Batch', 40, '/', 52, '| Training mean loss: ', 1.014703832328756)
+('[RNN] Epoch', 16, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.9928968138222699)
+('[RNN] Epoch', 17, '| Batch', 0, '/', 52, '| Training mean loss: ', 1.002942808472686)
+========================================
+('[RNN] Epoch', 17, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.0971035957336426)
+========================================
+('[RNN] Epoch', 17, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.6987915407854985)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 17, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.998000681831083)
+('[RNN] Epoch', 17, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.949045588814959)
+('[RNN] Epoch', 17, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.9679317577441107)
+('[RNN] Epoch', 17, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.9741939958637958)
+('[RNN] Epoch', 17, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.9494053491818304)
+('[RNN] Epoch', 18, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.9521116904421287)
+========================================
+('[RNN] Epoch', 18, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.0755218267440796)
+========================================
+('[RNN] Epoch', 18, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7034743202416919)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 18, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.9668370518306583)
+('[RNN] Epoch', 18, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.9298880465204129)
+('[RNN] Epoch', 18, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.9534063887373013)
+('[RNN] Epoch', 18, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.9385346735610801)
+('[RNN] Epoch', 18, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.9289222953746521)
+('[RNN] Epoch', 19, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.9212759364149861)
+========================================
+('[RNN] Epoch', 19, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.0649248361587524)
+========================================
+('[RNN] Epoch', 19, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7099697885196374)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 19, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.9482861945564309)
+('[RNN] Epoch', 19, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.904735527117562)
+('[RNN] Epoch', 19, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.9478810536619876)
+('[RNN] Epoch', 19, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.9342294057583931)
+('[RNN] Epoch', 19, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.9086706069744978)
+('[RNN] Epoch', 20, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.8912767292532826)
+========================================
+('[RNN] Epoch', 20, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.0645476579666138)
+========================================
+('[RNN] Epoch', 20, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7084592145015106)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 20, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.9350354707740471)
+('[RNN] Epoch', 20, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.8790204756836756)
+('[RNN] Epoch', 20, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.9190827354529092)
+('[RNN] Epoch', 20, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.9202949370772003)
+('[RNN] Epoch', 20, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.91125110615421)
+('[RNN] Epoch', 21, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.8891297598000674)
+========================================
+('[RNN] Epoch', 21, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.0570403337478638)
+========================================
+('[RNN] Epoch', 21, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7110271903323263)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 21, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.9152398597594374)
+('[RNN] Epoch', 21, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.8736995322162912)
+('[RNN] Epoch', 21, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.8922850064147515)
+('[RNN] Epoch', 21, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.8964079192573772)
+('[RNN] Epoch', 21, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.9003072668537788)
+('[RNN] Epoch', 22, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.8837505824987729)
+========================================
+('[RNN] Epoch', 22, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.0673407316207886)
+========================================
+('[RNN] Epoch', 22, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7086102719033233)
+========================================
+('Not improved evaluation checks:', 0, '/', 9)
+('[RNN] Epoch', 22, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.9389594933252537)
+('[RNN] Epoch', 22, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.8612726113923709)
+('[RNN] Epoch', 22, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.8908969919034917)
+('[RNN] Epoch', 22, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.878758886349282)
+('[RNN] Epoch', 22, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.8664813937295476)
+('[RNN] Epoch', 23, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.8461770543716002)
+========================================
+('[RNN] Epoch', 23, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.0571000576019287)
+========================================
+('[RNN] Epoch', 23, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7122356495468278)
+========================================
+('Not improved evaluation checks:', 1, '/', 9)
+('[RNN] Epoch', 23, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.927788076307821)
+('[RNN] Epoch', 23, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.8419305207444341)
+('[RNN] Epoch', 23, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.871642857437364)
+('[RNN] Epoch', 23, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.8639776588049827)
+('[RNN] Epoch', 23, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.8387420744914025)
+('[RNN] Epoch', 24, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.8361207712516334)
+========================================
+('[RNN] Epoch', 24, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.0525966882705688)
+========================================
+('[RNN] Epoch', 24, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7141993957703927)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 24, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.9010793713679154)
+('[RNN] Epoch', 24, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.8185670160408154)
+('[RNN] Epoch', 24, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.8585502079718744)
+('[RNN] Epoch', 24, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.8522558520793045)
+('[RNN] Epoch', 24, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.8187258552954035)
+('[RNN] Epoch', 25, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.8008842134920338)
+========================================
+('[RNN] Epoch', 25, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.0360143184661865)
+========================================
+('[RNN] Epoch', 25, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7161631419939577)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 25, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.8654958109148975)
+('[RNN] Epoch', 25, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.7951784309247906)
+('[RNN] Epoch', 25, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.8343436910487899)
+('[RNN] Epoch', 25, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.8311098621035917)
+('[RNN] Epoch', 25, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.7980029792612786)
+('[RNN] Epoch', 26, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.7798384384761439)
+========================================
+('[RNN] Epoch', 26, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.031972050666809)
+========================================
+('[RNN] Epoch', 26, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7240181268882175)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 26, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.8422233609576246)
+('[RNN] Epoch', 26, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.7850935623093246)
+('[RNN] Epoch', 26, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.8133593829694764)
+('[RNN] Epoch', 26, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.8234704497052399)
+('[RNN] Epoch', 26, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.8008025379790834)
+('[RNN] Epoch', 27, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.7789269341356426)
+========================================
+('[RNN] Epoch', 27, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.0269798040390015)
+========================================
+('[RNN] Epoch', 27, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7262839879154078)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 27, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.8328320032434781)
+('[RNN] Epoch', 27, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.7741338880416734)
+('[RNN] Epoch', 27, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.81255087521211)
+('[RNN] Epoch', 27, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.8275912371181317)
+('[RNN] Epoch', 27, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.7837871483405179)
+('[RNN] Epoch', 28, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.7748327743980908)
+========================================
+('[RNN] Epoch', 28, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.0546560287475586)
+========================================
+('[RNN] Epoch', 28, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7240181268882175)
+========================================
+('Not improved evaluation checks:', 0, '/', 9)
+('[RNN] Epoch', 28, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.8257307216986751)
+('[RNN] Epoch', 28, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.7904493267814651)
+('[RNN] Epoch', 28, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.8054270192966138)
+('[RNN] Epoch', 28, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.8068401268394063)
+('[RNN] Epoch', 28, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.781255180539482)
+('[RNN] Epoch', 29, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.7645474645801558)
+========================================
+('[RNN] Epoch', 29, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.053276538848877)
+========================================
+('[RNN] Epoch', 29, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7197885196374623)
+========================================
+('Not improved evaluation checks:', 1, '/', 9)
+('[RNN] Epoch', 29, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.8198078217356556)
+('[RNN] Epoch', 29, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.7810254455829508)
+('[RNN] Epoch', 29, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.7994037256527426)
+('[RNN] Epoch', 29, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.7979872499741364)
+('[RNN] Epoch', 29, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.775787127029942)
+('[RNN] Epoch', 30, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.7600095373511203)
+========================================
+('[RNN] Epoch', 30, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.040763020515442)
+========================================
+('[RNN] Epoch', 30, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7229607250755287)
+========================================
+('Not improved evaluation checks:', 2, '/', 9)
+('[RNN] Epoch', 30, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.8055395284217857)
+('[RNN] Epoch', 30, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.7659381988994901)
+('[RNN] Epoch', 30, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.7772463617712547)
+('[RNN] Epoch', 30, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.7669469635746619)
+('[RNN] Epoch', 30, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.7653983221648045)
+('[RNN] Epoch', 31, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.7504445659524859)
+========================================
+('[RNN] Epoch', 31, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.0349677801132202)
+========================================
+('[RNN] Epoch', 31, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7252265861027191)
+========================================
+('Not improved evaluation checks:', 3, '/', 9)
+('[RNN] Epoch', 31, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.8026119344434615)
+('[RNN] Epoch', 31, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.7553483439849997)
+('[RNN] Epoch', 31, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.772468351244228)
+('[RNN] Epoch', 31, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.7719738235278578)
+('[RNN] Epoch', 31, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.7658756205146464)
+('[RNN] Epoch', 32, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.7653944309956844)
+========================================
+('[RNN] Epoch', 32, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.0401901006698608)
+========================================
+('[RNN] Epoch', 32, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7244712990936556)
+========================================
+('Not improved evaluation checks:', 4, '/', 9)
+('Learning rate decreased to:', 0.010000000000000002)
+('[RNN] Epoch', 32, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.8008993230630967)
+('[RNN] Epoch', 32, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.7466927928275131)
+('[RNN] Epoch', 32, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.7595494520495718)
+('[RNN] Epoch', 32, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.7534846673819324)
+('[RNN] Epoch', 32, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.768680588788362)
+('[RNN] Epoch', 33, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.7308746572747044)
+========================================
+('[RNN] Epoch', 33, '| Batch', 0, '/', 52, '| Validation mean loss: ', 1.0352435111999512)
+========================================
+('[RNN] Epoch', 33, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7282477341389728)
+========================================
+('Not improved evaluation checks:', 5, '/', 9)
+('Learning rate decreased to:', 0.0010000000000000002)
+('[RNN] Epoch', 33, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.7558168989785867)
+('[RNN] Epoch', 33, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.7025551184526121)
+('[RNN] Epoch', 33, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.7070960765402708)
+('[RNN] Epoch', 33, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.6672772191729218)
+('[RNN] Epoch', 33, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.6522857674353764)
+('[RNN] Epoch', 34, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.6502216504359231)
+========================================
+('[RNN] Epoch', 34, '| Batch', 0, '/', 52, '| Validation mean loss: ', 0.9554154276847839)
+========================================
+('[RNN] Epoch', 34, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7484894259818731)
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+('[RNN] Epoch', 34, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.7167259849137928)
+('[RNN] Epoch', 34, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.6605401401153818)
+('[RNN] Epoch', 34, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.6833671784174851)
+('[RNN] Epoch', 34, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.656138391404026)
+('[RNN] Epoch', 34, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.6464906718431703)
+('[RNN] Epoch', 35, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.6448315408978474)
+========================================
+('[RNN] Epoch', 35, '| Batch', 0, '/', 52, '| Validation mean loss: ', 0.9558637142181396)
+========================================
+('[RNN] Epoch', 35, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7468277945619335)
+========================================
+('Not improved evaluation checks:', 0, '/', 9)
+('[RNN] Epoch', 35, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.7070742749591968)
+('[RNN] Epoch', 35, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.6508838065939112)
+('[RNN] Epoch', 35, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.6754610176641794)
+('[RNN] Epoch', 35, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.6513436962690198)
+('[RNN] Epoch', 35, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.6421809838576455)
+('[RNN] Epoch', 36, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.639276788640018)
+========================================
+('[RNN] Epoch', 36, '| Batch', 0, '/', 52, '| Validation mean loss: ', 0.9571259617805481)
+========================================
+('[RNN] Epoch', 36, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7474320241691843)
+========================================
+('Not improved evaluation checks:', 1, '/', 9)
+('[RNN] Epoch', 36, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.7002027255594251)
+('[RNN] Epoch', 36, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.6439961984350007)
+('[RNN] Epoch', 36, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.670169150115479)
+('[RNN] Epoch', 36, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.6476422265358783)
+('[RNN] Epoch', 36, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.6381485297724757)
+('[RNN] Epoch', 37, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.6343083106084486)
+========================================
+('[RNN] Epoch', 37, '| Batch', 0, '/', 52, '| Validation mean loss: ', 0.9584370255470276)
+========================================
+('[RNN] Epoch', 37, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7487915407854985)
+========================================
+('Not improved evaluation checks:', 2, '/', 9)
+('[RNN] Epoch', 37, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.6948528319042961)
+('[RNN] Epoch', 37, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.6394337117665807)
+('[RNN] Epoch', 37, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.6661793190985088)
+('[RNN] Epoch', 37, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.644408310463685)
+('[RNN] Epoch', 37, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.634352646119025)
+('[RNN] Epoch', 38, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.6298179967799126)
+========================================
+('[RNN] Epoch', 38, '| Batch', 0, '/', 52, '| Validation mean loss: ', 0.9601131677627563)
+========================================
+('[RNN] Epoch', 38, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7483383685800604)
+========================================
+('Not improved evaluation checks:', 3, '/', 9)
+('[RNN] Epoch', 38, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.6903427410423901)
+('[RNN] Epoch', 38, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.635406644417548)
+('[RNN] Epoch', 38, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.6623064964969312)
+('[RNN] Epoch', 38, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.6413250864937604)
+('[RNN] Epoch', 38, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.6308644316299961)
+('[RNN] Epoch', 39, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.6259352788511335)
+========================================
+('[RNN] Epoch', 39, '| Batch', 0, '/', 52, '| Validation mean loss: ', 0.9615713953971863)
+========================================
+('[RNN] Epoch', 39, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7481873111782478)
+========================================
+('Not improved evaluation checks:', 4, '/', 9)
+('Learning rate decreased to:', 0.00010000000000000003)
+('[RNN] Epoch', 39, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.6862563814468692)
+('[RNN] Epoch', 39, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.631951760112818)
+('[RNN] Epoch', 39, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.6491133314014644)
+('[RNN] Epoch', 39, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.6248696932461153)
+('[RNN] Epoch', 39, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.6221964864571273)
+('[RNN] Epoch', 40, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.6170779133217029)
+========================================
+('[RNN] Epoch', 40, '| Batch', 0, '/', 52, '| Validation mean loss: ', 0.9588474035263062)
+========================================
+('[RNN] Epoch', 40, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7490936555891239)
+========================================
+('Not improved evaluation checks:', 5, '/', 9)
+('Learning rate decreased to:', 1.0000000000000004e-05)
+('[RNN] Epoch', 40, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.6787331702080951)
+('[RNN] Epoch', 40, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.6257725636920077)
+('[RNN] Epoch', 40, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.6468119652807696)
+('[RNN] Epoch', 40, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.6234795975043185)
+('[RNN] Epoch', 40, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.6209688559757142)
+('[RNN] Epoch', 41, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.6163260052685409)
+========================================
+('[RNN] Epoch', 41, '| Batch', 0, '/', 52, '| Validation mean loss: ', 0.9588261842727661)
+========================================
+('[RNN] Epoch', 41, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7484894259818731)
+========================================
+('Not improved evaluation checks:', 6, '/', 9)
+('Learning rate decreased to:', 1.0000000000000004e-06)
+('[RNN] Epoch', 41, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.6783983936930708)
+('[RNN] Epoch', 41, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.6254035117346386)
+('[RNN] Epoch', 41, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.6465593215287408)
+('[RNN] Epoch', 41, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.623346222698116)
+('[RNN] Epoch', 41, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.6208519535408186)
+('[RNN] Epoch', 42, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.6162607080990449)
+========================================
+('[RNN] Epoch', 42, '| Batch', 0, '/', 52, '| Validation mean loss: ', 0.9588330388069153)
+========================================
+('[RNN] Epoch', 42, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7484894259818731)
+========================================
+('Not improved evaluation checks:', 7, '/', 9)
+('Learning rate decreased to:', 1.0000000000000005e-07)
+('[RNN] Epoch', 42, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.6783669793538579)
+('[RNN] Epoch', 42, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.6253666018560361)
+('[RNN] Epoch', 42, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.6465353298452965)
+('[RNN] Epoch', 42, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.6233324906802515)
+('[RNN] Epoch', 42, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.6208402629723905)
+('[RNN] Epoch', 43, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.6162543771216287)
+========================================
+('[RNN] Epoch', 43, '| Batch', 0, '/', 52, '| Validation mean loss: ', 0.9588340520858765)
+========================================
+('[RNN] Epoch', 43, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7486404833836858)
+========================================
+('Not improved evaluation checks:', 8, '/', 9)
+('Learning rate decreased to:', 1.0000000000000005e-08)
+('[RNN] Epoch', 43, '| Batch', 10, '/', 52, '| Training mean loss: ', 0.6783640810644417)
+('[RNN] Epoch', 43, '| Batch', 20, '/', 52, '| Training mean loss: ', 0.6253631184174262)
+('[RNN] Epoch', 43, '| Batch', 30, '/', 52, '| Training mean loss: ', 0.6465332777179902)
+('[RNN] Epoch', 43, '| Batch', 40, '/', 52, '| Training mean loss: ', 0.6233311344440511)
+('[RNN] Epoch', 43, '| Batch', 50, '/', 52, '| Training mean loss: ', 0.620839274280982)
+('[RNN] Epoch', 44, '| Batch', 0, '/', 52, '| Training mean loss: ', 0.6162539941160156)
+========================================
+('[RNN] Epoch', 44, '| Batch', 0, '/', 52, '| Validation mean loss: ', 0.9588340520858765)
+========================================
+('[RNN] Epoch', 44, '| Batch', 0, '/', 52, '| Validation accuracy: ', 0.7486404833836858)
+========================================
+('Not improved evaluation checks:', 9, '/', 9)
+('Learning rate decreased to:', 1.0000000000000005e-09)
+('Embedding weights loaded from file:', '../data/save/embed_weights.txt')
+('Model checkpoint loaded from file:', '../data/save/rnn_model_checkpoint.pth')
+Test results:
+========================================
+('Confusion matrix:\n', u't\\p\t   el\t   gu\t   en\t   ro\t   vi\t   ca\t   am\t   it\t   sv\t   cs\t   cy\t   bg\t   eu\t   et\t   id\t   es\t   ru\t   sr\t   nl\t   pt\t   no\t   lo\t   tr\t   ne\t   lv\t   si\t   lt\t   pa\t   th\t   sl\t   te\t   is\thi-Latn\t   ta\t   fr\t   hy\t   mr\t   ps\t   hr\t   bn\t   bo\t   ht\t   hu\t   fa\t   hi\t   bs\t   dv\t   fi\t   da\t   ja\t   he\t   ka\t   tl\t  ckb\t   ml\t   ko\t   kn\t   km\t   ur\t   sk\tzh-CN\t   de\t   ar\t   pl\t   uk\tzh-TW\t   ug\t   my\t   or\t   sd\t\taccuracy\nel\t  116\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      97.%\ngu\t    1\t  114\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      99.%\nen\t    0\t    0\t   53\t    0\t    0\t    1\t    0\t    1\t    0\t    2\t    1\t    0\t    0\t    0\t    5\t    3\t    0\t    0\t    5\t    4\t    1\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    2\t    0\t    1\t    3\t    0\t    2\t    0\t    0\t    0\t    1\t    0\t    1\t    3\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    3\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t      54.%\nro\t    0\t    0\t    0\t   44\t    1\t    2\t    0\t    7\t    0\t    0\t    0\t    0\t    1\t    1\t    0\t    1\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    4\t    1\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    3\t    0\t    1\t    0\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      58.%\nvi\t    0\t    0\t    0\t    0\t  103\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    0\t    0\t      95.%\nca\t    0\t    0\t    1\t    1\t    0\t   47\t    0\t    1\t    2\t    0\t    0\t    0\t    1\t    0\t    0\t    5\t    0\t    0\t    1\t    5\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    1\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    2\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      61.%\nam\t    0\t    0\t    0\t    0\t    0\t    0\t   53\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      91.%\nit\t    0\t    0\t    1\t    2\t    0\t    0\t    0\t   79\t    1\t    0\t    0\t    0\t    1\t    0\t    0\t    2\t    0\t    0\t    0\t    4\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    1\t    1\t    1\t    2\t    0\t    1\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    1\t    0\t    1\t    0\t    2\t    0\t    1\t    0\t    0\t    0\t    0\t      72.%\nsv\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t   85\t    0\t    2\t    0\t    0\t    1\t    4\t    1\t    0\t    0\t    0\t    1\t   12\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    2\t    0\t    0\t    1\t    0\t    3\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      70.%\ncs\t    0\t    0\t    2\t    0\t    1\t    1\t    0\t    1\t    3\t   72\t    1\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    3\t    2\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    2\t    5\t    0\t    1\t    1\t    0\t    0\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    6\t    0\t    0\t    1\t    0\t    3\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t   12\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t      58.%\ncy\t    0\t    0\t    5\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t  125\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t      88.%\nbg\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t   96\t    0\t    0\t    0\t    0\t    7\t   14\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    0\t      78.%\neu\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t   38\t    1\t    2\t    2\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    4\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    2\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t      63.%\net\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    5\t    1\t    0\t    0\t    0\t    0\t   67\t    6\t    2\t    0\t    0\t    1\t    2\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    4\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      68.%\nid\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    1\t    2\t  102\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    5\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    1\t    2\t    1\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    6\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t      78.%\nes\t    0\t    0\t    0\t    4\t    0\t    8\t    0\t   15\t    0\t    0\t    0\t    0\t    0\t    3\t    3\t   66\t    0\t    0\t    0\t    6\t    2\t    1\t    0\t    0\t    1\t    1\t    0\t    0\t    0\t    1\t    0\t    0\t    1\t    0\t    4\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    3\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t      52.%\nru\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t   17\t    0\t    0\t    0\t    0\t   63\t    8\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    9\t    0\t    0\t    0\t    0\t    0\t      64.%\nsr\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    1\t    0\t    0\t    0\t   16\t    1\t    0\t    0\t    0\t    5\t   34\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    7\t    0\t    0\t    1\t    0\t    0\t    0\t    9\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t      42.%\nnl\t    0\t    0\t    4\t    0\t    0\t    4\t    0\t    1\t    0\t    2\t    4\t    0\t    0\t    2\t    1\t    0\t    0\t    0\t   63\t    0\t    3\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    2\t    0\t    4\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      64.%\npt\t    0\t    0\t    2\t    3\t    0\t    1\t    0\t   12\t    3\t    2\t    0\t    0\t    1\t    2\t    1\t   17\t    0\t    0\t    0\t   41\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    2\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    6\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      41.%\nno\t    0\t    0\t    1\t    0\t    0\t    5\t    0\t    0\t    3\t    0\t    2\t    0\t    1\t    0\t    3\t    0\t    0\t    0\t    0\t    2\t   82\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    1\t    0\t    2\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    1\t    0\t    0\t    0\t    0\t    2\t   10\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    4\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      66.%\nlo\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   72\t    0\t    0\t    0\t    0\t    0\t    0\t    4\t    0\t    0\t    0\t    1\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    5\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      80.%\ntr\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    1\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t   46\t    0\t    1\t    1\t    0\t    0\t    0\t    1\t    0\t    2\t    0\t    0\t    1\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t      75.%\nne\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   93\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   11\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   16\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      77.%\nlv\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    3\t    2\t    1\t    0\t    0\t    3\t    1\t    2\t    0\t    0\t    0\t    1\t    2\t    0\t    0\t    1\t    0\t   62\t    0\t    1\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t      71.%\nsi\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    1\t    0\t    0\t    1\t    6\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t   77\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      86.%\nlt\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    3\t    0\t   22\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t      59.%\npa\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    1\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    1\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t   79\t    0\t    0\t    0\t    0\t    5\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      84.%\nth\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t  105\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t      90.%\nsl\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    3\t    4\t    0\t    0\t    0\t    0\t    1\t    4\t    0\t    0\t    0\t    0\t    2\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t   88\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    9\t    0\t    0\t    1\t    0\t    0\t    0\t   10\t    0\t    0\t    0\t    1\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t      66.%\nte\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    1\t    0\t    1\t    2\t    0\t    1\t    0\t    2\t    1\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t   92\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      84.%\nis\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    7\t    2\t    1\t    0\t    1\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    4\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    1\t    0\t   51\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t      64.%\nhi-Latn\t    0\t    0\t    6\t    0\t    0\t    1\t    1\t    1\t    2\t    1\t    1\t    0\t    1\t    0\t    9\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    8\t    0\t    3\t    0\t    1\t   52\t    0\t    2\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    1\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t      51.%\nta\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   95\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t      96.%\nfr\t    0\t    0\t    3\t    0\t    0\t    5\t    0\t    3\t    1\t    0\t    2\t    0\t    0\t    4\t    4\t    1\t    0\t    0\t    6\t    6\t    2\t    0\t    0\t    0\t    1\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    2\t    0\t   55\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    1\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t      53.%\nhy\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t  126\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t      98.%\nmr\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   12\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   51\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    7\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      71.%\nps\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t   80\t    0\t    0\t    0\t    0\t    0\t   10\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    1\t    3\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t   12\t      71.%\nhr\t    0\t    0\t    0\t    2\t    1\t    0\t    0\t    3\t    0\t    3\t    0\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    1\t    1\t    1\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t   20\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t   59\t    0\t    0\t    0\t    0\t    0\t    0\t   41\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    4\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      41.%\nbn\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    3\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t   96\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      90.%\nbo\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   50\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    6\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t      83.%\nht\t    0\t    0\t    6\t    2\t    0\t    1\t    0\t    3\t    0\t    0\t    1\t    0\t    0\t    0\t    4\t    2\t    0\t    0\t    3\t    1\t    2\t    1\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t   44\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      55.%\nhu\t    0\t    0\t    1\t    1\t    0\t    1\t    0\t    0\t    3\t    1\t    0\t    0\t    0\t    0\t    2\t    1\t    0\t    0\t    0\t    2\t    0\t    0\t    2\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t   56\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    3\t    0\t    2\t    0\t    4\t    0\t    0\t    0\t    0\t    0\t    0\t      65.%\nfa\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    0\t   97\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    5\t    0\t    0\t    0\t    0\t    0\t    0\t    5\t      85.%\nhi\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t   19\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    3\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t  120\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      81.%\nbs\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    3\t    3\t    0\t    1\t    0\t    2\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t   13\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t   46\t    0\t    0\t    0\t    0\t    0\t    0\t   60\t    1\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      43.%\ndv\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    4\t    2\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   90\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      90.%\nfi\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    1\t    1\t    0\t    0\t    0\t    5\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t   86\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      86.%\nda\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    1\t    1\t    1\t    0\t    0\t    2\t    0\t   20\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   14\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    4\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      28.%\nja\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   64\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t      91.%\nhe\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t  135\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      95.%\nka\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    4\t    0\t    1\t    0\t    0\t    0\t    0\t    1\t    1\t    0\t    0\t    0\t    0\t   97\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      89.%\ntl\t    0\t    0\t    4\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    1\t   15\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   27\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t      50.%\nckb\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   72\t    0\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    2\t    0\t    0\t    4\t      82.%\nml\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   84\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t      98.%\nko\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    1\t    0\t    0\t    0\t    0\t   44\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t      91.%\nkn\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    1\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   85\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      95.%\nkm\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    4\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   88\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      93.%\nur\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    1\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t   18\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    2\t    0\t    0\t   50\t    0\t    0\t    0\t    2\t    1\t    0\t    0\t    0\t    0\t    0\t    5\t      55.%\nsk\t    0\t    0\t    0\t    1\t    0\t    1\t    1\t    2\t    0\t   17\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    1\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t   73\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    0\t    0\t      64.%\nzh-CN\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    4\t    0\t    5\t    0\t    0\t   24\t    0\t    0\t    0\t    0\t   21\t    0\t    1\t    0\t    0\t      42.%\nde\t    0\t    0\t    2\t    0\t    0\t    1\t    0\t    1\t    3\t    1\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    4\t    0\t    1\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    1\t    0\t    3\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   91\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      76.%\nar\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t   14\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t   98\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t      85.%\npl\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    1\t    0\t    1\t    1\t    3\t    1\t    0\t    0\t    2\t    2\t    0\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   62\t    0\t    0\t    0\t    0\t    0\t    0\t      72.%\nuk\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    8\t    0\t    0\t    0\t    0\t   19\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   33\t    0\t    0\t    0\t    0\t    0\t      53.%\nzh-TW\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    3\t    0\t    0\t    0\t    0\t    0\t    7\t    0\t    9\t    0\t    0\t   14\t    1\t    0\t    0\t    0\t   31\t    0\t    0\t    0\t    0\t      44.%\nug\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    3\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t   33\t    0\t    0\t    0\t      86.%\nmy\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t  103\t    0\t    0\t      96.%\nor\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    4\t    0\t      80.%\nsd\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    2\t    0\t    0\t    0\t    0\t    0\t    7\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    1\t    0\t    0\t    0\t    1\t    2\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t    0\t  144\t      91.%\n')
+========================================
+('Best validation set mean loss:', 0.9554154276847839)
+========================================
+('Test set mean loss:', 0.9736815690994263)
+========================================
+('Best validation set accuracy:', 0.7484894259818731)
+========================================
+('Test set accuracy:', 0.7444940476190476)
+========================================
+('Precision:', [0.9747899159663865, 0.991304347826087, 0.5408163265306123, 0.5866666666666667, 0.9537037037037037, 0.6103896103896104, 0.9137931034482759, 0.7247706422018348, 0.7024793388429752, 0.5806451612903226, 0.8802816901408451, 0.7868852459016393, 0.6333333333333333, 0.6836734693877551, 0.7846153846153846, 0.528, 0.6428571428571429, 0.425, 0.6494845360824743, 0.41836734693877553, 0.6612903225806451, 0.8, 0.7540983606557377, 0.775, 0.7126436781609196, 0.8651685393258427, 0.5945945945945946, 0.8404255319148937, 0.9051724137931034, 0.6666666666666666, 0.8440366972477065, 0.6455696202531646, 0.5148514851485149, 0.9693877551020408, 0.5339805825242718, 0.984375, 0.7183098591549296, 0.7142857142857143, 0.4125874125874126, 0.9056603773584906, 0.8333333333333334, 0.5569620253164557, 0.6511627906976745, 0.8584070796460177, 0.8108108108108109, 0.43795620437956206, 0.9, 0.86, 0.2857142857142857, 0.9142857142857143, 0.9574468085106383, 0.8981481481481481, 0.5, 0.8275862068965517, 0.9882352941176471, 0.9166666666666666, 0.9550561797752809, 0.9361702127659575, 0.5555555555555556, 0.6460176991150443, 0.42105263157894735, 0.7647058823529411, 0.8521739130434782, 0.7294117647058823, 0.532258064516129, 0.44285714285714284, 0.868421052631579, 0.9626168224299065, 0.8, 0.9171974522292994])
+========================================
+('Recall:', [0.9830508474576272, 1.0, 0.5096153846153846, 0.6567164179104478, 0.9626168224299065, 0.5465116279069767, 0.8983050847457628, 0.5302013422818792, 0.6967213114754098, 0.6428571428571429, 0.8116883116883117, 0.6956521739130435, 0.6229508196721312, 0.67, 0.5125628140703518, 0.5641025641025641, 0.6631578947368421, 0.576271186440678, 0.6631578947368421, 0.45054945054945056, 0.5857142857142857, 0.9, 0.9019607843137255, 0.75, 0.6888888888888889, 0.9166666666666666, 0.7096774193548387, 0.8144329896907216, 0.875, 0.5866666666666667, 0.9583333333333334, 0.7083333333333334, 0.45614035087719296, 0.9895833333333334, 0.6179775280898876, 0.9692307692307692, 0.7727272727272727, 0.9090909090909091, 0.4013605442176871, 0.9696969696969697, 0.9090909090909091, 0.6875, 0.7272727272727273, 0.7461538461538462, 0.8391608391608392, 0.43478260869565216, 0.9574468085106383, 0.7543859649122807, 0.5, 0.8767123287671232, 0.9712230215827338, 1.0, 0.5294117647058824, 0.8888888888888888, 1.0, 0.7333333333333333, 1.0, 0.6518518518518519, 0.78125, 0.6822429906542056, 0.5333333333333333, 0.7459016393442623, 0.9158878504672897, 0.6966292134831461, 0.7021276595744681, 0.47692307692307695, 0.9428571428571428, 0.9809523809523809, 0.8, 0.8470588235294118])
+========================================
+('F1 score:', [0.9789029535864979, 0.9956331877729258, 0.5247524752475247, 0.619718309859155, 0.958139534883721, 0.5766871165644172, 0.9059829059829059, 0.6124031007751939, 0.6995884773662552, 0.6101694915254238, 0.8445945945945946, 0.7384615384615385, 0.628099173553719, 0.6767676767676768, 0.6200607902735562, 0.5454545454545455, 0.6528497409326425, 0.48920863309352514, 0.65625, 0.43386243386243384, 0.6212121212121212, 0.8470588235294118, 0.8214285714285715, 0.7622950819672132, 0.7005649717514124, 0.8901734104046243, 0.6470588235294118, 0.8272251308900525, 0.8898305084745763, 0.6241134751773049, 0.8975609756097562, 0.6754966887417219, 0.48372093023255813, 0.9793814432989691, 0.5729166666666666, 0.9767441860465116, 0.7445255474452555, 0.8, 0.40689655172413797, 0.9365853658536586, 0.8695652173913043, 0.6153846153846154, 0.6871165644171779, 0.7983539094650205, 0.8247422680412371, 0.43636363636363634, 0.9278350515463918, 0.8037383177570094, 0.36363636363636365, 0.8951048951048951, 0.9642857142857143, 0.9463414634146341, 0.5142857142857143, 0.8571428571428572, 0.9940828402366864, 0.8148148148148148, 0.9770114942528736, 0.7685589519650656, 0.6493506493506493, 0.6636363636363636, 0.47058823529411764, 0.7551867219917013, 0.8828828828828829, 0.7126436781609194, 0.6055045871559632, 0.45925925925925926, 0.904109589041096, 0.9716981132075471, 0.8000000000000002, 0.8807339449541285])
+========================================
+('Epochs trained:', 35)
+========================================
+('Total batches trained:', 1803)
+========================================
+System parameters used:
+{'batch_size_embed': 100,
+ 'batch_size_rnn': 1000,
+ 'can_use_live_tweets': False,
+ 'create_splitted_data_files': True,
+ 'cuda_is_avail': False,
+ 'embed_model_checkpoint_rel_path': '../data/save/embed_model_checkpoint.pth',
+ 'embed_weights_rel_path': '../data/save/embed_weights.txt',
+ 'eval_every_num_batches_embed': 10000,
+ 'eval_every_num_batches_rnn': 53,
+ 'eval_test_set': True,
+ 'fetch_only_first_x_tweets': inf,
+ 'fetch_only_langs': None,
+ 'hidden_size_rnn': 100,
+ 'initial_lr_embed': 0.025,
+ 'initial_lr_rnn': 0.01,
+ 'input_rt_data_rel_path': '../data/input_data/original/uniformly_sampled_dl.csv',
+ 'input_tr_va_te_data_rel_path': '../data/input_data/original/recall_oriented_dl.csv',
+ 'is_bidirectional': True,
+ 'lr_decay_factor_embed': 0.1,
+ 'lr_decay_factor_rnn': 0.1,
+ 'max_context_window_size': 3,
+ 'max_eval_checks_not_improved_embed': 10,
+ 'max_eval_checks_not_improved_rnn': 10,
+ 'max_num_epochs_embed': inf,
+ 'max_num_epochs_rnn': inf,
+ 'min_char_frequency': 2,
+ 'num_layers_rnn': 1,
+ 'num_neg_samples': 5,
+ 'out_te_data_rel_path': '../data/input_data/original_splitted/test.csv',
+ 'out_tr_data_rel_path': '../data/input_data/original_splitted/training.csv',
+ 'out_va_data_rel_path': '../data/input_data/original_splitted/validation.csv',
+ 'print_embed_model_checkpoint': None,
+ 'print_embed_testing': False,
+ 'print_model_checkpoint_embed_weights': None,
+ 'print_rnn_model_checkpoint': None,
+ 'rnn_model_checkpoint_rel_path': '../data/save/rnn_model_checkpoint.pth',
+ 'run_terminal': False,
+ 'sampling_table_min_char_count': 1,
+ 'sampling_table_specified_size_cap': inf,
+ 'split_shuffle_seed': 42,
+ 'tr_va_te_split_ratios': [0.8, 0.1, 0.1],
+ 'train_embed': False,
+ 'train_rnn': True,
+ 'trained_embed_weights_rel_path': '../data/save/trained/embed_weights.txt',
+ 'trained_model_checkpoint_rel_path': '../data/save/trained/rnn_model_checkpoint.pth',
+ 'weight_decay_rnn': 1e-05}
+========================================
+('Model checkpoint saved to file:', '../data/save/rnn_model_checkpoint.pth')
+Both embedding weights and model checkpoint path required!
