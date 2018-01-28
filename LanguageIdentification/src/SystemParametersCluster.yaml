@@ -12,7 +12,7 @@ print_rnn_model_checkpoint: null #"../data/save/trained/rnn_checkpoint_recall_al
 print_embed_model_checkpoint: null #"../data/save/trained/embed_checkpoint_uniformlyrecallmerged_all_valmloss0.48_19.01.2018.pth"   # path for the embedding model to be printed; set to 'null' to disable
 
 # Data paths
-input_tr_va_te_data_rel_path: "../data/input_data/original/uniformly_sampled_dl.csv"   # training, validation and test set files will be generated from this file
+input_tr_va_te_data_rel_path: "../data/input_data/original/recall_oriented_dl.csv"   # training, validation and test set files will be generated from this file
 input_rt_data_rel_path: "../data/input_data/original/recall_oriented_dl.csv"  # real test set file
 
 out_tr_data_rel_path: "../data/input_data/original_splitted/training.csv"   # generated training set file
@@ -40,10 +40,10 @@ sampling_table_specified_size_cap: .inf                     # caps specified sam
                                                             # note: this is only the specified size, the actual table size may slightly deviate due to roundings in the calculation
 max_context_window_size: 3                                  # maximum context window for sampling context characters
 num_neg_samples: 5                                          # number of negative samples, i.e. number of 0-positions that will be used to train the Skip-Gram
-batch_size_embed: 100                                       # number of target-context pairs in one batch
+batch_size_embed: 10                                       # number of target-context pairs in one batch
 max_eval_checks_not_improved_embed: 10                      # maximum number of evaluation checks at which the loss may not improve until the training is stopped
 max_num_epochs_embed: .inf                                  # maximum number of epochs before the training is stopped (set to '.inf' to not stop based on the number of epochs)
-eval_every_num_batches_embed: 1000                          # do an evaluation check on the validation set every eval_every_num_batches_embed batches
+eval_every_num_batches_embed: 10000                          # do an evaluation check on the validation set every eval_every_num_batches_embed batches
 lr_decay_factor_embed: 0.1                                  # factor which is multiplied with the learning rate when the decay is active, which is the case every not improved evaluation check >= half of max_eval_checks_not_improved_embed
 initial_lr_embed: 0.025                                     # initial learning rate
 
@@ -54,7 +54,7 @@ is_bidirectional: True                                      # if True: RNN (GRU)
 batch_size_rnn: 10                                          # number of tweets in one batch
 max_eval_checks_not_improved_rnn: 10                        # maximum number of evaluation checks at which the loss may not improve until the training is stopped
 max_num_epochs_rnn: .inf                                    # maximum number of epochs before the training is stopped (set to '.inf' to not stop based on the number of epochs)
-eval_every_num_batches_rnn: 5481                            # do an evaluation check on the validation set every eval_every_num_batches_embed batches
+eval_every_num_batches_rnn: 5310                            # do an evaluation check on the validation set every eval_every_num_batches_embed batches
 lr_decay_factor_rnn: 0.1                                    # factor which is multiplied with the learning rate when the decay is active, which is the case every not improved evaluation check >= half of max_eval_checks_not_improved_embed
 initial_lr_rnn: 0.01                                        # initial learning rate
 weight_decay_rnn: 0.00001                                   # weight decay (L2 penalty) for Adam
