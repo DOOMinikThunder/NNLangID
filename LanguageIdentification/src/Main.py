@@ -132,7 +132,7 @@ def main():
 
         rnn_calculation = RNNCalculation.RNNCalculation(system_param_dict)
         
-        # train RNN model (mono- or bidirectional GRU) with character embeddings;
+        # train RNN model (uni- or bidirectional GRU) with character embeddings;
         # the loss-based best model checkpoint is saved to file
         if (system_param_dict['train_rnn']):
             rnn_calculation.train_rnn(data_sets=[train_set_indexed, val_set_indexed],
