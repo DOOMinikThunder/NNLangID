@@ -1,6 +1,9 @@
 # NNLangID :earth_americas::speech_balloon:
 Project for neural network-based tweet language identification.
 
+## Architecture Overview
+![](ArchitectureOverview.png "Simplified overview of the general architecture.")
+
 ## Getting Started
 * Fetch tweet data from Twitter via the `TweetRetriever.py` and place it into `data/input_data/original` (already done for the [Twitter blog post](https://blog.twitter.com/engineering/en_us/a/2015/evaluating-language-identification-performance.html) data this project is based on).
 * Run `Main.py` for the main procedure. Depending on `use_cluster_params` it reads in one of the two YAML settings files, which contain all user parameters.
