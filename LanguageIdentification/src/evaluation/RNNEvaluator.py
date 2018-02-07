@@ -81,26 +81,26 @@ class RNNEvaluator(object):
         """
         predictions = []
         target_list = []
-        acc_loss = []
+        accumulated_loss = []
         for input, target in zip(input_data, target_data):
             hidden = self.model.initHidden()
             output, hidden = self.model(input, hidden)
             loss = self.model.criterion(output, target)
-            lang_predictions = np.zeros([output.size()[1]])
+            lang_prediction_probs = np.zeros([output.size()[1]])
             pred_size = output.size()[0]
             for pred in output:
-                for i in range(len(lang_predictions)):
-                    lang_predictions[i] += np.exp(pred[i].data[0])
-            lang_predictions = [lang_mean / pred_size for lang_mean in lang_predictions]
-            languages_probs_and_idx = [(lang_predictions[i], i) for i in range(len(lang_predictions))]
+                for i in range(len(lang_prediction_probs)):
+                    lang_prediction_probs[i] += np.exp(pred[i].data[0])
+            lang_prediction_probs = [lang_mean / pred_size for lang_mean in lang_prediction_probs]
+            languages_probs_and_idx = [(lang_prediction_probs[i], i) for i in range(len(lang_prediction_probs))]
             languages_probs_and_idx.sort(reverse=True)
             lang_prediction = [languages_probs_and_idx[i] for i in
                              range(min(n_highest_probs, len(languages_probs_and_idx)))]
 
-            acc_loss.append(loss)
+            accumulated_loss.append(loss)
             target_list.append(target.data[0])
             predictions.append(lang_prediction[0][1])
-        mean_loss = sum(acc_loss) / float(len(acc_loss))
+        mean_loss = sum(accumulated_loss) / float(len(accumulated_loss))
         pred_true = 0
         for pred, target in zip(predictions, target_list):
             pred_true += int(pred == target)
@@ -126,7 +126,7 @@ class RNNEvaluator(object):
             return -1
         predictions = []
         target_list = []
-        acc_loss = []
+        accumulated_loss = []
         for input, target in zip(input_data, target_data):
             hidden = self.model.initHidden()
             output, hidden = self.model(input, hidden)
@@ -134,20 +134,20 @@ class RNNEvaluator(object):
             loss = self.model.criterion(output, target)
 #            else:
 #                loss = 0
-            lang_predictions = np.zeros([output.size()[1]])
+            lang_prediction_probs = np.zeros([output.size()[1]])
             pred_size = output.size()[0]
             for pred in output:
-                for i in range(len(lang_predictions)):
-                    lang_predictions[i] += np.exp(pred[i].data[0])
-            lang_predictions = [lang_mean / pred_size for lang_mean in lang_predictions]
-            languages_probs_and_idx = [(lang_predictions[i], i) for i in range(len(lang_predictions))]
+                for i in range(len(lang_prediction_probs)):
+                    lang_prediction_probs[i] += np.exp(pred[i].data[0])
+            lang_prediction_probs = [lang_mean / pred_size for lang_mean in lang_prediction_probs]
+            languages_probs_and_idx = [(lang_prediction_probs[i], i) for i in range(len(lang_prediction_probs))]
             languages_probs_and_idx.sort(reverse=True)
             lang_prediction = [languages_probs_and_idx[i] for i in range(min(n_highest_probs, len(languages_probs_and_idx)))]
             
-            acc_loss.append(loss)
+            accumulated_loss.append(loss)
             target_list.append(target.data[0])
             predictions.append(lang_prediction[0][1])
-        mean_loss = sum(acc_loss) / float(len(acc_loss))
+        mean_loss = sum(accumulated_loss) / float(len(accumulated_loss))
         return mean_loss.data[0], predictions, target_list
 
     def evaluate_single_date(self, input, n_highest_probs, target=None):
@@ -168,8 +168,8 @@ class RNNEvaluator(object):
             loss = self.model.criterion(output, target)
         else:
             loss = 0
-        lang_prediction = self.__evaluate_prediction(output, n_highest_probs)
-        return lang_prediction, loss
+        lang_prediction_probs = self.__evaluate_prediction(output, n_highest_probs)
+        return lang_prediction_probs, loss
     
     def __evaluate_prediction(self, prediction, n_highest_probs):
         """
@@ -181,13 +181,13 @@ class RNNEvaluator(object):
         Returns:
             highest_probs: list of highest probability-language pairs for n languages
         """
-        lang_predictions = np.zeros([prediction.size()[1]])
+        lang_prediction_probs = np.zeros([prediction.size()[1]])
         pred_size = prediction.size()[0]
         for pred in prediction:
-            for i in range(len(lang_predictions)):
-                lang_predictions[i] += np.exp(pred[i].data[0])
-        lang_predictions = [lang_mean / pred_size for lang_mean in lang_predictions]
-        languages_probs_and_idx = [(lang_predictions[i], i) for i in range(len(lang_predictions))]
+            for i in range(len(lang_prediction_probs)):
+                lang_prediction_probs[i] += np.exp(pred[i].data[0])
+        lang_prediction_probs = [lang_mean / pred_size for lang_mean in lang_prediction_probs]
+        languages_probs_and_idx = [(lang_prediction_probs[i], i) for i in range(len(lang_prediction_probs))]
         languages_probs_and_idx.sort(reverse=True)
         highest_probs = [languages_probs_and_idx[i] for i in range(min(n_highest_probs, len(languages_probs_and_idx)))]
         return highest_probs
@@ -258,7 +258,7 @@ class RNNEvaluator(object):
             precision: list of precision for each language
         """
         true_positives = self.__true_positives(confusion_matrix)
-        false_positives = self.__false_positive(confusion_matrix)
+        false_positives = self.__false_positives(confusion_matrix)
         precision = []
         for tp, fp in zip(true_positives, false_positives):
             try:
@@ -280,27 +280,27 @@ class RNNEvaluator(object):
         """
         return [confusion_matrix[i][i] for i in range(len(confusion_matrix))]
 
-    def __false_positive(self, confusion_matrix):
+    def __false_negatives(self, confusion_matrix):
         """
-        false positive equals the sum of one row of the confusion matrix
+        false negatives equals the sum of one row of the confusion matrix, except i==j
         
         Args:
             confusion_matrix: detailed matrix of how each tweet was evaluated
 
         Returns:
-            false_positives: list of all false_positives for each language(row)
+            false_negatives: list of all false_negatives for each language(row)
         """
         return [confusion_matrix[i][:i] + confusion_matrix[i][i + 1:] for i in range(len(confusion_matrix))]
 
-    def __false_negatives(self, confusion_matrix):
+    def __false_positives(self, confusion_matrix):
         """
-        false negative equals the sum one column of the confusion matrix
+        false positives equals the sum one column of the confusion matrix, , except i==j
         
         Args:
             confusion_matrix: detailed matrix of how each tweet was evaluated
 
         Returns:
-            false_negatives: list of all false_negatives for each language(column)
+            false_positives: list of all false_positives for each language(column)
         """
         matrix_in_columns = list(zip(*confusion_matrix))
         return [matrix_in_columns[i][:i] + matrix_in_columns[i][i + 1:] for i in range(len(matrix_in_columns))]
