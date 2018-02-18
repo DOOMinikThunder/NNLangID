@@ -12,8 +12,8 @@ print_rnn_model_checkpoint: null #"../data/save/trained/rnn_checkpoint_recall_al
 print_embed_model_checkpoint: null #"../data/save/trained/embed_checkpoint_uniformlyrecallmerged_all_valmloss0.48_19.01.2018.pth"   # path for the embedding model to be printed; set to 'null' to disable
 
 # Data paths
-input_tr_va_te_data_rel_path: "../data/input_data/original/uniformly_sampled_dl.csv"   # training, validation and test set files will be generated from this file
-input_rt_data_rel_path: "../data/input_data/original/uniformly_sampled_dl.csv"  # real test set file
+input_tr_va_te_data_rel_path: "../data/input_data/original/recall_oriented_dl.csv"   # training, validation and test set files will be generated from this file
+input_rt_data_rel_path: "../data/input_data/original/recall_oriented_dl.csv"  # real test set file
 
 out_tr_data_rel_path: "../data/input_data/original_splitted/training.csv"   # generated training set file
 out_va_data_rel_path: "../data/input_data/original_splitted/validation.csv"     # generated validation set file
