@@ -25,4 +25,3 @@ Project developed by Alexander Heilig, Dominik Sauter and Tabea Kiupel in the co
 
 ## License
 Licensed unter the MIT license (see [LICENSE](LICENSE) file for more details).
-* Enjoy!
