@@ -1,6 +1,9 @@
 # NNLangID :earth_americas::speech_balloon:
 Project for neural network-based tweet language identification. See [project report](TweetLanguageIdentification_D.Sauter-A.Heilig-T.Kiupel_rev1.pdf) for more details.
 
+## Terminal Screenshot
+![](TerminalManual.PNG "Classified manually entered text.")
+
 ## Architecture Overview
 ![](ArchitectureOverview.png "Simplified overview of the general architecture.")
 
